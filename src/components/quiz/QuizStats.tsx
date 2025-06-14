@@ -13,45 +13,55 @@ interface QuizStatsProps {
 
 const QuizStats = ({ score, correctAnswers, difficulty }: QuizStatsProps) => {
   return (
-    <Card className="bg-white/80 backdrop-blur-sm shadow-lg rounded-2xl border-0">
-      <CardContent className="p-4 md:p-6">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <Card className="bg-white/90 backdrop-blur-sm shadow-lg rounded-xl sm:rounded-2xl border-0">
+      <CardContent className="p-3 sm:p-4 lg:p-6">
+        
+        {/* Mobile: Stack vertically, Desktop: Grid horizontal */}
+        <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 lg:gap-6">
+          
           {/* Score */}
-          <div className="flex items-center justify-center sm:justify-start space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-              <Target className="w-5 h-5 text-white" />
+          <div className="flex items-center justify-between sm:justify-center sm:flex-col sm:text-center space-x-3 sm:space-x-0 sm:space-y-2">
+            <div className="flex items-center space-x-3 sm:flex-col sm:space-x-0 sm:space-y-2">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                <Target className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              </div>
+              <div className="sm:text-center">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Score</p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Score</p>
-              <p className="text-xl font-bold text-blue-600">{score}</p>
-            </div>
+            <p className="text-lg sm:text-xl font-bold text-blue-600">{score}</p>
           </div>
 
           {/* Bonnes réponses */}
-          <div className="flex items-center justify-center sm:justify-start space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
-              <Award className="w-5 h-5 text-white" />
+          <div className="flex items-center justify-between sm:justify-center sm:flex-col sm:text-center space-x-3 sm:space-x-0 sm:space-y-2">
+            <div className="flex items-center space-x-3 sm:flex-col sm:space-x-0 sm:space-y-2">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                <Award className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              </div>
+              <div className="sm:text-center">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Bonnes réponses</p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Bonnes réponses</p>
-              <p className="text-xl font-bold text-green-600">{correctAnswers}</p>
-            </div>
+            <p className="text-lg sm:text-xl font-bold text-green-600">{correctAnswers}</p>
           </div>
 
           {/* Difficulté */}
-          <div className="flex items-center justify-center sm:justify-start space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
-              <Trophy className="w-5 h-5 text-white" />
+          <div className="flex items-center justify-between sm:justify-center sm:flex-col sm:text-center space-x-3 sm:space-x-0 sm:space-y-2">
+            <div className="flex items-center space-x-3 sm:flex-col sm:space-x-0 sm:space-y-2">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              </div>
+              <div className="sm:text-center">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Niveau</p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Niveau</p>
-              <Badge 
-                className={`${getDifficultyColor(difficulty)} text-xs font-semibold px-3 py-1 rounded-full`}
-              >
-                {getDifficultyLabel(difficulty)}
-              </Badge>
-            </div>
+            <Badge 
+              className={`${getDifficultyColor(difficulty)} text-xs font-semibold px-2 sm:px-3 py-1 rounded-full`}
+            >
+              {getDifficultyLabel(difficulty)}
+            </Badge>
           </div>
+          
         </div>
       </CardContent>
     </Card>
