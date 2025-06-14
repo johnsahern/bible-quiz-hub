@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -302,7 +301,7 @@ export const useMultiplayerRoom = (roomId?: string) => {
         if (roomData.status === 'playing' && roomData.questions && roomData.current_question !== null) {
           const questions = Array.isArray(roomData.questions) ? roomData.questions : [];
           if (questions.length > roomData.current_question) {
-            setCurrentQuestion(questions[roomData.current_question] as QuizQuestion);
+            setCurrentQuestion(questions[roomData.current_question] as unknown as QuizQuestion);
           }
         }
 
@@ -347,7 +346,7 @@ export const useMultiplayerRoom = (roomId?: string) => {
             if (newRoom.status === 'playing' && newRoom.questions && newRoom.current_question !== null) {
               const questions = Array.isArray(newRoom.questions) ? newRoom.questions : [];
               if (questions.length > newRoom.current_question) {
-                setCurrentQuestion(questions[newRoom.current_question] as QuizQuestion);
+                setCurrentQuestion(questions[newRoom.current_question] as unknown as QuizQuestion);
               }
             }
           }
