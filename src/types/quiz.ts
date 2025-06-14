@@ -101,4 +101,6 @@ export interface QuizResult {
   correctAnswers: number;
   timeSpent: number;
   badge: string;
+  difficulty: DifficultyLevel;
+  theme: QuizTheme;
 }

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { getBadge, calculateQuestionPoints, calculateTimeBonus } from '@/utils/quizUtils';
-import { DifficultyLevel } from '@/types/quiz';
+import { DifficultyLevel, QuizConfig, QuizResult, QuizTheme } from '@/types/quiz';
 import QuizStats from '@/components/quiz/QuizStats';
 import QuizLoadingState from '@/components/quiz/QuizLoadingState';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,22 +14,6 @@ interface Question {
   question: string;
   answers: string[];
   correctAnswer: number;
-}
-
-interface QuizConfig {
-  theme: string;
-  difficulty: DifficultyLevel;
-  questionCount: number;
-}
-
-interface QuizResult {
-  score: number;
-  correctAnswers: number;
-  totalQuestions: number;
-  timeSpent: number;
-  badge: string | null;
-  difficulty: DifficultyLevel;
-  theme: string;
 }
 
 interface QuizGameProps {
@@ -152,7 +136,7 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
       correctAnswers,
       totalQuestions: questions.length,
       timeSpent,
-      badge,
+      badge: badge || '',
       difficulty: config.difficulty,
       theme: config.theme
     };
