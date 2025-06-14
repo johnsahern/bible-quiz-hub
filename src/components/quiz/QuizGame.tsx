@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Clock, CheckCircle, XCircle } from 'lucide-react';
-import { QuizConfig, QuizQuestion, QuizResult } from '@/pages/SoloQuiz';
+import { QuizConfig, QuizQuestion, QuizResult } from '@/types/quiz';
 
 interface QuizGameProps {
   config: QuizConfig;

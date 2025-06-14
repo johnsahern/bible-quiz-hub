@@ -1,9 +1,8 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Trophy, Clock, Target, RotateCcw, Home, Share2 } from 'lucide-react';
-import { QuizResult } from '@/pages/SoloQuiz';
+import { QuizResult } from '@/types/quiz';
 
 interface QuizResultsProps {
   result: QuizResult;
