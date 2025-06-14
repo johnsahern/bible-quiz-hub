@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { getBadge, calculateQuestionPoints, calculateTimeBonus } from '@/utils/quizUtils';
 import { DifficultyLevel } from '@/types/quiz';
 import QuizStats from '@/components/quiz/QuizStats';
+import QuizLoadingState from '@/components/quiz/QuizLoadingState';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -44,27 +45,49 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(45);
   const [timeUp, setTimeUp] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
 
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        // Fetch the questions from your API or data source based on the config
-        const response = await fetch(`/api/quiz?theme=${config.theme}&difficulty=${config.difficulty}&questionCount=${config.questionCount}`);
-        const data = await response.json();
+        setIsLoading(true);
+        setError(null);
 
-        if (data && Array.isArray(data)) {
-          setQuestions(data);
-        } else {
-          console.error('Invalid quiz data format:', data);
-          // Handle the error appropriately, maybe navigate back or show a message
-          navigate('/');
+        console.log('Generating quiz questions with config:', config);
+
+        const { data, error } = await supabase.functions.invoke('generate-quiz-questions', {
+          body: {
+            theme: config.theme,
+            difficulty: config.difficulty,
+            questionCount: config.questionCount
+          }
+        });
+
+        if (error) {
+          console.error('Error calling edge function:', error);
+          throw new Error(error.message || 'Failed to generate quiz questions');
         }
+
+        if (!data || !Array.isArray(data.questions)) {
+          console.error('Invalid response format:', data);
+          throw new Error('Invalid response format from quiz generator');
+        }
+
+        console.log('Questions generated successfully:', data.questions);
+        setQuestions(data.questions);
+        setIsLoading(false);
       } catch (error) {
         console.error('Error fetching quiz questions:', error);
-        // Handle the error appropriately
-        navigate('/');
+        setError(error instanceof Error ? error.message : 'Failed to load quiz questions');
+        setIsLoading(false);
+        
+        // Navigate back to setup after a delay
+        setTimeout(() => {
+          navigate('/quiz-solo');
+        }, 3000);
       }
     };
 
@@ -74,18 +97,18 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
   useEffect(() => {
     if (timeLeft <= 0) {
       setTimeUp(true);
-      handleAnswerSelect(-1); // Auto-submit as incorrect
+      handleAnswerSelect(-1);
       return;
     }
 
-    if (questions.length === 0) return;
+    if (questions.length === 0 || isLoading) return;
 
     const timerId = setInterval(() => {
       setTimeLeft(prev => prev - 1);
     }, 1000);
 
     return () => clearInterval(timerId);
-  }, [timeLeft, currentQuestion, questions.length]);
+  }, [timeLeft, currentQuestion, questions.length, isLoading]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -101,7 +124,6 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
     
     if (correct) {
       setCorrectAnswers(prev => prev + 1);
-      // Calculate points with time bonus
       const basePoints = calculateQuestionPoints(config.difficulty);
       const bonus = calculateTimeBonus(timeLeft, basePoints);
       const questionScore = basePoints + bonus;
@@ -135,7 +157,6 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
       theme: config.theme
     };
 
-    // Save to database if user is authenticated
     if (user) {
       try {
         const { error } = await supabase
@@ -155,7 +176,6 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
           console.error('Error saving quiz result:', error);
         }
 
-        // Check for achievements
         await checkAndAwardAchievements(result);
       } catch (error) {
         console.error('Error saving quiz result:', error);
@@ -213,8 +233,40 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
     }
   };
 
+  if (isLoading) {
+    return <QuizLoadingState config={config} />;
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto mt-8 max-w-2xl">
+        <Card className="bg-white shadow-md rounded-lg">
+          <CardContent className="p-6 text-center">
+            <h2 className="text-xl font-semibold text-red-600 mb-4">Erreur</h2>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <p className="text-sm text-gray-500 mb-4">Redirection vers la configuration...</p>
+            <Button onClick={() => navigate('/quiz-solo')} variant="outline">
+              Retour à la configuration
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (questions.length === 0) {
-    return <div>Chargement des questions...</div>;
+    return (
+      <div className="container mx-auto mt-8 max-w-2xl">
+        <Card className="bg-white shadow-md rounded-lg">
+          <CardContent className="p-6 text-center">
+            <p className="text-gray-600">Aucune question disponible.</p>
+            <Button onClick={() => navigate('/quiz-solo')} className="mt-4">
+              Retour à la configuration
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   const question = questions[currentQuestion];
