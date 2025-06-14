@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -49,7 +50,7 @@ const QuizResults = ({ result, onPlayAgain, onBackToHome }: QuizResultsProps) =>
   };
 
   const handleShare = async () => {
-    const shareText = `J'ai obtenu ${result.correctAnswers}/${result.totalQuestions} bonnes réponses au BibleQuiz+ ! Badge: ${result.badge} 🏆`;
+    const shareText = `J'ai obtenu ${result.correctAnswers}/${result.totalQuestions} bonnes réponses au BibleQuiz+ avec ${result.score} points ! Badge: ${result.badge} 🏆`;
     
     if (navigator.share) {
       try {

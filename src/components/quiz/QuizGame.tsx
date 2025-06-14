@@ -6,7 +6,7 @@ import { AlertCircle } from 'lucide-react';
 import { QuizConfig, QuizQuestion, QuizResult } from '@/types/quiz';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { getBadge } from '@/utils/quizUtils';
+import { getBadge, calculateQuestionPoints, calculateTimeBonus } from '@/utils/quizUtils';
 import QuizLoadingState from './QuizLoadingState';
 import QuizErrorState from './QuizErrorState';
 import QuizProgress from './QuizProgress';
@@ -108,9 +108,21 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
   };
 
   const handleNextQuestion = () => {
+    let questionPoints = 0;
+    
     if (selectedAnswer !== null && selectedAnswer === currentQuestion.correctAnswer) {
       setCorrectAnswers(prev => prev + 1);
-      setScore(prev => prev + (timeLeft > 0 ? timeLeft * 10 : 0));
+      
+      // Calcul des points basé sur la difficulté
+      const basePoints = calculateQuestionPoints(config.difficulty);
+      
+      // Bonus de temps (jusqu'à 50% en plus selon le temps restant)
+      const timeBonus = calculateTimeBonus(timeLeft, basePoints);
+      
+      questionPoints = basePoints + timeBonus;
+      setScore(prev => prev + questionPoints);
+      
+      console.log(`✅ Question correcte! Points: ${basePoints} + bonus temps: ${timeBonus} = ${questionPoints} total`);
     }
 
     setShowResult(true);
@@ -191,7 +203,11 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
         </CardContent>
       </Card>
 
-      <QuizStats score={score} correctAnswers={correctAnswers} />
+      <QuizStats 
+        score={score} 
+        correctAnswers={correctAnswers} 
+        difficulty={config.difficulty}
+      />
     </div>
   );
 };
