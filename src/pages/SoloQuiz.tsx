@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import QuizSetup from '@/components/quiz/QuizSetup';
@@ -13,7 +14,8 @@ const SoloQuiz = () => {
   const [quizConfig, setQuizConfig] = useState<QuizConfig | null>(null);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
 
-  const handleStartQuiz = () => {
+  const handleStartQuiz = (config: QuizConfig) => {
+    setQuizConfig(config);
     setQuizState('playing');
   };
 
@@ -32,8 +34,8 @@ const SoloQuiz = () => {
 
   return (
     <div>
-      {quizState === 'setup' && <QuizSetup onQuizStart={handleStartQuiz} />}
-      {quizState === 'playing' && <QuizGame onQuizComplete={handleQuizComplete} />}
+      {quizState === 'setup' && <QuizSetup onStartQuiz={handleStartQuiz} />}
+      {quizState === 'playing' && quizConfig && <QuizGame config={quizConfig} onComplete={handleQuizComplete} />}
       {quizState === 'results' && <QuizResults result={quizResult} onPlayAgain={handlePlayAgain} onBackToHome={handleBackToHome} />}
     </div>
   );
