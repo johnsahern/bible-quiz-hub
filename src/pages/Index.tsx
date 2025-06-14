@@ -1,20 +1,17 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Book, Play, Users, Bell, User, LogIn, Trophy, Target, Clock, Star, ChevronRight } from 'lucide-react';
+import { Book, Play, Users, User } from 'lucide-react';
 import VerseDuJour from '@/components/VerseDuJour';
 import Navigation from '@/components/Navigation';
 import QuizCard from '@/components/QuizCard';
-import ProgressSection from '@/components/ProgressSection';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
   const [language, setLanguage] = useState('fr');
-  const { user, profile, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   const translations = {
     fr: {
@@ -23,18 +20,6 @@ const Index = () => {
       soloQuiz: "Quiz Personnel",
       multiQuiz: "Quiz Multijoueur",
       readBible: "Lecture Bible",
-      progress: "Ma Progression",
-      dailyVerse: "Verset du Jour",
-      notifications: "Notifications",
-      level: "Niveau",
-      badges: "Badges",
-      points: "Points",
-      login: "Se connecter",
-      profile: "Mon Profil",
-      welcome: "Bienvenue",
-      viewProfile: "Voir le profil",
-      gamesPlayed: "Quiz joués",
-      bestScore: "Meilleur score",
       joinNow: "Rejoignez BibleQuiz+ dès maintenant !",
       createAccount: "Créer un compte gratuit",
       accountDescription: "Créez votre compte pour sauvegarder vos scores, débloquer des achievements et défier vos amis."
@@ -45,18 +30,6 @@ const Index = () => {
       soloQuiz: "Solo Quiz",
       multiQuiz: "Multiplayer Quiz",
       readBible: "Bible Reading",
-      progress: "My Progress",
-      dailyVerse: "Daily Verse",
-      notifications: "Notifications",
-      level: "Level",
-      badges: "Badges",
-      points: "Points",
-      login: "Login",
-      profile: "My Profile",
-      welcome: "Welcome",
-      viewProfile: "View profile",
-      gamesPlayed: "Games played",
-      bestScore: "Best score",
       joinNow: "Join BibleQuiz+ now!",
       createAccount: "Create free account",
       accountDescription: "Create your account to save scores, unlock achievements and challenge your friends."
@@ -82,55 +55,8 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <Navigation language={language} setLanguage={setLanguage} />
       
-      {/* Compact Header Section */}
+      {/* Main Content */}
       <div className="container mx-auto px-4 pt-20 pb-8">
-        {/* Compact Profile Header */}
-        {user ? (
-          <div className="flex items-center justify-between mb-8 bg-white/70 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg border border-white/20">
-            <div className="flex items-center space-x-4">
-              <Avatar className="w-12 h-12 md:w-14 md:h-14 ring-2 ring-blue-200 shadow-md">
-                <AvatarImage src={profile?.avatar_url} />
-                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-bold text-lg">
-                  {profile?.full_name?.[0] || profile?.username?.[0] || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              
-              <div className="space-y-1">
-                <h2 className="text-lg md:text-xl font-bold text-gray-800">
-                  {t.welcome}, {profile?.full_name || profile?.username}!
-                </h2>
-                <div className="flex items-center space-x-3 text-sm">
-                  <div className="flex items-center space-x-1 text-blue-600">
-                    <Trophy className="w-4 h-4" />
-                    <span className="font-semibold">{profile?.total_points || 0}</span>
-                  </div>
-                  <div className="flex items-center space-x-1 text-purple-600">
-                    <Star className="w-4 h-4" />
-                    <span>Niv. {Math.floor((profile?.total_points || 0) / 100) + 1}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <Link to="/profile">
-              <Button variant="outline" size="sm" className="shadow-md hover:shadow-lg transition-all group">
-                <User className="w-4 h-4 mr-2" />
-                {t.profile}
-                <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
-          </div>
-        ) : (
-          <div className="flex justify-end mb-6">
-            <Link to="/auth">
-              <Button variant="outline" size="sm" className="shadow-md hover:shadow-lg transition-all duration-200">
-                <LogIn className="w-4 h-4 mr-2" />
-                {t.login}
-              </Button>
-            </Link>
-          </div>
-        )}
-
         {/* Main Title */}
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-blue-900 mb-4 animate-fade-in">
@@ -173,9 +99,6 @@ const Index = () => {
             delay="0.3s"
           />
         </div>
-
-        {/* Progress Section - Only show if user is logged in */}
-        {user && <ProgressSection language={language} />}
 
         {/* Call to Action for Non-Authenticated Users */}
         {!user && (
