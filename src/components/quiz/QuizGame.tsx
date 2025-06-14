@@ -38,7 +38,7 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
     try {
       setLoading(true);
       setError(null);
-      console.log('🚀 Generating questions with config:', config);
+      console.log('🚀 Generating questions with Gemini, config:', config);
 
       const { data, error } = await supabase.functions.invoke('generate-quiz-questions', {
         body: {
@@ -53,11 +53,11 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
       if (error) {
         console.error('❌ Supabase function error:', error);
         
-        // Messages d'erreur plus explicites
+        // Messages d'erreur plus explicites pour Gemini
         if (error.message?.includes('insufficient_quota') || error.message?.includes('429')) {
-          throw new Error('Quota OpenAI dépassé. Veuillez vérifier votre plan de facturation OpenAI et réessayer plus tard.');
+          throw new Error('Quota Gemini dépassé. Veuillez vérifier votre plan de facturation Gemini et réessayer plus tard.');
         } else if (error.message?.includes('401')) {
-          throw new Error('Clé API OpenAI invalide. Veuillez vérifier votre configuration.');
+          throw new Error('Clé API Gemini invalide. Veuillez vérifier votre configuration.');
         } else {
           throw new Error(`Erreur API: ${error.message}`);
         }
@@ -72,7 +72,7 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
         throw new Error('Aucune question générée');
       }
 
-      console.log('✅ Received questions:', data.questions);
+      console.log('✅ Received questions from Gemini:', data.questions);
       setQuestions(data.questions);
       setLoading(false);
     } catch (error) {
@@ -155,7 +155,7 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
           <CardContent className="p-8 text-center">
             <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
             <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              ✨ Génération de votre quiz personnalisé...
+              ✨ Génération de votre quiz avec Gemini...
             </h2>
             <p className="text-gray-600 mb-2">
               Préparation de {config.questionCount} questions uniques sur <strong>{config.theme}</strong>
@@ -186,7 +186,7 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
             )}
             
             <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              {isQuotaError ? 'Quota OpenAI dépassé' : 'Erreur de génération'}
+              {isQuotaError ? 'Quota Gemini dépassé' : 'Erreur de génération'}
             </h2>
             
             <p className="text-red-600 mb-4">{error}</p>
@@ -194,7 +194,7 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
             {isQuotaError && (
               <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
                 <p className="text-sm text-orange-800">
-                  <strong>Solution :</strong> Vérifiez votre plan de facturation OpenAI ou attendez la réinitialisation de votre quota.
+                  <strong>Solution :</strong> Vérifiez votre plan de facturation Gemini ou attendez la réinitialisation de votre quota.
                 </p>
               </div>
             )}
