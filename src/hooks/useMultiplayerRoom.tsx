@@ -61,7 +61,8 @@ export const useMultiplayerRoom = (roomId?: string) => {
 
       setRoom({
         ...roomData,
-        status: roomData.status as RoomStatus
+        status: roomData.status as RoomStatus,
+        questions: Array.isArray(roomData.questions) ? roomData.questions : []
       });
       setIsHost(true);
       
@@ -72,7 +73,8 @@ export const useMultiplayerRoom = (roomId?: string) => {
 
       return {
         ...roomData,
-        status: roomData.status as RoomStatus
+        status: roomData.status as RoomStatus,
+        questions: Array.isArray(roomData.questions) ? roomData.questions : []
       };
     } catch (err) {
       console.error('Erreur lors de la création de la salle:', err);
@@ -157,7 +159,8 @@ export const useMultiplayerRoom = (roomId?: string) => {
 
       setRoom({
         ...roomData,
-        status: roomData.status as RoomStatus
+        status: roomData.status as RoomStatus,
+        questions: Array.isArray(roomData.questions) ? roomData.questions : []
       });
       setIsHost(roomData.host_id === user.id);
 
@@ -290,13 +293,15 @@ export const useMultiplayerRoom = (roomId?: string) => {
 
         setRoom({
           ...roomData,
-          status: roomData.status as RoomStatus
+          status: roomData.status as RoomStatus,
+          questions: Array.isArray(roomData.questions) ? roomData.questions : []
         });
         setIsHost(roomData.host_id === user.id);
 
         // Charger la question actuelle si le quiz est en cours
         if (roomData.status === 'playing' && roomData.questions && roomData.current_question !== null) {
-          setCurrentQuestion(roomData.questions[roomData.current_question]);
+          const questions = Array.isArray(roomData.questions) ? roomData.questions : [];
+          setCurrentQuestion(questions[roomData.current_question]);
         }
 
         // Charger les joueurs
@@ -332,12 +337,14 @@ export const useMultiplayerRoom = (roomId?: string) => {
             const newRoom = payload.new as any;
             setRoom({
               ...newRoom,
-              status: newRoom.status as RoomStatus
+              status: newRoom.status as RoomStatus,
+              questions: Array.isArray(newRoom.questions) ? newRoom.questions : []
             });
             
             // Mettre à jour la question actuelle
             if (newRoom.status === 'playing' && newRoom.questions && newRoom.current_question !== null) {
-              setCurrentQuestion(newRoom.questions[newRoom.current_question]);
+              const questions = Array.isArray(newRoom.questions) ? newRoom.questions : [];
+              setCurrentQuestion(questions[newRoom.current_question]);
             }
           }
         }
