@@ -59,7 +59,10 @@ export const useMultiplayerRoom = (roomId?: string) => {
           is_ready: true
         });
 
-      setRoom(roomData);
+      setRoom({
+        ...roomData,
+        status: roomData.status as RoomStatus
+      });
       setIsHost(true);
       
       toast({
@@ -67,7 +70,10 @@ export const useMultiplayerRoom = (roomId?: string) => {
         description: `Code de la salle: ${roomCode}`,
       });
 
-      return roomData;
+      return {
+        ...roomData,
+        status: roomData.status as RoomStatus
+      };
     } catch (err) {
       console.error('Erreur lors de la création de la salle:', err);
       setError('Impossible de créer la salle');
@@ -149,7 +155,10 @@ export const useMultiplayerRoom = (roomId?: string) => {
         return false;
       }
 
-      setRoom(roomData);
+      setRoom({
+        ...roomData,
+        status: roomData.status as RoomStatus
+      });
       setIsHost(roomData.host_id === user.id);
 
       toast({
@@ -204,7 +213,7 @@ export const useMultiplayerRoom = (roomId?: string) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabase.supabaseKey}`,
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2YWZ0cG5mYWt4d2Vra2dnaXBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5MTU2ODYsImV4cCI6MjA2NTQ5MTY4Nn0.P8U0fwNKpnXFH4_JaN0ep5eATj3RGzUEPGozPbxcS1M`,
         },
         body: JSON.stringify({
           theme: room.theme,
@@ -279,7 +288,10 @@ export const useMultiplayerRoom = (roomId?: string) => {
 
         if (roomError) throw roomError;
 
-        setRoom(roomData);
+        setRoom({
+          ...roomData,
+          status: roomData.status as RoomStatus
+        });
         setIsHost(roomData.host_id === user.id);
 
         // Charger la question actuelle si le quiz est en cours
@@ -317,10 +329,13 @@ export const useMultiplayerRoom = (roomId?: string) => {
         (payload) => {
           console.log('Room update:', payload);
           if (payload.eventType === 'UPDATE') {
-            setRoom(payload.new as QuizRoom);
+            const newRoom = payload.new as any;
+            setRoom({
+              ...newRoom,
+              status: newRoom.status as RoomStatus
+            });
             
             // Mettre à jour la question actuelle
-            const newRoom = payload.new as QuizRoom;
             if (newRoom.status === 'playing' && newRoom.questions && newRoom.current_question !== null) {
               setCurrentQuestion(newRoom.questions[newRoom.current_question]);
             }

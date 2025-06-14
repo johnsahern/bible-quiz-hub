@@ -10,8 +10,9 @@ import { Users, Plus, LogIn, Gamepad2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMultiplayerRoom } from '@/hooks/useMultiplayerRoom';
 import { useAuth } from '@/contexts/AuthContext';
-import { themes } from '@/data/themes';
+import { getThemes } from '@/data/themes';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const MultiplayerSetup: React.FC = () => {
   const navigate = useNavigate();
@@ -27,6 +28,8 @@ const MultiplayerSetup: React.FC = () => {
   
   // État pour rejoindre une salle
   const [roomCode, setRoomCode] = useState('');
+
+  const themes = getThemes();
 
   const handleCreateRoom = async () => {
     if (!user) {
@@ -120,14 +123,10 @@ const MultiplayerSetup: React.FC = () => {
                   <SelectValue placeholder="Choisissez un thème" />
                 </SelectTrigger>
                 <SelectContent>
-                  {themes.map((themeGroup) => (
-                    <div key={themeGroup.category}>
-                      {themeGroup.themes.map((theme) => (
-                        <SelectItem key={theme.id} value={theme.id}>
-                          {theme.name}
-                        </SelectItem>
-                      ))}
-                    </div>
+                  {themes.map((theme) => (
+                    <SelectItem key={theme.id} value={theme.id}>
+                      {theme.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
