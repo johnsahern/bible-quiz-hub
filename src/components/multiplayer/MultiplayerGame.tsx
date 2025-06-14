@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -87,7 +86,7 @@ const MultiplayerGame: React.FC<MultiplayerGameProps> = ({
           score: players.find(p => p.user_id === user.id)?.score + points || points,
           correct_answers: isCorrect 
             ? (players.find(p => p.user_id === user.id)?.correct_answers || 0) + 1
-            : (players.find(p => p.user_id === user.i d)?.correct_answers || 0),
+            : (players.find(p => p.user_id === user.id)?.correct_answers || 0),
           current_answer: answerIndex,
           answer_time: new Date().toISOString()
         })
