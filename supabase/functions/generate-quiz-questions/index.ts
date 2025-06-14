@@ -26,7 +26,7 @@ serve(async (req) => {
   }
 
   try {
-    console.log('🚀 Starting BIBLICAL QUIZ generation with Gemini 2.5 Flash...');
+    console.log('🚀 Starting BIBLICAL QUIZ generation with Gemini 1.5 Flash...');
     
     if (!geminiApiKey) {
       console.error('❌ Gemini API key not found');
@@ -55,10 +55,10 @@ serve(async (req) => {
     console.log(rigorousPrompt);
     console.log('='.repeat(80));
 
-    console.log('🤖 Appel à Gemini-2.5-Flash avec seed:', ultraUniqueSeed);
+    console.log('🤖 Appel à Gemini-1.5-Flash avec seed:', ultraUniqueSeed);
 
-    // Appel à l'API Gemini 2.5 Flash
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
+    // Appel à l'API Gemini 1.5 Flash (nom correct du modèle)
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ Erreur API Gemini 2.5:', response.status, errorText);
+      console.error('❌ Erreur API Gemini 1.5:', response.status, errorText);
       
       if (response.status === 429) {
         throw new Error('Quota Gemini dépassé. Veuillez vérifier votre plan.');
@@ -111,16 +111,16 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('📡 RÉPONSE COMPLÈTE GEMINI 2.5:', JSON.stringify(data, null, 2));
+    console.log('📡 RÉPONSE COMPLÈTE GEMINI 1.5:', JSON.stringify(data, null, 2));
 
     const generatedContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!generatedContent) {
-      console.error('❌ Aucun contenu généré par Gemini 2.5');
-      throw new Error('Gemini 2.5 n\'a généré aucun contenu valide');
+      console.error('❌ Aucun contenu généré par Gemini 1.5');
+      throw new Error('Gemini 1.5 n\'a généré aucun contenu valide');
     }
 
-    console.log('📄 CONTENU BRUT GEMINI 2.5:', generatedContent);
+    console.log('📄 CONTENU BRUT GEMINI 1.5:', generatedContent);
 
     // Nettoyage et parsing du JSON
     const jsonContent = cleanJsonResponse(generatedContent);
@@ -132,13 +132,13 @@ serve(async (req) => {
     } catch (parseError) {
       console.error('❌ Échec du parsing JSON:', parseError);
       console.log('📄 Contenu défaillant:', jsonContent);
-      throw new Error('Impossible de parser la réponse JSON de Gemini 2.5');
+      throw new Error('Impossible de parser la réponse JSON de Gemini 1.5');
     }
 
     // Validation des questions
     const sanctifiedQuestions = validateQuestions(questions, questionCount);
 
-    console.log(`✅ SUCCÈS TOTAL ! ${sanctifiedQuestions.length} QUESTIONS BIBLIQUES PARFAITES GÉNÉRÉES avec Gemini 2.5`);
+    console.log(`✅ SUCCÈS TOTAL ! ${sanctifiedQuestions.length} QUESTIONS BIBLIQUES PARFAITES GÉNÉRÉES avec Gemini 1.5`);
     console.log('📖 APERÇU DES QUESTIONS CRÉÉES :');
     sanctifiedQuestions.forEach((q, i) => {
       console.log(`${i + 1}. ${q.question.substring(0, 100)}...`);
@@ -154,7 +154,7 @@ serve(async (req) => {
     
     return new Response(JSON.stringify({ 
       error: error.message,
-      details: 'Échec de la génération du quiz biblique avec Gemini 2.5',
+      details: 'Échec de la génération du quiz biblique avec Gemini 1.5',
       timestamp: new Date().toISOString()
     }), {
       status: 500,
