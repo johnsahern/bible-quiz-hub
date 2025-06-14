@@ -87,6 +87,145 @@ export type Database = {
         }
         Relationships: []
       }
+      quiz_room_answers: {
+        Row: {
+          answer_index: number
+          answered_at: string
+          id: string
+          is_correct: boolean
+          points_earned: number
+          question_index: number
+          response_time: number
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          answer_index: number
+          answered_at?: string
+          id?: string
+          is_correct: boolean
+          points_earned?: number
+          question_index: number
+          response_time: number
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          answer_index?: number
+          answered_at?: string
+          id?: string
+          is_correct?: boolean
+          points_earned?: number
+          question_index?: number
+          response_time?: number
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_room_answers_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_room_players: {
+        Row: {
+          answer_time: string | null
+          correct_answers: number
+          current_answer: number | null
+          id: string
+          is_ready: boolean
+          joined_at: string
+          room_id: string
+          score: number
+          user_id: string
+          username: string
+        }
+        Insert: {
+          answer_time?: string | null
+          correct_answers?: number
+          current_answer?: number | null
+          id?: string
+          is_ready?: boolean
+          joined_at?: string
+          room_id: string
+          score?: number
+          user_id: string
+          username: string
+        }
+        Update: {
+          answer_time?: string | null
+          correct_answers?: number
+          current_answer?: number | null
+          id?: string
+          is_ready?: boolean
+          joined_at?: string
+          room_id?: string
+          score?: number
+          user_id?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_room_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_rooms: {
+        Row: {
+          created_at: string
+          current_question: number | null
+          difficulty: string
+          finished_at: string | null
+          host_id: string
+          id: string
+          max_players: number
+          question_count: number
+          questions: Json | null
+          room_code: string
+          started_at: string | null
+          status: string
+          theme: string
+        }
+        Insert: {
+          created_at?: string
+          current_question?: number | null
+          difficulty: string
+          finished_at?: string | null
+          host_id: string
+          id?: string
+          max_players?: number
+          question_count?: number
+          questions?: Json | null
+          room_code: string
+          started_at?: string | null
+          status?: string
+          theme: string
+        }
+        Update: {
+          created_at?: string
+          current_question?: number | null
+          difficulty?: string
+          finished_at?: string | null
+          host_id?: string
+          id?: string
+          max_players?: number
+          question_count?: number
+          questions?: Json | null
+          room_code?: string
+          started_at?: string | null
+          status?: string
+          theme?: string
+        }
+        Relationships: []
+      }
       user_achievements: {
         Row: {
           achievement_name: string
@@ -119,7 +258,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_inactive_rooms: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      generate_room_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
