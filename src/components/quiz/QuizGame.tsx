@@ -1,17 +1,35 @@
-
 import { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { AlertCircle } from 'lucide-react';
-import { QuizConfig, QuizQuestion, QuizResult } from '@/types/quiz';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { getBadge, calculateQuestionPoints, calculateTimeBonus } from '@/utils/quizUtils';
-import QuizLoadingState from './QuizLoadingState';
-import QuizErrorState from './QuizErrorState';
-import QuizProgress from './QuizProgress';
-import QuestionDisplay from './QuestionDisplay';
-import QuizStats from './QuizStats';
+import { DifficultyLevel } from '@/types/quiz';
+import QuizStats from '@/components/quiz/QuizStats';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Question {
+  question: string;
+  answers: string[];
+  correctAnswer: number;
+}
+
+interface QuizConfig {
+  theme: string;
+  difficulty: DifficultyLevel;
+  questionCount: number;
+}
+
+interface QuizResult {
+  score: number;
+  correctAnswers: number;
+  totalQuestions: number;
+  timeSpent: number;
+  badge: string | null;
+  difficulty: DifficultyLevel;
+  theme: string;
+}
 
 interface QuizGameProps {
   config: QuizConfig;
@@ -19,195 +37,229 @@ interface QuizGameProps {
 }
 
 const QuizGame = ({ config, onComplete }: QuizGameProps) => {
-  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(45);
-  const [score, setScore] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
-  const [startTime] = useState(Date.now());
-  const { toast } = useToast();
+  const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(45);
+  const [timeUp, setTimeUp] = useState(false);
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const currentQuestion = questions[currentQuestionIndex];
-  const isLastQuestion = currentQuestionIndex === questions.length - 1;
-
-  // Generate questions when component mounts
   useEffect(() => {
-    generateQuestions();
-  }, [config]);
+    const fetchQuestions = async () => {
+      try {
+        // Fetch the questions from your API or data source based on the config
+        const response = await fetch(`/api/quiz?theme=${config.theme}&difficulty=${config.difficulty}&questionCount=${config.questionCount}`);
+        const data = await response.json();
 
-  const generateQuestions = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      console.log('🚀 Generating questions with Gemini 1.5 Flash, config:', config);
-
-      const { data, error } = await supabase.functions.invoke('generate-quiz-questions', {
-        body: {
-          theme: config.theme,
-          difficulty: config.difficulty,
-          questionCount: config.questionCount
-        }
-      });
-
-      console.log('📡 Supabase response:', { data, error });
-
-      if (error) {
-        console.error('❌ Supabase function error:', error);
-
-        // Messages d'erreur plus explicites pour Gemini 1.5
-        if (error.message?.includes('insufficient_quota') || error.message?.includes('429')) {
-          throw new Error('Quota Gemini 1.5 dépassé. Veuillez vérifier votre plan de facturation Gemini et réessayer plus tard.');
-        } else if (error.message?.includes('401')) {
-          throw new Error('Clé API Gemini 1.5 invalide. Veuillez vérifier votre configuration.');
+        if (data && Array.isArray(data)) {
+          setQuestions(data);
         } else {
-          throw new Error(`Erreur API: ${error.message}`);
+          console.error('Invalid quiz data format:', data);
+          // Handle the error appropriately, maybe navigate back or show a message
+          navigate('/');
         }
+      } catch (error) {
+        console.error('Error fetching quiz questions:', error);
+        // Handle the error appropriately
+        navigate('/');
       }
+    };
 
-      if (!data?.questions || !Array.isArray(data.questions)) {
-        console.error('❌ Invalid response format:', data);
-        throw new Error('Format de réponse invalide de l\'API');
-      }
+    fetchQuestions();
+  }, [config, navigate]);
 
-      if (data.questions.length === 0) {
-        throw new Error('Aucune question générée');
-      }
-
-      console.log('✅ Received questions from Gemini 1.5:', data.questions);
-      setQuestions(data.questions);
-      setLoading(false);
-    } catch (error) {
-      console.error('❌ Error generating questions:', error);
-      setError(error.message || 'Erreur inconnue');
-      setLoading(false);
-      toast({
-        title: "Erreur de génération",
-        description: error.message,
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Timer
   useEffect(() => {
-    if (timeLeft > 0 && !showResult && !loading) {
-      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-      return () => clearTimeout(timer);
-    } else if (timeLeft === 0 && !loading) {
-      handleNextQuestion();
+    if (timeLeft <= 0) {
+      setTimeUp(true);
+      handleAnswerSelect(-1); // Auto-submit as incorrect
+      return;
     }
-  }, [timeLeft, showResult, loading]);
+
+    if (questions.length === 0) return;
+
+    const timerId = setInterval(() => {
+      setTimeLeft(prev => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timerId);
+  }, [timeLeft, currentQuestion, questions.length]);
+
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (showResult) return;
-    setSelectedAnswer(answerIndex);
-  };
+    if (selectedAnswer !== null || timeUp) return;
 
-  const handleNextQuestion = () => {
-    let questionPoints = 0;
+    setSelectedAnswer(answerIndex);
+    const correct = answerIndex === questions[currentQuestion].correctAnswer;
     
-    if (selectedAnswer !== null && selectedAnswer === currentQuestion.correctAnswer) {
+    if (correct) {
       setCorrectAnswers(prev => prev + 1);
-      
-      // Calcul des points basé sur la difficulté
+      // Calculate points with time bonus
       const basePoints = calculateQuestionPoints(config.difficulty);
-      
-      // Bonus de temps (jusqu'à 50% en plus selon le temps restant)
-      const timeBonus = calculateTimeBonus(timeLeft, basePoints);
-      
-      questionPoints = basePoints + timeBonus;
-      setScore(prev => prev + questionPoints);
-      
-      console.log(`✅ Question correcte! Points: ${basePoints} + bonus temps: ${timeBonus} = ${questionPoints} total`);
+      const bonus = calculateTimeBonus(timeLeft, basePoints);
+      const questionScore = basePoints + bonus;
+      setScore(prev => prev + questionScore);
     }
 
-    setShowResult(true);
-
     setTimeout(() => {
-      if (isLastQuestion) {
-        // Quiz terminé
-        const totalTime = Math.round((Date.now() - startTime) / 1000);
-        const finalResult: QuizResult = {
-          score,
-          totalQuestions: questions.length,
-          timeSpent: totalTime,
-          correctAnswers,
-          badge: getBadge(correctAnswers, questions.length)
-        };
-        onComplete(finalResult);
-      } else {
-        // Question suivante
-        setCurrentQuestionIndex(prev => prev + 1);
+      if (currentQuestion < questions.length - 1) {
+        setCurrentQuestion(prev => prev + 1);
         setSelectedAnswer(null);
-        setShowResult(false);
         setTimeLeft(45);
+        setTimeUp(false);
+      } else {
+        finishQuiz();
       }
     }, 2000);
   };
 
-  if (loading) {
-    return <QuizLoadingState config={config} />;
+  const finishQuiz = async () => {
+    const finalScore = score;
+    const badge = getBadge(correctAnswers, questions.length);
+    const timeSpent = questions.length * 45 - timeLeft;
+
+    const result: QuizResult = {
+      score: finalScore,
+      correctAnswers,
+      totalQuestions: questions.length,
+      timeSpent,
+      badge,
+      difficulty: config.difficulty,
+      theme: config.theme
+    };
+
+    // Save to database if user is authenticated
+    if (user) {
+      try {
+        const { error } = await supabase
+          .from('quiz_history')
+          .insert({
+            user_id: user.id,
+            theme: config.theme,
+            difficulty: config.difficulty,
+            score: finalScore,
+            correct_answers: correctAnswers,
+            total_questions: questions.length,
+            time_spent: timeSpent,
+            badge: badge
+          });
+
+        if (error) {
+          console.error('Error saving quiz result:', error);
+        }
+
+        // Check for achievements
+        await checkAndAwardAchievements(result);
+      } catch (error) {
+        console.error('Error saving quiz result:', error);
+      }
+    }
+
+    onComplete(result);
+  };
+
+  const checkAndAwardAchievements = async (result: QuizResult) => {
+    if (!user) return;
+
+    const achievements = [];
+
+    // Perfect score achievement
+    if (result.correctAnswers === result.totalQuestions) {
+      achievements.push({
+        user_id: user.id,
+        achievement_type: 'perfect_score',
+        achievement_name: 'Score Parfait',
+        description: 'Répondre correctement à toutes les questions d\'un quiz'
+      });
+    }
+
+    // High score achievements
+    if (result.score >= 100) {
+      achievements.push({
+        user_id: user.id,
+        achievement_type: 'high_score',
+        achievement_name: 'Centurion',
+        description: 'Obtenir 100 points ou plus dans un quiz'
+      });
+    }
+
+    // Difficulty-based achievements
+    if (result.difficulty === 'difficile' && result.correctAnswers >= result.totalQuestions * 0.8) {
+      achievements.push({
+        user_id: user.id,
+        achievement_type: 'difficulty_master',
+        achievement_name: 'Maître de la Difficulté',
+        description: 'Réussir 80% ou plus d\'un quiz difficile'
+      });
+    }
+
+    // Save achievements
+    for (const achievement of achievements) {
+      try {
+        await supabase
+          .from('user_achievements')
+          .insert(achievement);
+      } catch (error) {
+        // Achievement might already exist, ignore duplicate errors
+        console.log('Achievement already exists or error:', error);
+      }
+    }
+  };
+
+  if (questions.length === 0) {
+    return <div>Chargement des questions...</div>;
   }
 
-  if (error) {
-    return <QuizErrorState error={error} onRetry={generateQuestions} />;
-  }
-
-  if (!currentQuestion) {
-    return (
-      <div className="max-w-2xl mx-auto">
-        <Card className="bg-white shadow-lg">
-          <CardContent className="p-8 text-center">
-            <AlertCircle className="w-8 h-8 mx-auto mb-4 text-amber-500" />
-            <p className="text-amber-600 mb-4">Aucune question disponible.</p>
-            <Button onClick={generateQuestions} className="mt-4">
-              Réessayer
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const question = questions[currentQuestion];
+  const progress = ((currentQuestion + 1) / questions.length) * 100;
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <Card className="bg-white shadow-lg">
+    <div className="container mx-auto mt-8 max-w-2xl">
+      <QuizStats score={score} correctAnswers={correctAnswers} difficulty={config.difficulty} />
+
+      <Card className="mb-4 bg-white shadow-md rounded-lg">
         <CardContent className="p-6">
-          <QuizProgress
-            currentQuestionIndex={currentQuestionIndex}
-            totalQuestions={questions.length}
-            timeLeft={timeLeft}
-          />
+          <div className="mb-4">
+            <p className="text-gray-600 text-sm">
+              Question {currentQuestion + 1} / {questions.length}
+            </p>
+            <Progress value={progress} className="h-2 rounded-full accent-blue-500" />
+          </div>
 
-          <QuestionDisplay
-            question={currentQuestion}
-            selectedAnswer={selectedAnswer}
-            showResult={showResult}
-            onAnswerSelect={handleAnswerSelect}
-          />
+          <div className="mb-6">
+            <h2 className="text-2xl font-semibold text-blue-800 mb-2">{question.question}</h2>
+            <p className="text-gray-500 text-sm">
+              Temps restant: {formatTime(timeLeft)}
+            </p>
+          </div>
 
-          {!showResult && (
-            <Button
-              onClick={handleNextQuestion}
-              disabled={selectedAnswer === null}
-              className="w-full"
-              size="lg"
-            >
-              {isLastQuestion ? 'Terminer le Quiz' : 'Question suivante'}
-            </Button>
-          )}
+          <div className="grid gap-4">
+            {question.answers.map((answer, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                className={`w-full text-lg ${selectedAnswer === index
+                  ? index === question.correctAnswer
+                    ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                    : 'bg-red-100 text-red-800 hover:bg-red-200'
+                  : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                onClick={() => handleAnswerSelect(index)}
+                disabled={selectedAnswer !== null || timeUp}
+              >
+                {answer}
+              </Button>
+            ))}
+          </div>
         </CardContent>
       </Card>
-
-      <QuizStats 
-        score={score} 
-        correctAnswers={correctAnswers} 
-        difficulty={config.difficulty}
-      />
     </div>
   );
 };

@@ -9,7 +9,111 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          best_score: number | null
+          created_at: string | null
+          favorite_theme: string | null
+          full_name: string | null
+          games_played: number | null
+          id: string
+          total_points: number | null
+          updated_at: string | null
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          best_score?: number | null
+          created_at?: string | null
+          favorite_theme?: string | null
+          full_name?: string | null
+          games_played?: number | null
+          id: string
+          total_points?: number | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          best_score?: number | null
+          created_at?: string | null
+          favorite_theme?: string | null
+          full_name?: string | null
+          games_played?: number | null
+          id?: string
+          total_points?: number | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
+      quiz_history: {
+        Row: {
+          badge: string | null
+          correct_answers: number
+          created_at: string | null
+          difficulty: string
+          id: string
+          score: number
+          theme: string
+          time_spent: number
+          total_questions: number
+          user_id: string
+        }
+        Insert: {
+          badge?: string | null
+          correct_answers: number
+          created_at?: string | null
+          difficulty: string
+          id?: string
+          score: number
+          theme: string
+          time_spent: number
+          total_questions: number
+          user_id: string
+        }
+        Update: {
+          badge?: string | null
+          correct_answers?: number
+          created_at?: string | null
+          difficulty?: string
+          id?: string
+          score?: number
+          theme?: string
+          time_spent?: number
+          total_questions?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_achievements: {
+        Row: {
+          achievement_name: string
+          achievement_type: string
+          description: string | null
+          earned_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          achievement_name: string
+          achievement_type: string
+          description?: string | null
+          earned_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          achievement_name?: string
+          achievement_type?: string
+          description?: string | null
+          earned_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
