@@ -3,20 +3,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { getBadge } from '@/utils/quizUtils';
-import { QuizConfig, QuizResult } from '@/types/quiz';
+import { QuizConfig, QuizResult, QuizQuestion } from '@/types/quiz';
 import { useQuizAchievements } from '@/components/quiz/QuizAchievements';
 import { useQuizScoring } from '@/components/quiz/QuizScoring';
 import { useAuth } from '@/contexts/AuthContext';
 
-interface Question {
-  question: string;
-  options: string[];
-  correctAnswer: number;
-  verse?: string;
-}
-
 export const useQuizLogic = (config: QuizConfig, onComplete: (result: QuizResult) => void) => {
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [correctAnswers, setCorrectAnswers] = useState(0);
