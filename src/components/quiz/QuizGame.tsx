@@ -12,7 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface Question {
   question: string;
-  answers: string[];
+  options: string[];
   correctAnswer: number;
 }
 
@@ -277,7 +277,7 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
           </div>
 
           <div className="grid gap-4">
-            {question.answers.map((answer, index) => (
+            {question.options.map((option, index) => (
               <Button
                 key={index}
                 variant="outline"
@@ -286,11 +286,11 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
                     ? 'bg-green-100 text-green-800 hover:bg-green-200'
                     : 'bg-red-100 text-red-800 hover:bg-red-200'
                   : 'bg-white text-gray-700 hover:bg-gray-50'
-                  }`}
+                }`}
                 onClick={() => handleAnswerSelect(index)}
                 disabled={selectedAnswer !== null || timeUp}
               >
-                {answer}
+                {option}
               </Button>
             ))}
           </div>
