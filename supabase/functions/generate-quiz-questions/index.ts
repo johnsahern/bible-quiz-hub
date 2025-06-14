@@ -3,7 +3,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getBiblicalContext } from './biblical-contexts.ts';
 import { getDifficultyInstruction } from './difficulty-instructions.ts';
-import { validateQuestions, generateUniqueSeed, cleanJsonResponse } from './validation-utils.ts';
+import { validateQuestions, generateUniqueSeed, cleanJsonResponse, validateThematicRelevance } from './validation-utils.ts';
 import { buildRigorousPrompt } from './prompt-builder.ts';
 
 const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
@@ -47,17 +47,17 @@ serve(async (req) => {
     console.log('📖 Biblical theme:', selectedContext.title);
     console.log('🎯 Difficulty level:', selectedDifficulty.level);
 
-    // Construction du prompt théologique
+    // Construction du prompt théologique RENFORCÉ
     const rigorousPrompt = buildRigorousPrompt(selectedContext, selectedDifficulty, questionCount, ultraUniqueSeed);
 
-    console.log('📋 PROMPT THÉOLOGIQUE RIGOUREUX ENVOYÉ :');
+    console.log('📋 PROMPT THÉOLOGIQUE ULTRA-RIGOUREUX ENVOYÉ :');
     console.log('=' .repeat(80));
     console.log(rigorousPrompt);
     console.log('='.repeat(80));
 
-    console.log('🤖 Appel à Gemini-1.5-Flash avec seed:', ultraUniqueSeed);
+    console.log('🤖 Appel à Gemini-1.5-Flash avec validation thématique renforcée, seed:', ultraUniqueSeed);
 
-    // Appel à l'API Gemini 1.5 Flash (nom correct du modèle)
+    // Appel à l'API Gemini 1.5 Flash avec configuration optimisée
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
@@ -70,9 +70,9 @@ serve(async (req) => {
           }]
         }],
         generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.8,
+          temperature: 0.6, // Légèrement plus bas pour plus de cohérence
+          topK: 35,
+          topP: 0.85,
           maxOutputTokens: 8000,
           candidateCount: 1,
         },
@@ -135,17 +135,20 @@ serve(async (req) => {
       throw new Error('Impossible de parser la réponse JSON de Gemini 1.5');
     }
 
-    // Validation des questions
-    const sanctifiedQuestions = validateQuestions(questions, questionCount);
+    // Validation structurelle des questions
+    const structurallyValidQuestions = validateQuestions(questions, questionCount);
+    
+    // Validation thématique supplémentaire
+    const thematicallyValidQuestions = validateThematicRelevance(structurallyValidQuestions, theme);
 
-    console.log(`✅ SUCCÈS TOTAL ! ${sanctifiedQuestions.length} QUESTIONS BIBLIQUES PARFAITES GÉNÉRÉES avec Gemini 1.5`);
+    console.log(`✅ SUCCÈS TOTAL ! ${thematicallyValidQuestions.length} QUESTIONS BIBLIQUES PARFAITES ET THÉMATIQUEMENT CONFORMES GÉNÉRÉES avec Gemini 1.5`);
     console.log('📖 APERÇU DES QUESTIONS CRÉÉES :');
-    sanctifiedQuestions.forEach((q, i) => {
-      console.log(`${i + 1}. ${q.question.substring(0, 100)}...`);
-      console.log(`   Réponse: ${q.options[q.correctAnswer]} (${q.verse})`);
+    thematicallyValidQuestions.forEach((q, i) => {
+      console.log(`${i + 1}. ${q.question.substring(0, 80)}...`);
+      console.log(`   Réponse: ${q.options[q.correctAnswer]} (${q.verse || 'Pas de verset'})`);
     });
 
-    return new Response(JSON.stringify({ questions: sanctifiedQuestions }), {
+    return new Response(JSON.stringify({ questions: thematicallyValidQuestions }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
@@ -154,7 +157,7 @@ serve(async (req) => {
     
     return new Response(JSON.stringify({ 
       error: error.message,
-      details: 'Échec de la génération du quiz biblique avec Gemini 1.5',
+      details: 'Échec de la génération du quiz biblique avec validation thématique renforcée',
       timestamp: new Date().toISOString()
     }), {
       status: 500,

@@ -1,116 +1,144 @@
+import { QuizQuestion } from './biblical-contexts.ts';
 
-export interface QuizQuestion {
-  id: string;
-  question: string;
-  options: string[];
-  correctAnswer: number;
-  verse: string;
-}
-
-export function validateQuestions(questions: any[], questionCount: number): QuizQuestion[] {
+export function validateQuestions(questions: any[], expectedCount: number): any[] {
+  console.log('🔍 Validation des questions reçues...');
+  
   if (!Array.isArray(questions)) {
-    console.error('❌ La réponse n\'est pas un tableau:', typeof questions);
-    throw new Error('Réponse Gemini non conforme - tableau requis');
+    console.error('❌ Questions reçues ne sont pas un tableau');
+    throw new Error('Format de questions invalide');
   }
 
-  if (questions.length === 0) {
-    console.error('❌ Tableau de questions vide');
-    throw new Error('Gemini n\'a généré aucune question biblique');
-  }
-
-  console.log(`📊 QUESTIONS BIBLIQUES GÉNÉRÉES : ${questions.length}`);
-
-  return questions.slice(0, questionCount).map((q, index) => {
-    console.log(`🔍 Validation question biblique ${index + 1}:`, q);
+  const validQuestions = questions.filter(q => {
+    // Validation de base
+    const hasBasicStructure = q.question && 
+                             Array.isArray(q.options) && 
+                             q.options.length === 4 &&
+                             typeof q.correctAnswer === 'number' &&
+                             q.correctAnswer >= 0 && 
+                             q.correctAnswer < 4;
     
-    if (!q || typeof q !== 'object') {
-      throw new Error(`Question ${index + 1} invalide - structure incorrecte`);
+    if (!hasBasicStructure) {
+      console.warn('❌ Question rejetée - structure invalide:', q);
+      return false;
     }
 
-    const questionId = q.id || `biblical_q${index + 1}`;
-    const question = q.question || `Question biblique ${index + 1} non définie`;
-    
-    if (!Array.isArray(q.options) || q.options.length !== 4) {
-      console.error(`❌ Question ${index + 1} - options invalides:`, q.options);
-      throw new Error(`Question ${index + 1}: 4 options bibliques requises, reçu ${q.options?.length || 0}`);
+    // Validation de la longueur de la question
+    if (q.question.length < 10) {
+      console.warn('❌ Question rejetée - trop courte:', q.question);
+      return false;
     }
-    
-    const correctAnswer = typeof q.correctAnswer === 'number' && 
-      q.correctAnswer >= 0 && q.correctAnswer <= 3 
-      ? q.correctAnswer 
-      : 0;
-    
-    if (correctAnswer !== q.correctAnswer) {
-      console.warn(`⚠️ Question ${index + 1}: correctAnswer corrigé de ${q.correctAnswer} vers ${correctAnswer}`);
-    }
-    
-    const verse = q.verse || 'Référence biblique à vérifier';
 
-    return {
-      id: questionId,
-      question: question.trim(),
-      options: q.options.map((opt: any) => opt.toString().trim()),
-      correctAnswer,
-      verse: verse.trim()
-    };
+    // Validation des options
+    if (q.options.some((opt: string) => !opt || opt.length < 2)) {
+      console.warn('❌ Question rejetée - options invalides:', q.options);
+      return false;
+    }
+
+    // Validation du verset (optionnel mais recommandé)
+    if (q.verse && q.verse.length < 3) {
+      console.warn('⚠️ Verset suspect pour la question:', q.question);
+    }
+
+    return true;
   });
+
+  console.log(`✅ ${validQuestions.length}/${questions.length} questions validées`);
+
+  if (validQuestions.length === 0) {
+    throw new Error('Aucune question valide générée');
+  }
+
+  // Retourner exactement le nombre demandé (ou moins si pas assez)
+  const finalQuestions = validQuestions.slice(0, expectedCount);
+  
+  // Ajouter des IDs séquentiels
+  return finalQuestions.map((q, index) => ({
+    ...q,
+    id: q.id || `q${index + 1}`
+  }));
 }
 
 export function generateUniqueSeed(theme: string, difficulty: string, questionCount: number): number {
-  // Utiliser plusieurs sources d'entropie pour garantir l'unicité
   const timestamp = Date.now();
-  const microseconds = performance.now() * 1000; // Précision en microsecondes
-  const randomComponent = Math.random() * 999999999; // Grand nombre aléatoire
-  const sessionRandom = Math.random() * 888888888; // Second nombre aléatoire
+  const themeHash = theme.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const difficultyHash = difficulty.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   
-  // Hachage des paramètres d'entrée avec plus de variabilité
-  const themeHash = theme.split('').reduce((acc, char, i) => {
-    return acc + char.charCodeAt(0) * (i + 1) * 17; // Multiplier par 17 pour plus de dispersion
-  }, 0);
+  // Créer un seed vraiment unique basé sur plusieurs facteurs
+  const uniqueSeed = timestamp + themeHash * 1000 + difficultyHash * 100 + questionCount * 10;
   
-  const difficultyHash = difficulty.split('').reduce((acc, char, i) => {
-    return acc + char.charCodeAt(0) * (i + 1) * 23; // Multiplier par 23 pour plus de dispersion
-  }, 0);
-  
-  // Ajouter un compteur basé sur l'heure précise pour éviter les collisions
-  const hourMinuteSecond = new Date().getHours() * 10000 + new Date().getMinutes() * 100 + new Date().getSeconds();
-  const millisecondComponent = new Date().getMilliseconds() * 1000;
-  
-  // Combiner toutes les sources d'entropie
-  const combinedSeed = Math.floor(
-    timestamp + 
-    microseconds + 
-    randomComponent + 
-    sessionRandom +
-    themeHash * 31 + 
-    difficultyHash * 37 + 
-    questionCount * 41 +
-    hourMinuteSecond * 43 +
-    millisecondComponent * 47
-  );
-  
-  // S'assurer que le seed est toujours positif et dans une plage raisonnable
-  return Math.abs(combinedSeed) % 999999999999 + 100000000000;
+  return uniqueSeed;
 }
 
-export function cleanJsonResponse(content: string): string {
-  let cleanedContent = content.trim();
+export function cleanJsonResponse(response: string): string {
+  console.log('🧹 Nettoyage de la réponse JSON...');
   
-  // Suppression des balises markdown
-  cleanedContent = cleanedContent.replace(/```json\s*/gi, '');
-  cleanedContent = cleanedContent.replace(/\s*```/g, '');
-  cleanedContent = cleanedContent.replace(/^[^[\{]*/, ''); // Supprime tout avant le premier [ ou {
-  cleanedContent = cleanedContent.replace(/[^}\]]*$/, ''); // Supprime tout après le dernier } ou ]
+  let cleaned = response.trim();
   
-  // Recherche du tableau JSON
-  const jsonStart = cleanedContent.indexOf('[');
-  const jsonEnd = cleanedContent.lastIndexOf(']') + 1;
+  // Supprimer les balises markdown si présentes
+  cleaned = cleaned.replace(/```json\s*/g, '');
+  cleaned = cleaned.replace(/```\s*/g, '');
   
-  if (jsonStart === -1 || jsonEnd === 0) {
-    console.error('❌ Aucun tableau JSON trouvé dans la réponse Gemini');
-    console.log('📄 Contenu reçu:', cleanedContent);
-    throw new Error('Format de réponse Gemini invalide - JSON manquant');
+  // Supprimer tout texte avant le premier [
+  const firstBracket = cleaned.indexOf('[');
+  if (firstBracket !== -1) {
+    cleaned = cleaned.substring(firstBracket);
   }
   
-  return cleanedContent.substring(jsonStart, jsonEnd);
+  // Supprimer tout texte après le dernier ]
+  const lastBracket = cleaned.lastIndexOf(']');
+  if (lastBracket !== -1) {
+    cleaned = cleaned.substring(0, lastBracket + 1);
+  }
+  
+  // Nettoyer les caractères de contrôle et espaces superflus
+  cleaned = cleaned.replace(/[\r\n\t]/g, ' ').replace(/\s+/g, ' ');
+  
+  console.log('✅ JSON nettoyé avec succès');
+  return cleaned;
+}
+
+// Fonction pour valider la pertinence thématique (validation supplémentaire)
+export function validateThematicRelevance(questions: any[], selectedTheme: string): any[] {
+  console.log(`🎯 Validation de la pertinence thématique pour le thème: ${selectedTheme}`);
+  
+  // Mots-clés thématiques pour une validation basique côté serveur
+  const thematicKeywords: { [key: string]: string[] } = {
+    'vie-jesus': ['Jésus', 'Christ', 'Seigneur', 'Nazareth', 'Bethléem', 'Galilée'],
+    'miracles-jesus': ['miracle', 'guérison', 'multiplication', 'résurrection', 'aveugle', 'paralytique'],
+    'david': ['David', 'roi', 'Goliath', 'Saül', 'Bethléem', 'berger'],
+    'creation': ['création', 'Genèse', 'Adam', 'Ève', 'jardin', 'Eden'],
+    'moise': ['Moïse', 'Égypte', 'Pharaon', 'Exode', 'Sinai', 'tables'],
+    'paul-apotre': ['Paul', 'Saul', 'Damas', 'Tarse', 'épîtres', 'voyage'],
+    // Ajouter d'autres thèmes selon les besoins...
+  };
+  
+  const keywords = thematicKeywords[selectedTheme] || [];
+  
+  if (keywords.length === 0) {
+    console.log('ℹ️ Pas de mots-clés spécifiques définis pour ce thème, validation générale uniquement');
+    return questions;
+  }
+  
+  const relevantQuestions = questions.filter(q => {
+    const questionText = (q.question + ' ' + q.options.join(' ')).toLowerCase();
+    const hasRelevantKeyword = keywords.some(keyword => 
+      questionText.includes(keyword.toLowerCase())
+    );
+    
+    if (!hasRelevantKeyword) {
+      console.warn(`⚠️ Question potentiellement hors-sujet détectée: ${q.question.substring(0, 50)}...`);
+    }
+    
+    return hasRelevantKeyword;
+  });
+  
+  console.log(`✅ ${relevantQuestions.length}/${questions.length} questions considérées comme thématiquement pertinentes`);
+  
+  // Si trop de questions sont filtrées, on garde les originales avec un avertissement
+  if (relevantQuestions.length < questions.length * 0.5) {
+    console.warn('⚠️ Trop de questions filtrées, conservation des questions originales');
+    return questions;
+  }
+  
+  return relevantQuestions;
 }
