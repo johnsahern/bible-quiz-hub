@@ -50,7 +50,7 @@ const QuizResults = ({ result, onPlayAgain, onBackToHome }: QuizResultsProps) =>
   };
 
   const handleShare = async () => {
-    const shareText = `J'ai obtenu ${result.correctAnswers}/${result.totalQuestions} bonnes réponses au BibleQuiz+ avec ${result.score} points ! Badge: ${result.badge} 🏆`;
+    const shareText = `J'ai obtenu ${result.correctAnswers}/${result.totalQuestions} bonnes réponses au BibleQuiz+ ! Badge: ${result.badge} 🏆`;
     
     if (navigator.share) {
       try {
@@ -84,10 +84,10 @@ const QuizResults = ({ result, onPlayAgain, onBackToHome }: QuizResultsProps) =>
         </CardHeader>
         
         <CardContent className="space-y-6">
-          {/* Score principal */}
+          {/* Score principal - Afficher le nombre de bonnes réponses */}
           <div className="text-center">
             <div className="text-4xl font-bold text-blue-900 mb-2">
-              {result.correctAnswers}/{result.totalQuestions}
+              {result.score}/{result.totalQuestions}
             </div>
             <div className="text-lg text-blue-700 mb-4">
               {percentage}% de bonnes réponses
@@ -104,10 +104,10 @@ const QuizResults = ({ result, onPlayAgain, onBackToHome }: QuizResultsProps) =>
             <div className="bg-white rounded-lg p-4 text-center shadow-sm">
               <div className="flex items-center justify-center mb-2">
                 <Target className="w-5 h-5 text-green-600 mr-2" />
-                <span className="text-sm text-gray-600">Score Final</span>
+                <span className="text-sm text-gray-600">Bonnes Réponses</span>
               </div>
-              <div className="text-2xl font-bold text-green-600">{result.score}</div>
-              <div className="text-xs text-gray-500">points</div>
+              <div className="text-2xl font-bold text-green-600">{result.correctAnswers}</div>
+              <div className="text-xs text-gray-500">sur {result.totalQuestions}</div>
             </div>
             
             <div className="bg-white rounded-lg p-4 text-center shadow-sm">
@@ -116,7 +116,7 @@ const QuizResults = ({ result, onPlayAgain, onBackToHome }: QuizResultsProps) =>
                 <span className="text-sm text-gray-600">Temps Total</span>
               </div>
               <div className="text-2xl font-bold text-blue-600">{formatTime(result.timeSpent)}</div>
-              <div className="text-xs text-gray-500">minutes</div>
+              <div className="text-xs text-gray-500">temps de réaction</div>
             </div>
           </div>
 

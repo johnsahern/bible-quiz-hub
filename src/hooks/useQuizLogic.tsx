@@ -19,6 +19,8 @@ export const useQuizLogic = (config: QuizConfig, onComplete: (result: QuizResult
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [totalTimeSpent, setTotalTimeSpent] = useState(0);
+  const [questionStartTime, setQuestionStartTime] = useState<number>(Date.now());
   
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -53,6 +55,7 @@ export const useQuizLogic = (config: QuizConfig, onComplete: (result: QuizResult
 
         console.log('Questions generated successfully:', data.questions);
         setQuestions(data.questions);
+        setQuestionStartTime(Date.now());
         setIsLoading(false);
       } catch (error) {
         console.error('Error fetching quiz questions:', error);
@@ -87,6 +90,10 @@ export const useQuizLogic = (config: QuizConfig, onComplete: (result: QuizResult
   const handleAnswerSelect = (answerIndex: number) => {
     if (selectedAnswer !== null || timeUp) return;
 
+    // Calculer le temps de réaction pour cette question
+    const reactionTime = 45 - timeLeft;
+    setTotalTimeSpent(prev => prev + reactionTime);
+
     setSelectedAnswer(answerIndex);
     setShowResult(true);
     const correct = answerIndex === questions[currentQuestion].correctAnswer;
@@ -104,6 +111,7 @@ export const useQuizLogic = (config: QuizConfig, onComplete: (result: QuizResult
         setShowResult(false);
         setTimeLeft(45);
         setTimeUp(false);
+        setQuestionStartTime(Date.now());
       } else {
         finishQuiz();
       }
@@ -111,15 +119,13 @@ export const useQuizLogic = (config: QuizConfig, onComplete: (result: QuizResult
   };
 
   const finishQuiz = async () => {
-    const finalScore = score;
     const badge = getBadge(correctAnswers, questions.length);
-    const timeSpent = questions.length * 45 - timeLeft;
 
     const result: QuizResult = {
-      score: finalScore,
+      score: correctAnswers, // Utiliser le nombre de bonnes réponses comme score affiché
       correctAnswers,
       totalQuestions: questions.length,
-      timeSpent,
+      timeSpent: totalTimeSpent,
       badge: badge || '',
       difficulty: config.difficulty,
       theme: config.theme
@@ -133,10 +139,10 @@ export const useQuizLogic = (config: QuizConfig, onComplete: (result: QuizResult
             user_id: user.id,
             theme: config.theme,
             difficulty: config.difficulty,
-            score: finalScore,
+            score: score, // Utiliser le score calculé pour la base de données
             correct_answers: correctAnswers,
             total_questions: questions.length,
-            time_spent: timeSpent,
+            time_spent: totalTimeSpent,
             badge: badge
           });
 
