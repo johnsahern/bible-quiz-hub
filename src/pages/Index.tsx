@@ -82,82 +82,43 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <Navigation language={language} setLanguage={setLanguage} />
       
-      {/* Header Section */}
+      {/* Compact Header Section */}
       <div className="container mx-auto px-4 pt-20 pb-8">
-        {/* Enhanced Profile Section */}
+        {/* Compact Profile Header */}
         {user ? (
-          <div className="mb-8">
-            <Card className="bg-gradient-to-r from-blue-600 via-blue-700 to-purple-700 text-white border-0 shadow-2xl overflow-hidden relative">
-              <div className="absolute inset-0 bg-black/10"></div>
-              <CardContent className="relative p-6 md:p-8">
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                  {/* User Info Section */}
-                  <div className="flex items-center space-x-4 md:space-x-6">
-                    <Avatar className="w-16 h-16 md:w-20 md:h-20 ring-4 ring-white/30 shadow-lg">
-                      <AvatarImage src={profile?.avatar_url} />
-                      <AvatarFallback className="bg-white/20 text-white text-xl md:text-2xl font-bold">
-                        {profile?.full_name?.[0] || profile?.username?.[0] || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                    
-                    <div className="space-y-2">
-                      <div>
-                        <h2 className="text-xl md:text-2xl font-bold text-white mb-1">
-                          {t.welcome}, {profile?.full_name || profile?.username}!
-                        </h2>
-                        <p className="text-blue-100 text-sm md:text-base">
-                          @{profile?.username || 'user'}
-                        </p>
-                      </div>
-                      
-                      {/* Quick Stats */}
-                      <div className="flex flex-wrap items-center gap-3 md:gap-4">
-                        <div className="flex items-center space-x-2 bg-white/20 px-3 py-1 rounded-full">
-                          <Trophy className="w-4 h-4 text-yellow-300" />
-                          <span className="text-sm md:text-base font-semibold">
-                            {profile?.total_points || 0} pts
-                          </span>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2 bg-white/20 px-3 py-1 rounded-full">
-                          <Target className="w-4 h-4 text-green-300" />
-                          <span className="text-sm md:text-base font-semibold">
-                            {profile?.best_score || 0}
-                          </span>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2 bg-white/20 px-3 py-1 rounded-full">
-                          <Clock className="w-4 h-4 text-purple-300" />
-                          <span className="text-sm md:text-base font-semibold">
-                            {profile?.games_played || 0} {t.gamesPlayed}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+          <div className="flex items-center justify-between mb-8 bg-white/70 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg border border-white/20">
+            <div className="flex items-center space-x-4">
+              <Avatar className="w-12 h-12 md:w-14 md:h-14 ring-2 ring-blue-200 shadow-md">
+                <AvatarImage src={profile?.avatar_url} />
+                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-bold text-lg">
+                  {profile?.full_name?.[0] || profile?.username?.[0] || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              
+              <div className="space-y-1">
+                <h2 className="text-lg md:text-xl font-bold text-gray-800">
+                  {t.welcome}, {profile?.full_name || profile?.username}!
+                </h2>
+                <div className="flex items-center space-x-3 text-sm">
+                  <div className="flex items-center space-x-1 text-blue-600">
+                    <Trophy className="w-4 h-4" />
+                    <span className="font-semibold">{profile?.total_points || 0}</span>
                   </div>
-
-                  {/* Action Button */}
-                  <div className="flex flex-col items-end space-y-3">
-                    <Link to="/profile" className="w-full md:w-auto">
-                      <Button 
-                        variant="secondary" 
-                        className="bg-white text-blue-700 hover:bg-blue-50 shadow-lg w-full md:w-auto group transition-all duration-200"
-                      >
-                        <User className="w-4 h-4 mr-2" />
-                        {t.viewProfile}
-                        <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                      </Button>
-                    </Link>
-                    
-                    {/* Level Badge */}
-                    <Badge className="bg-amber-500 text-amber-900 hover:bg-amber-400 px-3 py-1">
-                      <Star className="w-3 h-3 mr-1" />
-                      {t.level} {Math.floor((profile?.total_points || 0) / 100) + 1}
-                    </Badge>
+                  <div className="flex items-center space-x-1 text-purple-600">
+                    <Star className="w-4 h-4" />
+                    <span>Niv. {Math.floor((profile?.total_points || 0) / 100) + 1}</span>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
+
+            <Link to="/profile">
+              <Button variant="outline" size="sm" className="shadow-md hover:shadow-lg transition-all group">
+                <User className="w-4 h-4 mr-2" />
+                {t.profile}
+                <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
           </div>
         ) : (
           <div className="flex justify-end mb-6">
@@ -213,7 +174,7 @@ const Index = () => {
           />
         </div>
 
-        {/* Progress Section */}
+        {/* Progress Section - Only show if user is logged in */}
         {user && <ProgressSection language={language} />}
 
         {/* Call to Action for Non-Authenticated Users */}
