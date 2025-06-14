@@ -1,43 +1,21 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { QuizConfig, QuizQuestion, QuizResult } from '@/types/quiz';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface QuizGameProps {
   config: QuizConfig;
   onComplete: (result: QuizResult) => void;
 }
 
-// Questions d'exemple (en attendant l'intégration IA)
-const sampleQuestions: Record<string, QuizQuestion[]> = {
-  'vie-jesus': [
-    {
-      id: '1',
-      question: 'Dans quelle ville Jésus est-il né ?',
-      options: ['Nazareth', 'Bethléem', 'Jérusalem', 'Capharnaüm'],
-      correctAnswer: 1,
-      verse: 'Matthieu 2:1 - Jésus étant né à Bethléem en Judée...'
-    },
-    {
-      id: '2',
-      question: 'Combien de disciples Jésus a-t-il appelés ?',
-      options: ['10', '11', '12', '13'],
-      correctAnswer: 2,
-      verse: 'Marc 3:14 - Il en établit douze pour les avoir avec lui...'
-    },
-    {
-      id: '3',
-      question: 'Quel miracle Jésus a-t-il accompli lors des noces de Cana ?',
-      options: ['Guérison d\'un aveugle', 'Transformation de l\'eau en vin', 'Multiplication des pains', 'Résurrection d\'un mort'],
-      correctAnswer: 1,
-      verse: 'Jean 2:11 - Tel fut, à Cana en Galilée, le premier des miracles que fit Jésus.'
-    }
-  ]
-};
-
 const QuizGame = ({ config, onComplete }: QuizGameProps) => {
+  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -45,20 +23,61 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
   const [score, setScore] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [startTime] = useState(Date.now());
-  const [questions] = useState(sampleQuestions['vie-jesus'] || []);
+  const { toast } = useToast();
 
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
+  // Generate questions when component mounts
+  useEffect(() => {
+    generateQuestions();
+  }, [config]);
+
+  const generateQuestions = async () => {
+    try {
+      setLoading(true);
+      console.log('Generating questions with config:', config);
+
+      const { data, error } = await supabase.functions.invoke('generate-quiz-questions', {
+        body: {
+          theme: config.theme,
+          difficulty: config.difficulty,
+          questionCount: config.questionCount
+        }
+      });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
+
+      if (!data?.questions) {
+        throw new Error('No questions received from API');
+      }
+
+      console.log('Received questions:', data.questions);
+      setQuestions(data.questions);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error generating questions:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer les questions. Veuillez réessayer.",
+        variant: "destructive",
+      });
+      setLoading(false);
+    }
+  };
+
   // Timer
   useEffect(() => {
-    if (timeLeft > 0 && !showResult) {
+    if (timeLeft > 0 && !showResult && !loading) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearTimeout(timer);
-    } else if (timeLeft === 0) {
+    } else if (timeLeft === 0 && !loading) {
       handleNextQuestion();
     }
-  }, [timeLeft, showResult]);
+  }, [timeLeft, showResult, loading]);
 
   const handleAnswerSelect = (answerIndex: number) => {
     if (showResult) return;
@@ -110,8 +129,40 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
     return 'text-red-600';
   };
 
+  if (loading) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <Card className="bg-white shadow-lg">
+          <CardContent className="p-8 text-center">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+              Génération de votre quiz...
+            </h2>
+            <p className="text-gray-600">
+              Préparation de {config.questionCount} questions sur {config.theme} (niveau {config.difficulty})
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (!currentQuestion) {
-    return <div>Chargement des questions...</div>;
+    return (
+      <div className="max-w-2xl mx-auto">
+        <Card className="bg-white shadow-lg">
+          <CardContent className="p-8 text-center">
+            <p className="text-red-600">Erreur lors du chargement des questions.</p>
+            <Button 
+              onClick={generateQuestions} 
+              className="mt-4"
+            >
+              Réessayer
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
