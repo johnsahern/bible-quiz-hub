@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Book, Play, Users, Bell, User, LogIn, Trophy } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Book, Play, Users, Bell, User, LogIn, Trophy, Target, Clock, Star, ChevronRight } from 'lucide-react';
 import VerseDuJour from '@/components/VerseDuJour';
 import Navigation from '@/components/Navigation';
 import QuizCard from '@/components/QuizCard';
@@ -30,7 +31,13 @@ const Index = () => {
       points: "Points",
       login: "Se connecter",
       profile: "Mon Profil",
-      welcome: "Bienvenue"
+      welcome: "Bienvenue",
+      viewProfile: "Voir le profil",
+      gamesPlayed: "Quiz joués",
+      bestScore: "Meilleur score",
+      joinNow: "Rejoignez BibleQuiz+ dès maintenant !",
+      createAccount: "Créer un compte gratuit",
+      accountDescription: "Créez votre compte pour sauvegarder vos scores, débloquer des achievements et défier vos amis."
     },
     en: {
       title: "BibleQuiz+",
@@ -46,7 +53,13 @@ const Index = () => {
       points: "Points",
       login: "Login",
       profile: "My Profile",
-      welcome: "Welcome"
+      welcome: "Welcome",
+      viewProfile: "View profile",
+      gamesPlayed: "Games played",
+      bestScore: "Best score",
+      joinNow: "Join BibleQuiz+ now!",
+      createAccount: "Create free account",
+      accountDescription: "Create your account to save scores, unlock achievements and challenge your friends."
     }
   };
 
@@ -71,43 +84,98 @@ const Index = () => {
       
       {/* Header Section */}
       <div className="container mx-auto px-4 pt-20 pb-8">
-        {/* Auth Section */}
-        <div className="flex justify-end mb-4">
-          {user ? (
-            <div className="flex items-center space-x-4">
-              {profile && (
-                <div className="text-right">
-                  <p className="text-sm text-blue-700">
-                    {t.welcome}, {profile.full_name || profile.username}!
-                  </p>
-                  <div className="flex items-center justify-end space-x-2 text-xs text-blue-600">
-                    <Trophy className="w-3 h-3" />
-                    <span>{profile.total_points} pts</span>
+        {/* Enhanced Profile Section */}
+        {user ? (
+          <div className="mb-8">
+            <Card className="bg-gradient-to-r from-blue-600 via-blue-700 to-purple-700 text-white border-0 shadow-2xl overflow-hidden relative">
+              <div className="absolute inset-0 bg-black/10"></div>
+              <CardContent className="relative p-6 md:p-8">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                  {/* User Info Section */}
+                  <div className="flex items-center space-x-4 md:space-x-6">
+                    <Avatar className="w-16 h-16 md:w-20 md:h-20 ring-4 ring-white/30 shadow-lg">
+                      <AvatarImage src={profile?.avatar_url} />
+                      <AvatarFallback className="bg-white/20 text-white text-xl md:text-2xl font-bold">
+                        {profile?.full_name?.[0] || profile?.username?.[0] || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    
+                    <div className="space-y-2">
+                      <div>
+                        <h2 className="text-xl md:text-2xl font-bold text-white mb-1">
+                          {t.welcome}, {profile?.full_name || profile?.username}!
+                        </h2>
+                        <p className="text-blue-100 text-sm md:text-base">
+                          @{profile?.username || 'user'}
+                        </p>
+                      </div>
+                      
+                      {/* Quick Stats */}
+                      <div className="flex flex-wrap items-center gap-3 md:gap-4">
+                        <div className="flex items-center space-x-2 bg-white/20 px-3 py-1 rounded-full">
+                          <Trophy className="w-4 h-4 text-yellow-300" />
+                          <span className="text-sm md:text-base font-semibold">
+                            {profile?.total_points || 0} pts
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 bg-white/20 px-3 py-1 rounded-full">
+                          <Target className="w-4 h-4 text-green-300" />
+                          <span className="text-sm md:text-base font-semibold">
+                            {profile?.best_score || 0}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 bg-white/20 px-3 py-1 rounded-full">
+                          <Clock className="w-4 h-4 text-purple-300" />
+                          <span className="text-sm md:text-base font-semibold">
+                            {profile?.games_played || 0} {t.gamesPlayed}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Button */}
+                  <div className="flex flex-col items-end space-y-3">
+                    <Link to="/profile" className="w-full md:w-auto">
+                      <Button 
+                        variant="secondary" 
+                        className="bg-white text-blue-700 hover:bg-blue-50 shadow-lg w-full md:w-auto group transition-all duration-200"
+                      >
+                        <User className="w-4 h-4 mr-2" />
+                        {t.viewProfile}
+                        <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </Link>
+                    
+                    {/* Level Badge */}
+                    <Badge className="bg-amber-500 text-amber-900 hover:bg-amber-400 px-3 py-1">
+                      <Star className="w-3 h-3 mr-1" />
+                      {t.level} {Math.floor((profile?.total_points || 0) / 100) + 1}
+                    </Badge>
                   </div>
                 </div>
-              )}
-              <Link to="/profile">
-                <Button variant="outline" size="sm">
-                  <User className="w-4 h-4 mr-2" />
-                  {t.profile}
-                </Button>
-              </Link>
-            </div>
-          ) : (
+              </CardContent>
+            </Card>
+          </div>
+        ) : (
+          <div className="flex justify-end mb-6">
             <Link to="/auth">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="shadow-md hover:shadow-lg transition-all duration-200">
                 <LogIn className="w-4 h-4 mr-2" />
                 {t.login}
               </Button>
             </Link>
-          )}
-        </div>
+          </div>
+        )}
 
+        {/* Main Title */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-blue-900 mb-4 animate-fade-in">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-blue-900 mb-4 animate-fade-in">
             {t.title}
           </h1>
-          <p className="text-lg text-blue-700 max-w-2xl mx-auto animate-fade-in">
+          <p className="text-lg md:text-xl text-blue-700 max-w-3xl mx-auto animate-fade-in">
             {t.subtitle}
           </p>
         </div>
@@ -118,7 +186,7 @@ const Index = () => {
         </div>
 
         {/* Main Action Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <QuizCard
             icon={<Play className="w-8 h-8" />}
             title={t.soloQuiz}
@@ -150,18 +218,27 @@ const Index = () => {
 
         {/* Call to Action for Non-Authenticated Users */}
         {!user && (
-          <Card className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-            <CardContent className="p-8 text-center">
-              <h3 className="text-2xl font-bold mb-4">Rejoignez BibleQuiz+ dès maintenant !</h3>
-              <p className="mb-6 text-blue-100">
-                Créez votre compte pour sauvegarder vos scores, débloquer des achievements et défier vos amis.
-              </p>
-              <Link to="/auth">
-                <Button variant="secondary" size="lg">
-                  <User className="w-4 h-4 mr-2" />
-                  Créer un compte gratuit
-                </Button>
-              </Link>
+          <Card className="bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white border-0 shadow-2xl overflow-hidden relative">
+            <div className="absolute inset-0 bg-black/10"></div>
+            <CardContent className="relative p-8 md:p-12 text-center">
+              <div className="max-w-2xl mx-auto">
+                <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                  {t.joinNow}
+                </h3>
+                <p className="mb-8 text-blue-100 text-base md:text-lg leading-relaxed">
+                  {t.accountDescription}
+                </p>
+                <Link to="/auth">
+                  <Button 
+                    variant="secondary" 
+                    size="lg" 
+                    className="bg-white text-blue-700 hover:bg-blue-50 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 px-8 py-3"
+                  >
+                    <User className="w-5 h-5 mr-3" />
+                    {t.createAccount}
+                  </Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
         )}
