@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { BookOpen, Search } from 'lucide-react';
 import { QuizTheme } from '@/types/quiz';
 import ThemeCategory from './ThemeCategory';
-import { getThemes } from '../../../data/themes';
+import { getThemes } from '../../data/themes';
 
 interface ThemeSelectionProps {
   selectedTheme: QuizTheme;
