@@ -57,11 +57,40 @@ export function validateQuestions(questions: any[], questionCount: number): Quiz
 }
 
 export function generateUniqueSeed(theme: string, difficulty: string, questionCount: number): number {
+  // Utiliser plusieurs sources d'entropie pour garantir l'unicité
   const timestamp = Date.now();
-  const randomSeed = Math.random() * 999999999;
-  const themeHash = theme.split('').reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 1), 0);
-  const difficultyHash = difficulty.split('').reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 1), 0);
-  return Math.floor(timestamp + randomSeed + themeHash * 13 + difficultyHash * 17 + questionCount * 23);
+  const microseconds = performance.now() * 1000; // Précision en microsecondes
+  const randomComponent = Math.random() * 999999999; // Grand nombre aléatoire
+  const sessionRandom = Math.random() * 888888888; // Second nombre aléatoire
+  
+  // Hachage des paramètres d'entrée avec plus de variabilité
+  const themeHash = theme.split('').reduce((acc, char, i) => {
+    return acc + char.charCodeAt(0) * (i + 1) * 17; // Multiplier par 17 pour plus de dispersion
+  }, 0);
+  
+  const difficultyHash = difficulty.split('').reduce((acc, char, i) => {
+    return acc + char.charCodeAt(0) * (i + 1) * 23; // Multiplier par 23 pour plus de dispersion
+  }, 0);
+  
+  // Ajouter un compteur basé sur l'heure précise pour éviter les collisions
+  const hourMinuteSecond = new Date().getHours() * 10000 + new Date().getMinutes() * 100 + new Date().getSeconds();
+  const millisecondComponent = new Date().getMilliseconds() * 1000;
+  
+  // Combiner toutes les sources d'entropie
+  const combinedSeed = Math.floor(
+    timestamp + 
+    microseconds + 
+    randomComponent + 
+    sessionRandom +
+    themeHash * 31 + 
+    difficultyHash * 37 + 
+    questionCount * 41 +
+    hourMinuteSecond * 43 +
+    millisecondComponent * 47
+  );
+  
+  // S'assurer que le seed est toujours positif et dans une plage raisonnable
+  return Math.abs(combinedSeed) % 999999999999 + 100000000000;
 }
 
 export function cleanJsonResponse(content: string): string {
