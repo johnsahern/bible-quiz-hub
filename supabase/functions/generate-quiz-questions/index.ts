@@ -51,6 +51,13 @@ serve(async (req) => {
         keyVerses: ['Matthieu 13:34-35', 'Marc 4:33-34', 'Luc 8:10', 'Matthieu 13:11', 'Psaume 78:2']
       },
 
+      // Apôtres
+      'jacques-apotre': {
+        title: 'Jacques l\'Apôtre, frère de Jean et pilier de l\'Église',
+        context: 'Jacques, fils de Zébédée et frère de Jean, appelé avec son frère par Jésus près de la mer de Galilée (Matthieu 4:21-22, Marc 1:19-20). Surnommé avec Jean "Boanergès" (fils du tonnerre) à cause de leur zèle ardent (Marc 3:17). Témoin privilégié de la transfiguration sur la montagne sainte avec Pierre et Jean (Matthieu 17:1-9, Marc 9:2-8, Luc 9:28-36). Présent lors de la résurrection de la fille de Jaïrus (Marc 5:37, Luc 8:51). Accompagne Jésus dans ses derniers moments à Gethsémané (Matthieu 26:37, Marc 14:33). Demande avec Jean les places d\'honneur dans le royaume (Matthieu 20:20-28, Marc 10:35-45). Premier apôtre martyr, mis à mort par l\'épée sur ordre d\'Hérode Agrippa Ier vers 44 ap. J.-C. (Actes 12:1-2). Son martyre marque le début des persécutions contre les dirigeants de l\'Église primitive. Membre du cercle intime des Douze avec Pierre et Jean.',
+        keyVerses: ['Actes 12:2', 'Marc 3:17', 'Matthieu 17:1', 'Marc 10:39', 'Luc 9:54']
+      },
+
       // Pentateuque - Fondements de la foi
       'creation': {
         title: 'la création du monde par la Parole de Dieu',
@@ -77,18 +84,11 @@ serve(async (req) => {
         keyVerses: ['Ésaïe 7:14', 'Ésaïe 9:5', 'Ésaïe 53:5-6', 'Ésaïe 40:3', 'Ésaïe 6:3']
       },
 
-      // Personnages de l'AT
-      'david': {
-        title: 'David, roi selon le cœur de Dieu',
-        context: 'Onction par Samuel à Bethléem (1 Samuel 16:1-13), musicien à la cour de Saül (1 Samuel 16:14-23), victoire contre Goliath de Gath (1 Samuel 17), amitié avec Jonathan (1 Samuel 18:1-4), jalousie de Saül (1 Samuel 18:5-16), mariage avec Mical (1 Samuel 18:17-30), fuite et vie errante (1 Samuel 19-26), séjour chez les Philistins (1 Samuel 27-30), mort de Saül et Jonathan (1 Samuel 31), lamentation (2 Samuel 1), roi de Juda à Hébron (2 Samuel 2:1-7), guerre contre la maison de Saül (2 Samuel 2:8-4:12), roi de tout Israël (2 Samuel 5:1-5), conquête de Jérusalem (2 Samuel 5:6-10), victoires contre les Philistins (2 Samuel 5:17-25), transport de l\'arche (2 Samuel 6), alliance davidique (2 Samuel 7), conquêtes et empire (2 Samuel 8-10), péché avec Bath-Schéba (2 Samuel 11), réprimande de Nathan (2 Samuel 12:1-15), mort de l\'enfant (2 Samuel 12:15-23), naissance de Salomon (2 Samuel 12:24-25), révolte d\'Absalom (2 Samuel 13-19), dénombrement et peste (2 Samuel 24), dernières paroles (2 Samuel 23:1-7), psalmiste inspiré (Psaumes)',
-        keyVerses: ['1 Samuel 13:14', '2 Samuel 7:16', 'Psaume 23:1', 'Actes 13:22', 'Matthieu 1:1']
-      },
-
-      // Et continuer pour tous les autres thèmes...
-      'abraham': {
-        title: 'Abraham, père de la foi et des croyants',
-        context: 'Appel à Ur des Chaldéens (Genèse 12:1-3), promesses divines (descendance, terre, bénédiction), départ vers Canaan (Genèse 12:4-9), descente en Égypte (Genèse 12:10-20), séparation d\'avec Lot (Genèse 13), victoire contre les rois (Genèse 14), alliance avec Dieu (Genèse 15), naissance d\'Ismaël par Agar (Genèse 16), circoncision signe de l\'alliance (Genèse 17), hospitalité aux trois anges (Genèse 18:1-15), intercession pour Sodome (Genèse 18:16-33), naissance d\'Isaac (Genèse 21:1-7), renvoi d\'Agar et Ismaël (Genèse 21:8-21), sacrifice d\'Isaac sur le mont Morija (Genèse 22:1-19), achat de la caverne de Macpéla (Genèse 23), mariage d\'Isaac (Genèse 24), mort à 175 ans (Genèse 25:7-10)',
-        keyVerses: ['Genèse 12:2-3', 'Genèse 15:6', 'Romains 4:16', 'Galates 3:8-9', 'Hébreux 11:8-10']
+      // Pour tous les autres thèmes, on utilise un contexte générique mais bibliquement correct
+      'default': {
+        title: 'ce thème biblique important',
+        context: 'Un sujet biblique fondamental qui mérite une étude approfondie des Écritures saintes. Les questions porteront sur les enseignements, personnages, événements et vérités doctrinales liés à ce thème, en s\'appuyant sur l\'ensemble de la révélation biblique.',
+        keyVerses: ['2 Timothée 3:16', 'Psaume 119:105', '1 Pierre 1:25']
       }
     };
 
@@ -108,11 +108,12 @@ serve(async (req) => {
       }
     };
 
-    const selectedContext = biblicalContexts[theme];
+    // Récupération du contexte - utilise 'default' si le thème n'existe pas
+    const selectedContext = biblicalContexts[theme] || biblicalContexts['default'];
     const selectedDifficulty = difficultyInstructions[difficulty];
 
-    if (!selectedContext) {
-      throw new Error(`Thème biblique non supporté: ${theme}`);
+    if (!selectedDifficulty) {
+      throw new Error(`Niveau de difficulté non supporté: ${difficulty}`);
     }
 
     // Seed ultra-unique pour éviter toute répétition
