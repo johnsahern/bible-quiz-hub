@@ -71,6 +71,7 @@ const Index = () => {
             description="Quiz personnel avec différents niveaux"
             color="bg-gradient-to-br from-blue-500 to-blue-600"
             delay="0.1s"
+            route="/quiz-solo"
           />
           
           <QuizCard
