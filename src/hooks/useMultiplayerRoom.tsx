@@ -301,7 +301,9 @@ export const useMultiplayerRoom = (roomId?: string) => {
         // Charger la question actuelle si le quiz est en cours
         if (roomData.status === 'playing' && roomData.questions && roomData.current_question !== null) {
           const questions = Array.isArray(roomData.questions) ? roomData.questions : [];
-          setCurrentQuestion(questions[roomData.current_question]);
+          if (questions.length > roomData.current_question) {
+            setCurrentQuestion(questions[roomData.current_question] as QuizQuestion);
+          }
         }
 
         // Charger les joueurs
@@ -344,7 +346,9 @@ export const useMultiplayerRoom = (roomId?: string) => {
             // Mettre à jour la question actuelle
             if (newRoom.status === 'playing' && newRoom.questions && newRoom.current_question !== null) {
               const questions = Array.isArray(newRoom.questions) ? newRoom.questions : [];
-              setCurrentQuestion(questions[newRoom.current_question]);
+              if (questions.length > newRoom.current_question) {
+                setCurrentQuestion(questions[newRoom.current_question] as QuizQuestion);
+              }
             }
           }
         }
