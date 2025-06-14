@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, Clock, Target, RotateCcw, Home, Share2 } from 'lucide-react';
+import { Trophy, Clock, Target, RotateCcw, Home, Share2, Star } from 'lucide-react';
 import { QuizResult } from '@/types/quiz';
 
 interface QuizResultsProps {
@@ -87,7 +87,7 @@ const QuizResults = ({ result, onPlayAgain, onBackToHome }: QuizResultsProps) =>
           {/* Score principal - Afficher le nombre de bonnes réponses */}
           <div className="text-center">
             <div className="text-4xl font-bold text-blue-900 mb-2">
-              {result.score}/{result.totalQuestions}
+              {result.correctAnswers}/{result.totalQuestions}
             </div>
             <div className="text-lg text-blue-700 mb-4">
               {percentage}% de bonnes réponses
@@ -100,7 +100,7 @@ const QuizResults = ({ result, onPlayAgain, onBackToHome }: QuizResultsProps) =>
           </div>
 
           {/* Statistiques détaillées */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-3">
             <div className="bg-white rounded-lg p-4 text-center shadow-sm">
               <div className="flex items-center justify-center mb-2">
                 <Target className="w-5 h-5 text-green-600 mr-2" />
@@ -117,6 +117,15 @@ const QuizResults = ({ result, onPlayAgain, onBackToHome }: QuizResultsProps) =>
               </div>
               <div className="text-2xl font-bold text-blue-600">{formatTime(result.timeSpent)}</div>
               <div className="text-xs text-gray-500">temps de réaction</div>
+            </div>
+
+            <div className="bg-white rounded-lg p-4 text-center shadow-sm">
+              <div className="flex items-center justify-center mb-2">
+                <Star className="w-5 h-5 text-purple-600 mr-2" />
+                <span className="text-sm text-gray-600">Points Totaux</span>
+              </div>
+              <div className="text-2xl font-bold text-purple-600">{result.score}</div>
+              <div className="text-xs text-gray-500">points gagnés</div>
             </div>
           </div>
 
