@@ -17,7 +17,9 @@ import {
   Edit, 
   Save,
   Share2,
-  History
+  History,
+  LogOut,
+  Settings
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -159,125 +161,149 @@ const Profile = () => {
   };
 
   if (!user || !profile) {
-    return <div>Chargement...</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <User className="w-6 h-6 text-white" />
+          </div>
+          <p className="text-blue-700">Chargement...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-4 sm:py-8 max-w-4xl">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 gap-4">
           <Button
             variant="ghost"
             onClick={() => navigate('/')}
-            className="text-blue-600"
+            className="text-blue-600 hover:bg-blue-100 self-start"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Retour à l'accueil
           </Button>
-          
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={shareProfile}
-              className="text-blue-600"
-            >
-              <Share2 className="w-4 h-4 mr-2" />
-              Partager
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleSignOut}
-              className="text-red-600"
-            >
-              Déconnexion
-            </Button>
-          </div>
         </div>
 
-        {/* Profile Header */}
-        <Card className="mb-8">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
-                  <User className="w-8 h-8 text-white" />
+        {/* Profile Header Card */}
+        <Card className="mb-6 sm:mb-8 shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+          <CardHeader className="pb-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="flex items-center space-x-4 flex-1">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                  <User className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                 </div>
-                <div>
-                  <CardTitle className="text-2xl">
+                <div className="flex-1 min-w-0">
+                  <CardTitle className="text-xl sm:text-2xl text-blue-900 truncate">
                     {profile.full_name || profile.username || 'Utilisateur'}
                   </CardTitle>
-                  <p className="text-gray-600">@{profile.username || 'user'}</p>
+                  <p className="text-gray-600 text-sm sm:text-base">@{profile.username || 'user'}</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Membre depuis {new Date(profile.created_at).toLocaleDateString('fr-FR')}
+                  </p>
                 </div>
               </div>
               
-              <Button
-                variant="outline"
-                onClick={() => setIsEditing(!isEditing)}
-                disabled={loading}
-              >
-                {isEditing ? <Save className="w-4 h-4" /> : <Edit className="w-4 h-4" />}
-              </Button>
+              {/* Action Buttons */}
+              <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsEditing(!isEditing)}
+                  disabled={loading}
+                  className="flex-1 sm:flex-initial text-blue-600 border-blue-200 hover:bg-blue-50"
+                  size="sm"
+                >
+                  {isEditing ? <Save className="w-4 h-4 mr-2" /> : <Edit className="w-4 h-4 mr-2" />}
+                  {isEditing ? 'Sauvegarder' : 'Modifier'}
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={shareProfile}
+                  className="flex-1 sm:flex-initial text-green-600 border-green-200 hover:bg-green-50"
+                  size="sm"
+                >
+                  <Share2 className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Partager</span>
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={handleSignOut}
+                  className="flex-1 sm:flex-initial text-red-600 border-red-200 hover:bg-red-50"
+                  size="sm"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Déconnexion</span>
+                </Button>
+              </div>
             </div>
           </CardHeader>
           
-          <CardContent>
+          <CardContent className="pt-0">
             {isEditing ? (
               <div className="space-y-4">
-                <div>
-                  <Label htmlFor="username">Nom d'utilisateur</Label>
-                  <Input
-                    id="username"
-                    value={editData.username}
-                    onChange={(e) => setEditData({ ...editData, username: e.target.value })}
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="username" className="text-sm font-medium text-gray-700">Nom d'utilisateur</Label>
+                    <Input
+                      id="username"
+                      value={editData.username}
+                      onChange={(e) => setEditData({ ...editData, username: e.target.value })}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="fullname" className="text-sm font-medium text-gray-700">Nom complet</Label>
+                    <Input
+                      id="fullname"
+                      value={editData.full_name}
+                      onChange={(e) => setEditData({ ...editData, full_name: e.target.value })}
+                      className="mt-1"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="fullname">Nom complet</Label>
-                  <Input
-                    id="fullname"
-                    value={editData.full_name}
-                    onChange={(e) => setEditData({ ...editData, full_name: e.target.value })}
-                  />
-                </div>
-                <Button onClick={handleSaveProfile} disabled={loading}>
-                  Sauvegarder
+                <Button onClick={handleSaveProfile} disabled={loading} className="w-full sm:w-auto">
+                  {loading ? 'Sauvegarde...' : 'Sauvegarder les modifications'}
                 </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="text-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                   <div className="flex items-center justify-center mb-2">
                     <Trophy className="w-5 h-5 text-yellow-600 mr-1" />
-                    <span className="text-sm text-gray-600">Points</span>
                   </div>
-                  <div className="text-2xl font-bold text-yellow-600">{profile.total_points}</div>
+                  <div className="text-lg sm:text-2xl font-bold text-yellow-600">{profile.total_points}</div>
+                  <div className="text-xs sm:text-sm text-gray-600">Points</div>
                 </div>
                 
-                <div className="text-center">
+                <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
                   <div className="flex items-center justify-center mb-2">
                     <Target className="w-5 h-5 text-green-600 mr-1" />
-                    <span className="text-sm text-gray-600">Meilleur Score</span>
                   </div>
-                  <div className="text-2xl font-bold text-green-600">{profile.best_score}</div>
+                  <div className="text-lg sm:text-2xl font-bold text-green-600">{profile.best_score}</div>
+                  <div className="text-xs sm:text-sm text-gray-600">Meilleur Score</div>
                 </div>
                 
-                <div className="text-center">
+                <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
                   <div className="flex items-center justify-center mb-2">
                     <BookOpen className="w-5 h-5 text-blue-600 mr-1" />
-                    <span className="text-sm text-gray-600">Quiz Joués</span>
                   </div>
-                  <div className="text-2xl font-bold text-blue-600">{profile.games_played}</div>
+                  <div className="text-lg sm:text-2xl font-bold text-blue-600">{profile.games_played}</div>
+                  <div className="text-xs sm:text-sm text-gray-600">Quiz Joués</div>
                 </div>
                 
-                <div className="text-center">
+                <div className="text-center p-3 bg-purple-50 rounded-lg border border-purple-200">
                   <div className="flex items-center justify-center mb-2">
                     <Clock className="w-5 h-5 text-purple-600 mr-1" />
-                    <span className="text-sm text-gray-600">Membre depuis</span>
                   </div>
-                  <div className="text-sm font-medium text-purple-600">
-                    {new Date(profile.created_at).toLocaleDateString('fr-FR')}
+                  <div className="text-sm sm:text-lg font-bold text-purple-600">
+                    {achievements.length}
                   </div>
+                  <div className="text-xs sm:text-sm text-gray-600">Achievements</div>
                 </div>
               </div>
             )}
@@ -286,29 +312,39 @@ const Profile = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="history" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="history">Historique</TabsTrigger>
-            <TabsTrigger value="achievements">Achievements</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="history" className="text-sm sm:text-base">Historique</TabsTrigger>
+            <TabsTrigger value="achievements" className="text-sm sm:text-base">Achievements</TabsTrigger>
           </TabsList>
 
           {/* Historique des quiz */}
           <TabsContent value="history">
-            <Card>
+            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-lg sm:text-xl">
                   <History className="w-5 h-5 mr-2" />
                   Historique des Quiz
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {quizHistory.length === 0 ? (
-                  <p className="text-center text-gray-500">Aucun quiz joué pour le moment</p>
+                  <div className="text-center py-8">
+                    <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500">Aucun quiz joué pour le moment</p>
+                    <Button 
+                      onClick={() => navigate('/quiz-solo')} 
+                      className="mt-4"
+                      variant="outline"
+                    >
+                      Commencer un quiz
+                    </Button>
+                  </div>
                 ) : (
                   <div className="space-y-3">
                     {quizHistory.map((quiz) => (
-                      <div key={quiz.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <div className="font-medium">{quiz.theme}</div>
+                      <div key={quiz.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                        <div className="flex-1 mb-3 sm:mb-0">
+                          <div className="font-medium text-gray-900">{quiz.theme}</div>
                           <div className="text-sm text-gray-600">
                             {quiz.correct_answers}/{quiz.total_questions} bonnes réponses
                           </div>
@@ -316,12 +352,16 @@ const Profile = () => {
                             {new Date(quiz.created_at).toLocaleDateString('fr-FR')}
                           </div>
                         </div>
-                        <div className="text-right">
-                          <Badge className="mb-1">{quiz.difficulty}</Badge>
-                          <div className="text-lg font-bold text-blue-600">{quiz.score} pts</div>
-                          {quiz.badge && (
-                            <div className="text-xs text-amber-600">{quiz.badge}</div>
-                          )}
+                        <div className="flex items-center justify-between sm:justify-end sm:text-right gap-4">
+                          <Badge variant="outline" className="text-xs">
+                            {quiz.difficulty}
+                          </Badge>
+                          <div>
+                            <div className="text-lg font-bold text-blue-600">{quiz.score} pts</div>
+                            {quiz.badge && (
+                              <div className="text-xs text-amber-600">{quiz.badge}</div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -333,24 +373,35 @@ const Profile = () => {
 
           {/* Achievements */}
           <TabsContent value="achievements">
-            <Card>
+            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-lg sm:text-xl">
                   <Trophy className="w-5 h-5 mr-2" />
                   Achievements
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {achievements.length === 0 ? (
-                  <p className="text-center text-gray-500">Aucun achievement débloqué</p>
+                  <div className="text-center py-8">
+                    <Trophy className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500">Aucun achievement débloqué</p>
+                    <p className="text-sm text-gray-400 mt-2">Jouez des quiz pour débloquer des achievements !</p>
+                  </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {achievements.map((achievement) => (
-                      <div key={achievement.id} className="p-4 bg-amber-50 rounded-lg border border-amber-200">
-                        <div className="font-medium text-amber-800">{achievement.achievement_name}</div>
-                        <div className="text-sm text-amber-700">{achievement.description}</div>
-                        <div className="text-xs text-amber-600 mt-2">
-                          {new Date(achievement.earned_at).toLocaleDateString('fr-FR')}
+                      <div key={achievement.id} className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg border border-amber-200 hover:shadow-md transition-shadow">
+                        <div className="flex items-start space-x-3">
+                          <div className="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Trophy className="w-5 h-5 text-white" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-amber-800 truncate">{achievement.achievement_name}</div>
+                            <div className="text-sm text-amber-700 mt-1">{achievement.description}</div>
+                            <div className="text-xs text-amber-600 mt-2">
+                              {new Date(achievement.earned_at).toLocaleDateString('fr-FR')}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     ))}
