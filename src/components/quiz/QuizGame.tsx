@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Clock, CheckCircle, XCircle, Loader2, AlertCircle } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Loader2, AlertCircle, CreditCard } from 'lucide-react';
 import { QuizConfig, QuizQuestion, QuizResult } from '@/types/quiz';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -51,7 +52,15 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
 
       if (error) {
         console.error('❌ Supabase function error:', error);
-        throw new Error(`Erreur API: ${error.message}`);
+        
+        // Messages d'erreur plus explicites
+        if (error.message?.includes('insufficient_quota') || error.message?.includes('429')) {
+          throw new Error('Quota OpenAI dépassé. Veuillez vérifier votre plan de facturation OpenAI et réessayer plus tard.');
+        } else if (error.message?.includes('401')) {
+          throw new Error('Clé API OpenAI invalide. Veuillez vérifier votre configuration.');
+        } else {
+          throw new Error(`Erreur API: ${error.message}`);
+        }
       }
 
       if (!data?.questions || !Array.isArray(data.questions)) {
@@ -72,8 +81,8 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
       setLoading(false);
       
       toast({
-        title: "Erreur",
-        description: `Impossible de générer les questions: ${error.message}`,
+        title: "Erreur de génération",
+        description: error.message,
         variant: "destructive",
       });
     }
@@ -146,13 +155,16 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
           <CardContent className="p-8 text-center">
             <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
             <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              Génération de votre quiz...
+              ✨ Génération de votre quiz personnalisé...
             </h2>
-            <p className="text-gray-600">
-              Préparation de {config.questionCount} questions sur {config.theme} (niveau {config.difficulty})
+            <p className="text-gray-600 mb-2">
+              Préparation de {config.questionCount} questions uniques sur <strong>{config.theme}</strong>
+            </p>
+            <p className="text-sm text-gray-500">
+              Niveau: <span className="font-medium">{config.difficulty}</span>
             </p>
             <div className="mt-4 text-sm text-gray-500">
-              ⏳ Cela peut prendre quelques secondes...
+              ⏳ Création de questions originales en cours...
             </div>
           </CardContent>
         </Card>
@@ -161,25 +173,46 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
   }
 
   if (error) {
+    const isQuotaError = error.includes('Quota') || error.includes('quota') || error.includes('429');
+    
     return (
       <div className="max-w-2xl mx-auto">
         <Card className="bg-white shadow-lg">
           <CardContent className="p-8 text-center">
-            <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
+            {isQuotaError ? (
+              <CreditCard className="w-12 h-12 mx-auto mb-4 text-orange-500" />
+            ) : (
+              <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
+            )}
+            
             <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              Erreur de génération
+              {isQuotaError ? 'Quota OpenAI dépassé' : 'Erreur de génération'}
             </h2>
+            
             <p className="text-red-600 mb-4">{error}</p>
+            
+            {isQuotaError && (
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-orange-800">
+                  <strong>Solution :</strong> Vérifiez votre plan de facturation OpenAI ou attendez la réinitialisation de votre quota.
+                </p>
+              </div>
+            )}
+            
             <div className="space-y-2">
               <Button 
                 onClick={generateQuestions} 
                 className="w-full"
+                variant={isQuotaError ? "outline" : "default"}
               >
                 <Loader2 className="w-4 h-4 mr-2" />
                 Réessayer
               </Button>
               <p className="text-xs text-gray-500">
-                Si le problème persiste, vérifiez votre connexion internet
+                {isQuotaError 
+                  ? "Peut nécessiter d'attendre quelques minutes"
+                  : "Vérifiez votre connexion internet"
+                }
               </p>
             </div>
           </CardContent>
