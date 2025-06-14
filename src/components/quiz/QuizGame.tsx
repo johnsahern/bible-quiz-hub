@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Clock, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Loader2, AlertCircle } from 'lucide-react';
 import { QuizConfig, QuizQuestion, QuizResult } from '@/types/quiz';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -16,6 +15,7 @@ interface QuizGameProps {
 const QuizGame = ({ config, onComplete }: QuizGameProps) => {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -36,7 +36,8 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
   const generateQuestions = async () => {
     try {
       setLoading(true);
-      console.log('Generating questions with config:', config);
+      setError(null);
+      console.log('🚀 Generating questions with config:', config);
 
       const { data, error } = await supabase.functions.invoke('generate-quiz-questions', {
         body: {
@@ -46,26 +47,35 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
         }
       });
 
+      console.log('📡 Supabase response:', { data, error });
+
       if (error) {
-        console.error('Supabase function error:', error);
-        throw error;
+        console.error('❌ Supabase function error:', error);
+        throw new Error(`Erreur API: ${error.message}`);
       }
 
-      if (!data?.questions) {
-        throw new Error('No questions received from API');
+      if (!data?.questions || !Array.isArray(data.questions)) {
+        console.error('❌ Invalid response format:', data);
+        throw new Error('Format de réponse invalide de l\'API');
       }
 
-      console.log('Received questions:', data.questions);
+      if (data.questions.length === 0) {
+        throw new Error('Aucune question générée');
+      }
+
+      console.log('✅ Received questions:', data.questions);
       setQuestions(data.questions);
       setLoading(false);
     } catch (error) {
-      console.error('Error generating questions:', error);
+      console.error('❌ Error generating questions:', error);
+      setError(error.message || 'Erreur inconnue');
+      setLoading(false);
+      
       toast({
         title: "Erreur",
-        description: "Impossible de générer les questions. Veuillez réessayer.",
+        description: `Impossible de générer les questions: ${error.message}`,
         variant: "destructive",
       });
-      setLoading(false);
     }
   };
 
@@ -141,6 +151,37 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
             <p className="text-gray-600">
               Préparation de {config.questionCount} questions sur {config.theme} (niveau {config.difficulty})
             </p>
+            <div className="mt-4 text-sm text-gray-500">
+              ⏳ Cela peut prendre quelques secondes...
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <Card className="bg-white shadow-lg">
+          <CardContent className="p-8 text-center">
+            <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+              Erreur de génération
+            </h2>
+            <p className="text-red-600 mb-4">{error}</p>
+            <div className="space-y-2">
+              <Button 
+                onClick={generateQuestions} 
+                className="w-full"
+              >
+                <Loader2 className="w-4 h-4 mr-2" />
+                Réessayer
+              </Button>
+              <p className="text-xs text-gray-500">
+                Si le problème persiste, vérifiez votre connexion internet
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -152,7 +193,8 @@ const QuizGame = ({ config, onComplete }: QuizGameProps) => {
       <div className="max-w-2xl mx-auto">
         <Card className="bg-white shadow-lg">
           <CardContent className="p-8 text-center">
-            <p className="text-red-600">Erreur lors du chargement des questions.</p>
+            <AlertCircle className="w-8 h-8 mx-auto mb-4 text-amber-500" />
+            <p className="text-amber-600 mb-4">Aucune question disponible.</p>
             <Button 
               onClick={generateQuestions} 
               className="mt-4"
