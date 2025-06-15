@@ -1,3 +1,4 @@
+
 import React from 'react';
 import QuizCard from '@/components/QuizCard';
 import VerseDuJour from '@/components/VerseDuJour';
@@ -46,8 +47,8 @@ const Index = () => {
           />
         </div>
 
-        <VerseDuJour />
-        <ProgressSection />
+        <VerseDuJour language="fr" />
+        <ProgressSection language="fr" />
       </div>
     </div>
   );
