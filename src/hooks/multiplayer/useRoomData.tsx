@@ -25,6 +25,7 @@ export const useRoomData = ({
 }: UseRoomDataProps) => {
   const isLoadingRef = useRef(false);
   const lastLoadedRoomId = useRef<string | null>(null);
+  const lastLoadedUserId = useRef<string | null>(null);
 
   useEffect(() => {
     // Early return if no roomId or userId
@@ -33,9 +34,9 @@ export const useRoomData = ({
       return;
     }
 
-    // Skip if already loaded this room
-    if (lastLoadedRoomId.current === roomId) {
-      console.log('Skipping duplicate room data load for:', roomId);
+    // Skip if already loaded this combination
+    if (lastLoadedRoomId.current === roomId && lastLoadedUserId.current === userId) {
+      console.log('Skipping duplicate room data load for:', roomId, userId);
       return;
     }
 
@@ -48,6 +49,7 @@ export const useRoomData = ({
     const loadRoomData = async () => {
       isLoadingRef.current = true;
       lastLoadedRoomId.current = roomId;
+      lastLoadedUserId.current = userId;
 
       try {
         console.log('Loading room data for room:', roomId);

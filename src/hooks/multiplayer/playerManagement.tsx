@@ -11,6 +11,19 @@ export const addPlayerToRoom = async (user: any, roomId: string, isHost: boolean
   try {
     console.log('👤 Adding player to room:', roomId);
 
+    // First check if player is already in room
+    const { data: existingPlayer } = await supabase
+      .from('quiz_room_players')
+      .select('id')
+      .eq('room_id', roomId)
+      .eq('user_id', user.id)
+      .single();
+
+    if (existingPlayer) {
+      console.log('ℹ️ Player already in room');
+      return true; // Already in room is not an error
+    }
+
     // Get user profile
     const { data: profile } = await supabase
       .from('profiles')

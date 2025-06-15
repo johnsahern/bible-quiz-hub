@@ -18,7 +18,6 @@ export const useRealtimeSubscription = ({
   setCurrentQuestion
 }: UseRealtimeSubscriptionProps) => {
   const channelRef = useRef<any>(null);
-  const isSubscribedRef = useRef(false);
   const currentRoomIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -28,14 +27,13 @@ export const useRealtimeSubscription = ({
         console.log('Cleaning up subscription - no roomId');
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
-        isSubscribedRef.current = false;
         currentRoomIdRef.current = null;
       }
       return;
     }
 
     // Skip if already subscribed to the same room
-    if (isSubscribedRef.current && currentRoomIdRef.current === roomId) {
+    if (currentRoomIdRef.current === roomId && channelRef.current) {
       console.log('Already subscribed to room:', roomId);
       return;
     }
@@ -45,13 +43,12 @@ export const useRealtimeSubscription = ({
       console.log('Cleaning up existing channel');
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
-      isSubscribedRef.current = false;
     }
 
     console.log('Setting up realtime subscription for room:', roomId);
 
     const roomChannel = supabase
-      .channel(`room-${roomId}`)
+      .channel(`room-${roomId}-${Date.now()}`) // Add timestamp to ensure unique channel
       .on('postgres_changes', 
         { event: '*', schema: 'public', table: 'quiz_rooms', filter: `id=eq.${roomId}` },
         (payload) => {
@@ -95,7 +92,6 @@ export const useRealtimeSubscription = ({
     roomChannel.subscribe((status) => {
       console.log('Subscription status:', status);
       if (status === 'SUBSCRIBED') {
-        isSubscribedRef.current = true;
         currentRoomIdRef.current = roomId;
       }
     });
@@ -107,7 +103,6 @@ export const useRealtimeSubscription = ({
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
-        isSubscribedRef.current = false;
         currentRoomIdRef.current = null;
       }
     };

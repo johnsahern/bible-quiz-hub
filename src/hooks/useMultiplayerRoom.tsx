@@ -1,5 +1,5 @@
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { QuizRoom, RoomPlayer } from '@/types/multiplayer';
 import { QuizQuestion } from '@/types/quiz';
@@ -11,12 +11,6 @@ import { useRoomData } from './multiplayer/useRoomData';
 import { UseMultiplayerRoomReturn } from './multiplayer/types';
 
 export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn => {
-  console.log('useMultiplayerRoom hook called:', { 
-    roomId, 
-    userId: useAuth().user?.id,
-    hookCallCount: Date.now()
-  });
-
   const { user } = useAuth();
   const [room, setRoom] = useState<QuizRoom | null>(null);
   const [players, setPlayers] = useState<RoomPlayer[]>([]);
@@ -25,19 +19,28 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Extract primitive values for stable dependencies
-  const userId = user?.id;
-  const stableRoomId = roomId;
+  // Use refs to prevent hook recreation on each render
+  const stableRoomId = useRef(roomId);
+  const stableUserId = useRef(user?.id);
+  
+  // Update refs only when values actually change
+  useEffect(() => {
+    stableRoomId.current = roomId;
+  }, [roomId]);
+  
+  useEffect(() => {
+    stableUserId.current = user?.id;
+  }, [user?.id]);
 
-  // Create operations with stable dependencies
-  const roomOperations = useRoomOperations(userId);
-  const playerActions = usePlayerActions(userId, room?.id);
-  const quizOperations = useQuizOperations(userId, room?.id, isHost);
+  // Create operations with stable values
+  const roomOperations = useRoomOperations(stableUserId.current);
+  const playerActions = usePlayerActions(stableUserId.current, stableRoomId.current);
+  const quizOperations = useQuizOperations(stableUserId.current, stableRoomId.current, isHost);
 
   // Load room data on mount - only if roomId is provided
   useRoomData({
-    roomId: stableRoomId,
-    userId,
+    roomId: stableRoomId.current,
+    userId: stableUserId.current,
     setRoom,
     setIsHost,
     setCurrentQuestion,
@@ -47,7 +50,7 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
 
   // Set up realtime subscriptions - only if roomId is provided  
   useRealtimeSubscription({
-    roomId: stableRoomId,
+    roomId: stableRoomId.current,
     setRoom,
     setPlayers,
     setCurrentQuestion
