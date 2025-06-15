@@ -1,8 +1,8 @@
 
 // Configuration centralisée pour l'API Bible
 export const BIBLE_API_CONFIG = {
-  // Clé API temporaire - L'utilisateur doit obtenir une clé valide sur https://scripture.api.bible
-  API_KEY: 'YOUR_API_KEY_HERE', // Remplacer par une clé API valide
+  // Clé API valide fournie par l'utilisateur
+  API_KEY: '805e891ef27f88a403c1d61184828c7d',
   BASE_URL: 'https://api.scripture.api.bible/v1',
   
   // IDs spécifiques pour Louis Segond et autres versions françaises
