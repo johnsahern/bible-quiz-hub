@@ -8,16 +8,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Users, Plus, LogIn, Gamepad2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useMultiplayerRoom } from '@/hooks/useMultiplayerRoom';
 import { useAuth } from '@/contexts/AuthContext';
 import { getThemes } from '@/data/themes';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useRoomOperations } from '@/hooks/multiplayer/useRoomOperations';
 
 const MultiplayerSetup: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { createRoom, joinRoom, loading } = useMultiplayerRoom();
+  const roomOperations = useRoomOperations(user);
   
   // État pour créer une salle
   const [createForm, setCreateForm] = useState({
@@ -28,6 +28,7 @@ const MultiplayerSetup: React.FC = () => {
   
   // État pour rejoindre une salle
   const [roomCode, setRoomCode] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const themes = getThemes();
 
@@ -46,9 +47,16 @@ const MultiplayerSetup: React.FC = () => {
       return;
     }
 
-    const room = await createRoom(createForm.theme, createForm.difficulty, createForm.questionCount);
-    if (room) {
-      navigate(`/quiz-multijoueur/${room.id}`);
+    setLoading(true);
+    try {
+      const room = await roomOperations.createRoom(createForm.theme, createForm.difficulty, createForm.questionCount);
+      if (room) {
+        navigate(`/quiz-multijoueur/${room.id}`);
+      }
+    } catch (error) {
+      console.error('Error creating room:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,19 +75,25 @@ const MultiplayerSetup: React.FC = () => {
       return;
     }
 
-    const success = await joinRoom(roomCode.trim());
-    if (success) {
-      // La navigation sera gérée par le hook après avoir rejoint avec succès
-      // Nous devons récupérer l'ID de la salle
-      const { data: roomData } = await supabase
-        .from('quiz_rooms')
-        .select('id')
-        .eq('room_code', roomCode.toUpperCase())
-        .single();
-      
-      if (roomData) {
-        navigate(`/quiz-multijoueur/${roomData.id}`);
+    setLoading(true);
+    try {
+      const success = await roomOperations.joinRoom(roomCode.trim());
+      if (success) {
+        // Récupérer l'ID de la salle pour naviguer
+        const { data: roomData } = await supabase
+          .from('quiz_rooms')
+          .select('id')
+          .eq('room_code', roomCode.toUpperCase())
+          .single();
+        
+        if (roomData) {
+          navigate(`/quiz-multijoueur/${roomData.id}`);
+        }
       }
+    } catch (error) {
+      console.error('Error joining room:', error);
+    } finally {
+      setLoading(false);
     }
   };
 

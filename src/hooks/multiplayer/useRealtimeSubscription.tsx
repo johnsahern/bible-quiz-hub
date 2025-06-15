@@ -18,15 +18,17 @@ export const useRealtimeSubscription = ({
   setCurrentQuestion
 }: UseRealtimeSubscriptionProps) => {
   const channelRef = useRef<any>(null);
+  const isSubscribedRef = useRef(false);
 
   useEffect(() => {
-    if (!roomId) return;
+    if (!roomId || isSubscribedRef.current) return;
 
     // Clean up existing channel first
     if (channelRef.current) {
       console.log('Cleaning up existing channel');
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
+      isSubscribedRef.current = false;
     }
 
     console.log('Setting up realtime subscription for room:', roomId);
@@ -75,6 +77,9 @@ export const useRealtimeSubscription = ({
     // Subscribe and store reference
     roomChannel.subscribe((status) => {
       console.log('Subscription status:', status);
+      if (status === 'SUBSCRIBED') {
+        isSubscribedRef.current = true;
+      }
     });
     
     channelRef.current = roomChannel;
@@ -84,6 +89,7 @@ export const useRealtimeSubscription = ({
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
+        isSubscribedRef.current = false;
       }
     };
   }, [roomId]); // Only depend on roomId to avoid re-subscriptions

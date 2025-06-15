@@ -26,7 +26,7 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
   const playerActions = usePlayerActions(user, room);
   const quizOperations = useQuizOperations(user, room, isHost);
 
-  // Load room data on mount
+  // Load room data on mount - seulement si roomId est fourni
   useRoomData({
     roomId,
     user,
@@ -37,7 +37,7 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
     setError
   });
 
-  // Set up realtime subscriptions
+  // Set up realtime subscriptions - seulement si roomId est fourni  
   useRealtimeSubscription({
     roomId,
     setRoom,
