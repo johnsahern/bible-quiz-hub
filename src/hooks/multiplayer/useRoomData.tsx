@@ -24,8 +24,9 @@ export const useRoomData = ({
   setError
 }: UseRoomDataProps) => {
   useEffect(() => {
-    if (!roomId || !user) {
-      console.log('Missing roomId or user for useRoomData');
+    // Vérifier que les paramètres requis sont présents
+    if (!roomId || !user?.id) {
+      console.log('Missing roomId or user for useRoomData:', { roomId, userId: user?.id });
       return;
     }
 
@@ -93,5 +94,5 @@ export const useRoomData = ({
     };
 
     loadRoomData();
-  }, [roomId, user?.id, setRoom, setIsHost, setCurrentQuestion, setPlayers, setError]);
+  }, [roomId, user?.id]); // Simplifier les dépendances pour éviter undefined
 };
