@@ -1,8 +1,12 @@
 
-import { useState, useEffect } from 'react';
-import { getBibleChapter, localBibleInfo, BibleChapter } from '@/data/bibleTexts';
+// Ce hook est maintenant obsolète, remplacé par useBibleData
+// Gardé pour compatibilité temporaire
 
-export const useLocalBibleText = (bookKey: string, chapter: number) => {
+import { useState, useEffect } from 'react';
+import { getBibleChapter } from '@/data/bibleChapters';
+import { availableBibleVersions } from '@/data/bibleStructure';
+
+export const useLocalBibleText = (bookKey: string, chapter: number, versionId: string = 'LSG') => {
   const [text, setText] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -13,19 +17,24 @@ export const useLocalBibleText = (bookKey: string, chapter: number) => {
     setIsLoading(true);
     setError(null);
 
-    // Simulation d'un petit délai pour l'UX
     setTimeout(() => {
-      const chapterData = getBibleChapter(bookKey, chapter);
+      const chapterData = getBibleChapter(versionId, bookKey, chapter);
       
       if (!chapterData) {
-        setError('Ce chapitre n\'est pas encore disponible dans la base de données locale.');
+        setError(`Ce chapitre n'est pas encore disponible dans la base de données locale pour la version ${versionId}.`);
         setText(null);
       } else {
+        const bibleInfo = availableBibleVersions.find(v => v.id === versionId) || {
+          id: versionId,
+          name: 'Version locale',
+          language: 'fr'
+        };
+
         const result = {
           book: bookKey,
           chapter,
           verses: chapterData.verses,
-          bibleInfo: localBibleInfo
+          bibleInfo
         };
         setText(result);
         setError(null);
@@ -33,7 +42,7 @@ export const useLocalBibleText = (bookKey: string, chapter: number) => {
       
       setIsLoading(false);
     }, 300);
-  }, [bookKey, chapter]);
+  }, [bookKey, chapter, versionId]);
 
   return { text, isLoading, error };
 };
