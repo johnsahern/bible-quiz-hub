@@ -24,10 +24,15 @@ export const useRoomData = ({
   setError
 }: UseRoomDataProps) => {
   useEffect(() => {
-    if (!roomId || !user) return;
+    if (!roomId || !user) {
+      console.log('Missing roomId or user for useRoomData');
+      return;
+    }
 
     const loadRoomData = async () => {
       try {
+        console.log('Loading room data for room:', roomId);
+        
         // Charger la salle
         const { data: roomData, error: roomError } = await supabase
           .from('quiz_rooms')
@@ -35,7 +40,17 @@ export const useRoomData = ({
           .eq('id', roomId)
           .single();
 
-        if (roomError) throw roomError;
+        if (roomError) {
+          console.error('Room loading error:', roomError);
+          throw roomError;
+        }
+
+        if (!roomData) {
+          setError('Salle introuvable');
+          return;
+        }
+
+        console.log('Room data loaded:', roomData);
 
         setRoom({
           ...roomData,
@@ -53,15 +68,24 @@ export const useRoomData = ({
         }
 
         // Charger les joueurs
+        console.log('Loading players for room:', roomId);
         const { data: playersData, error: playersError } = await supabase
           .from('quiz_room_players')
           .select('*')
           .eq('room_id', roomId)
           .order('joined_at');
 
-        if (playersError) throw playersError;
+        if (playersError) {
+          console.error('Players loading error:', playersError);
+          throw playersError;
+        }
 
+        console.log('Players data loaded:', playersData);
         setPlayers(playersData || []);
+        
+        // Clear any previous errors
+        setError(null);
+        
       } catch (err) {
         console.error('Erreur lors du chargement de la salle:', err);
         setError('Impossible de charger la salle');
@@ -69,5 +93,5 @@ export const useRoomData = ({
     };
 
     loadRoomData();
-  }, [roomId, user, setRoom, setIsHost, setCurrentQuestion, setPlayers, setError]);
+  }, [roomId, user?.id, setRoom, setIsHost, setCurrentQuestion, setPlayers, setError]);
 };

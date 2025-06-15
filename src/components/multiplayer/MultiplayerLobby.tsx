@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Users, Crown, Check, Clock, Play } from 'lucide-react';
 import { QuizRoom, RoomPlayer } from '@/types/multiplayer';
+import { useAuth } from '@/contexts/AuthContext';
 import { useMultiplayerRoom } from '@/hooks/useMultiplayerRoom';
 
 interface MultiplayerLobbyProps {
@@ -14,14 +15,16 @@ interface MultiplayerLobbyProps {
 }
 
 const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({ room, players, isHost }) => {
+  const { user } = useAuth();
   const { setPlayerReady, startQuiz } = useMultiplayerRoom(room.id);
 
   const readyPlayers = players.filter(p => p.is_ready);
   const canStart = players.length >= 2 && readyPlayers.length === players.length;
+  const currentPlayer = players.find(p => p.user_id === user?.id);
 
   const handleReadyToggle = () => {
-    const currentPlayer = players.find(p => p.user_id === room.host_id);
-    setPlayerReady(!currentPlayer?.is_ready);
+    if (!currentPlayer) return;
+    setPlayerReady(!currentPlayer.is_ready);
   };
 
   return (
@@ -130,9 +133,10 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({ room, players, isHo
                 <Button
                   onClick={handleReadyToggle}
                   className="w-full"
-                  variant={players.find(p => p.user_id === room.host_id)?.is_ready ? "secondary" : "default"}
+                  variant={currentPlayer?.is_ready ? "secondary" : "default"}
+                  disabled={!currentPlayer}
                 >
-                  {players.find(p => p.user_id === room.host_id)?.is_ready ? (
+                  {currentPlayer?.is_ready ? (
                     <>
                       <Check className="w-4 h-4 mr-2" />
                       Prêt !

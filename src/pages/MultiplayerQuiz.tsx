@@ -17,6 +17,8 @@ const MultiplayerQuiz: React.FC = () => {
   const { user } = useAuth();
   const { room, players, isHost, currentQuestion, loading, error, leaveRoom } = useMultiplayerRoom(roomId);
 
+  console.log('MultiplayerQuiz render:', { roomId, room, players, loading, error });
+
   const handleLeaveRoom = async () => {
     await leaveRoom();
     navigate('/');
