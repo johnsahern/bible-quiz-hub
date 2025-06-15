@@ -31,6 +31,11 @@ const Index = () => {
             </div>
           </header>
 
+          {/* Verset du Jour - Maintenant en haut */}
+          <div className="mb-16">
+            <VerseDuJour language={language} />
+          </div>
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             <QuizCard
               icon={<Brain className="w-8 h-8" />}
@@ -60,8 +65,8 @@ const Index = () => {
             />
           </div>
 
+          {/* Section de progression maintenant en bas */}
           <div className="space-y-12">
-            <VerseDuJour language={language} />
             <ProgressSection language={language} />
           </div>
         </div>
