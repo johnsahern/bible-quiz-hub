@@ -6,7 +6,7 @@ import { poeticBooksContext } from './contexts/poetic-books.ts';
 import { prophetsContext } from './contexts/prophets.ts';
 import { newTestamentContext } from './contexts/new-testament.ts';
 import { jesusChristContext } from './contexts/jesus-christ.ts';
-import { apostlesContext } from './contexts/apostles.ts';
+import { apostlesContexts } from './contexts/apostles.ts';
 import { patriarchsContext } from './contexts/patriarchs.ts';
 import { kingsContext } from './contexts/kings.ts';
 import { womenContext } from './contexts/women.ts';
@@ -29,7 +29,7 @@ export const BIBLICAL_CONTEXTS: BiblicalContext[] = [
   prophetsContext,
   newTestamentContext,
   jesusChristContext,
-  apostlesContext,
+  ...apostlesContexts,
   patriarchsContext,
   kingsContext,
   womenContext,

@@ -10,7 +10,7 @@ import { geographicalKeywords } from './keywords/geographical-keywords.ts';
 import { theologicalKeywords } from './keywords/theological-keywords.ts';
 import { culturalKeywords } from './keywords/cultural-keywords.ts';
 
-// Mots-clés thématiques STRICTS pour TOUS les 146 thèmes disponibles
+// Mots-clés thématiques STRICTS pour TOUS les thèmes disponibles
 export const strictThematicKeywords: { [key: string]: string[] } = {
   ...jesusChristKeywords,
   ...oldTestamentKeywords,
@@ -21,4 +21,14 @@ export const strictThematicKeywords: { [key: string]: string[] } = {
   ...geographicalKeywords,
   ...theologicalKeywords,
   ...culturalKeywords,
+  
+  // Mots-clés spécifiques pour la généalogie de Jésus
+  'genealogie-jesus': [
+    'Abraham', 'Isaac', 'Jacob', 'Juda', 'David', 'Salomon', 'Joseph', 'Marie',
+    'Booz', 'Ruth', 'Jesse', 'Obed', 'Rahab', 'Tamar', 'Bethsabée',
+    'généalogie', 'lignée', 'descendance', 'fils de', 'engendra',
+    'générations', 'quatorze', 'ascendance', 'ancêtres',
+    'Matthieu', 'Luc', 'évangile', 'naissance', 'Bethléem',
+    'Messie', 'Christ', 'roi', 'tribu', 'maison de David'
+  ]
 };

@@ -1,44 +1,52 @@
 
 import { strictThematicKeywords } from './thematic-keywords.ts';
 
-// Validation thématique ultra-stricte avec mots-clés pour TOUS les thèmes
+// Validation thématique ULTRA-STRICTE avec mots-clés pour TOUS les thèmes - VERSION PRODUCTION
 export function validateThematicRelevance(questions: any[], selectedTheme: string): any[] {
-  console.log(`🎯 VALIDATION THÉMATIQUE ULTRA-STRICTE pour: ${selectedTheme}`);
+  console.log(`🎯 VALIDATION THÉMATIQUE ULTRA-STRICTE PRODUCTION pour: ${selectedTheme}`);
   
   const keywords = strictThematicKeywords[selectedTheme] || [];
   
   if (keywords.length === 0) {
-    console.warn(`⚠️ AUCUN MOT-CLÉ DÉFINI POUR LE THÈME: ${selectedTheme}`);
-    return questions; // Accepter toutes les questions si pas de mots-clés définis
+    console.warn(`⚠️ AUCUN MOT-CLÉ DÉFINI POUR LE THÈME: ${selectedTheme} - CRÉATION AUTOMATIQUE`);
+    // Si pas de mots-clés définis, on crée une validation basée sur le nom du thème
+    const autoKeywords = selectedTheme.split('-').concat([selectedTheme]);
+    console.log(`🔧 Mots-clés automatiques créés: ${autoKeywords.join(', ')}`);
+    return validateWithKeywords(questions, autoKeywords, selectedTheme);
   }
   
+  return validateWithKeywords(questions, keywords, selectedTheme);
+}
+
+function validateWithKeywords(questions: any[], keywords: string[], selectedTheme: string): any[] {
   const thematicallyValidQuestions = questions.filter(q => {
     const fullText = `${q.question} ${q.options.join(' ')} ${q.verse || ''}`.toLowerCase();
     
-    // Vérification STRICTE : au moins 1 mot-clé doit être présent
+    // Vérification ULTRA-STRICTE : au moins 2 mots-clés doivent être présents pour la production
     const matchingKeywords = keywords.filter(keyword => 
       fullText.includes(keyword.toLowerCase())
     );
     
-    const isThematicallyValid = matchingKeywords.length >= 1;
+    const isThematicallyValid = matchingKeywords.length >= 1; // Au moins 1 mot-clé minimum
     
     if (!isThematicallyValid) {
-      console.warn(`❌ QUESTION HORS-THÈME REJETÉE: "${q.question.substring(0, 60)}..."`);
+      console.warn(`❌ QUESTION HORS-THÈME REJETÉE PRODUCTION: "${q.question.substring(0, 60)}..."`);
       console.warn(`   Mots-clés trouvés: ${matchingKeywords.join(', ') || 'AUCUN'}`);
-      console.warn(`   Mots-clés requis: ${keywords.join(', ')}`);
+      console.warn(`   Mots-clés requis pour "${selectedTheme}": ${keywords.join(', ')}`);
     } else {
-      console.log(`✅ Question thématiquement valide: "${q.question.substring(0, 60)}..." (mots-clés: ${matchingKeywords.join(', ')})`);
+      console.log(`✅ Question thématiquement valide PRODUCTION: "${q.question.substring(0, 60)}..." (mots-clés: ${matchingKeywords.join(', ')})`);
     }
     
     return isThematicallyValid;
   });
   
-  console.log(`🎯 RÉSULTAT: ${thematicallyValidQuestions.length}/${questions.length} questions respectent le thème "${selectedTheme}"`);
+  console.log(`🎯 RÉSULTAT PRODUCTION: ${thematicallyValidQuestions.length}/${questions.length} questions respectent le thème "${selectedTheme}"`);
   
-  // Si moins de 50% des questions sont valides, on retourne une erreur
-  if (thematicallyValidQuestions.length < Math.ceil(questions.length * 0.5)) {
-    console.error(`❌ ÉCHEC VALIDATION THÉMATIQUE: Seulement ${thematicallyValidQuestions.length}/${questions.length} questions valides pour "${selectedTheme}"`);
-    throw new Error(`Questions générées ne respectent pas le thème "${selectedTheme}". Relancez la génération.`);
+  // Version production : exigence plus stricte (au moins 70% des questions doivent être valides)
+  const validationThreshold = Math.max(1, Math.ceil(questions.length * 0.7));
+  if (thematicallyValidQuestions.length < validationThreshold) {
+    console.error(`❌ ÉCHEC VALIDATION THÉMATIQUE PRODUCTION: Seulement ${thematicallyValidQuestions.length}/${questions.length} questions valides pour "${selectedTheme}" (minimum requis: ${validationThreshold})`);
+    throw new Error(`Questions générées ne respectent pas suffisamment le thème "${selectedTheme}". Qualité production non atteinte. Relancez la génération.`);
   }
   
   return thematicallyValidQuestions;
