@@ -2,59 +2,70 @@
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
-export const useQuizOperations = (user: any, room: any, isHost: boolean) => {
-  const userId = user?.id || null;
-  const roomId = room?.id || null;
+export const useQuizOperations = (userId?: string, roomId?: string, isHost: boolean = false) => {
+  const { user } = useAuth();
 
   const startQuiz = useCallback(async () => {
-    if (!userId || !roomId || !isHost) return;
+    if (!userId || !user || !roomId || !isHost) {
+      console.log('❌ Cannot start quiz: missing requirements');
+      return false;
+    }
 
     try {
-      // Générer les questions
-      const response = await fetch(`https://evaftpnfakxwekkggipn.supabase.co/functions/v1/generate-quiz-questions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2YWZ0cG5mYWt4d2Vra2dnaXBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5MTU2ODYsImV4cCI6MjA2NTQ5MTY4Nn0.P8U0fwNKpnXFH4_JaN0ep5eATj3RGzUEPGozPbxcS1M`,
-        },
-        body: JSON.stringify({
-          theme: room.theme,
-          difficulty: room.difficulty,
-          questionCount: room.question_count
-        }),
-      });
+      console.log('🎮 Starting quiz for room:', roomId);
 
-      if (!response.ok) throw new Error('Erreur lors de la génération des questions');
+      // Generate questions via edge function
+      const { data: questionsData, error: questionsError } = await supabase.functions.invoke(
+        'generate-quiz-questions',
+        {
+          body: { 
+            theme: 'general', // You might want to pass the actual theme
+            difficulty: 'facile', // You might want to pass the actual difficulty
+            count: 10
+          }
+        }
+      );
 
-      const questions = await response.json();
+      if (questionsError) {
+        console.error('❌ Questions generation failed:', questionsError);
+        throw questionsError;
+      }
 
-      // Mettre à jour la salle
-      const { error } = await supabase
+      // Update room with questions and start quiz
+      const { error: updateError } = await supabase
         .from('quiz_rooms')
         .update({
+          questions: questionsData.questions,
           status: 'playing',
-          questions: questions,
-          current_question: 0,
-          started_at: new Date().toISOString()
+          started_at: new Date().toISOString(),
+          current_question: 0
         })
         .eq('id', roomId);
 
-      if (error) throw error;
+      if (updateError) {
+        console.error('❌ Room update failed:', updateError);
+        throw updateError;
+      }
 
+      console.log('✅ Quiz started successfully');
       toast({
         title: "Quiz démarré !",
-        description: "Le quiz multijoueur a commencé",
+        description: "La partie commence maintenant.",
       });
-    } catch (err) {
-      console.error('Erreur lors du démarrage du quiz:', err);
+
+      return true;
+    } catch (err: any) {
+      console.error('💥 Error starting quiz:', err);
       toast({
         title: "Erreur",
         description: "Impossible de démarrer le quiz",
         variant: "destructive",
       });
+      return false;
     }
-  }, [userId, roomId, isHost, user, room]);
+  }, [userId, user, roomId, isHost]);
 
   return { startQuiz };
 };

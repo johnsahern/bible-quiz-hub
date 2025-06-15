@@ -1,5 +1,5 @@
 
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { QuizRoom, RoomPlayer } from '@/types/multiplayer';
 import { QuizQuestion } from '@/types/quiz';
@@ -11,6 +11,12 @@ import { useRoomData } from './multiplayer/useRoomData';
 import { UseMultiplayerRoomReturn } from './multiplayer/types';
 
 export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn => {
+  console.log('useMultiplayerRoom hook called:', { 
+    roomId, 
+    userId: useAuth().user?.id,
+    hookCallCount: Date.now()
+  });
+
   const { user } = useAuth();
   const [room, setRoom] = useState<QuizRoom | null>(null);
   const [players, setPlayers] = useState<RoomPlayer[]>([]);
@@ -19,22 +25,19 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Stabilize roomId to prevent unnecessary re-renders
-  const stableRoomId = useMemo(() => roomId, [roomId]);
+  // Extract primitive values for stable dependencies
   const userId = user?.id;
+  const stableRoomId = roomId;
 
-  // Create operations with memoized user object
-  const memoizedUser = useMemo(() => user, [user?.id]);
-  const memoizedRoom = useMemo(() => room, [room?.id]);
-
-  const roomOperations = useRoomOperations(memoizedUser);
-  const playerActions = usePlayerActions(memoizedUser, memoizedRoom);
-  const quizOperations = useQuizOperations(memoizedUser, memoizedRoom, isHost);
+  // Create operations with stable dependencies
+  const roomOperations = useRoomOperations(userId);
+  const playerActions = usePlayerActions(userId, room?.id);
+  const quizOperations = useQuizOperations(userId, room?.id, isHost);
 
   // Load room data on mount - only if roomId is provided
   useRoomData({
     roomId: stableRoomId,
-    user: memoizedUser,
+    userId,
     setRoom,
     setIsHost,
     setCurrentQuestion,

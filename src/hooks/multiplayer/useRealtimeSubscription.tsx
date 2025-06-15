@@ -111,5 +111,5 @@ export const useRealtimeSubscription = ({
         currentRoomIdRef.current = null;
       }
     };
-  }, [roomId]); // Only depend on roomId
+  }, [roomId]); // Only roomId as dependency
 };

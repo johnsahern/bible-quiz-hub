@@ -6,7 +6,7 @@ import { RoomStatus, RoomPlayer } from '@/types/multiplayer';
 
 interface UseRoomDataProps {
   roomId?: string;
-  user: any;
+  userId?: string;
   setRoom: (room: any) => void;
   setIsHost: (isHost: boolean) => void;
   setCurrentQuestion: (question: QuizQuestion | null) => void;
@@ -16,7 +16,7 @@ interface UseRoomDataProps {
 
 export const useRoomData = ({
   roomId,
-  user,
+  userId,
   setRoom,
   setIsHost,
   setCurrentQuestion,
@@ -25,12 +25,11 @@ export const useRoomData = ({
 }: UseRoomDataProps) => {
   const isLoadingRef = useRef(false);
   const lastLoadedRoomId = useRef<string | null>(null);
-  const userId = user?.id;
 
   useEffect(() => {
-    // Early return if no roomId or user
+    // Early return if no roomId or userId
     if (!roomId || !userId) {
-      console.log('Missing roomId or user for useRoomData:', { roomId, userId });
+      console.log('Missing roomId or userId for useRoomData:', { roomId, userId });
       return;
     }
 
@@ -115,5 +114,5 @@ export const useRoomData = ({
     };
 
     loadRoomData();
-  }, [roomId, userId]); // Only depend on primitive values
+  }, [roomId, userId]); // Only primitive dependencies
 };

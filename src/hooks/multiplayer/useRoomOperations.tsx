@@ -3,12 +3,13 @@ import { useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { createRoom as createRoomUtil } from './roomCreation';
 import { joinRoom as joinRoomUtil, addPlayerToRoom } from './playerManagement';
+import { useAuth } from '@/contexts/AuthContext';
 
-export const useRoomOperations = (user: any) => {
-  const userId = user?.id || null;
+export const useRoomOperations = (userId?: string) => {
+  const { user } = useAuth();
 
   const createRoom = useCallback(async (theme: string, difficulty: string, questionCount: number = 10) => {
-    if (!userId) {
+    if (!userId || !user) {
       console.log('❌ No user available for room creation');
       return null;
     }
@@ -43,7 +44,7 @@ export const useRoomOperations = (user: any) => {
   }, [userId, user]);
 
   const joinRoom = useCallback(async (roomCode: string) => {
-    if (!userId) {
+    if (!userId || !user) {
       console.log('❌ No user available for joining room');
       return false;
     }
