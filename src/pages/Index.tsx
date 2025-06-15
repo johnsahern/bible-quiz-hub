@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import QuizCard from '@/components/QuizCard';
 import VerseDuJour from '@/components/VerseDuJour';
+import BibleReadingSection from '@/components/BibleReadingSection';
 import ProgressSection from '@/components/ProgressSection';
 import { Brain, Users, Gamepad2 } from 'lucide-react';
 
@@ -31,10 +32,13 @@ const Index = () => {
             </div>
           </header>
 
-          {/* Verset du Jour - Maintenant en haut */}
+          {/* Verset du Jour - En haut */}
           <div className="mb-16">
             <VerseDuJour language={language} />
           </div>
+
+          {/* Section Lecture & Audio */}
+          <BibleReadingSection language={language} />
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             <QuizCard
@@ -65,7 +69,7 @@ const Index = () => {
             />
           </div>
 
-          {/* Section de progression maintenant en bas */}
+          {/* Section de progression en bas */}
           <div className="space-y-12">
             <ProgressSection language={language} />
           </div>
