@@ -20,9 +20,9 @@ export const useTrueFalseQuestions = (): UseTrueFalseQuestionsReturn => {
     setError(null);
 
     try {
-      console.log('🎯 Génération de questions Vrai/Faux...', { theme, difficulty, count });
+      console.log('🎯 Génération de questions Vrai/Faux uniques...', { theme, difficulty, count });
 
-      // Utiliser supabase.functions.invoke au lieu de fetch direct
+      // Utiliser supabase.functions.invoke pour appeler Gemini
       const { data, error: functionError } = await supabase.functions.invoke('generate-true-false-questions', {
         body: {
           theme,
@@ -32,46 +32,54 @@ export const useTrueFalseQuestions = (): UseTrueFalseQuestionsReturn => {
       });
 
       if (functionError) {
+        console.error('❌ Erreur fonction Supabase:', functionError);
         throw new Error(functionError.message);
       }
 
       if (data.error) {
+        console.error('❌ Erreur dans la réponse:', data.error);
         throw new Error(data.error);
       }
 
       if (!data.questions || !Array.isArray(data.questions)) {
-        throw new Error('Format de réponse invalide');
+        console.error('❌ Format de réponse invalide:', data);
+        throw new Error('Format de réponse invalide de Gemini');
       }
 
-      console.log('✅ Questions Vrai/Faux générées:', data.questions.length);
+      console.log('✅ Questions Vrai/Faux uniques générées:', data.questions.length);
+      console.log('🎲 IDs des questions:', data.questions.map((q: any) => q.id));
+      
       setQuestions(data.questions);
 
     } catch (err) {
       console.error('❌ Erreur génération questions Vrai/Faux:', err);
-      setError(err instanceof Error ? err.message : 'Erreur inconnue');
+      const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue lors de la génération';
+      setError(errorMessage);
       
-      // Fallback avec questions par défaut
-      const fallbackQuestions: TrueFalseQuestion[] = [
-        {
-          id: 'fallback1',
-          statement: 'Jésus est né à Bethléem selon les évangiles',
-          isTrue: true,
-          explanation: 'Jésus est effectivement né à Bethléem selon les évangiles de Matthieu et Luc.',
-          verse: 'Matthieu 2:1',
-          difficulty: difficulty as 'facile' | 'moyen' | 'difficile',
-          theme
-        },
-        {
-          id: 'fallback2',
-          statement: 'Moïse a guidé le peuple d\'Israël pendant 40 ans dans le désert',
-          isTrue: true,
-          explanation: 'Le peuple d\'Israël a erré 40 ans dans le désert sous la conduite de Moïse.',
-          verse: 'Deutéronome 8:2',
-          difficulty: difficulty as 'facile' | 'moyen' | 'difficile',
-          theme
-        }
-      ];
-      setQuestions(fallbackQuestions.slice(0, count));
+      // Fallback avec questions par défaut uniquement si l'erreur n'est pas liée à Gemini
+      if (!errorMessage.includes('Gemini') && !errorMessage.includes('API')) {
+        const fallbackQuestions: TrueFalseQuestion[] = [
+          {
+            id: `fallback_${Date.now()}_1`,
+            statement: 'Jésus est né à Bethléem selon les évangiles',
+            isTrue: true,
+            explanation: 'Jésus est effectivement né à Bethléem selon les évangiles de Matthieu et Luc.',
+            verse: 'Matthieu 2:1',
+            difficulty: difficulty as 'facile' | 'moyen' | 'difficile',
+            theme
+          },
+          {
+            id: `fallback_${Date.now()}_2`,
+            statement: 'Moïse a guidé le peuple d\'Israël pendant 40 ans dans le désert',
+            isTrue: true,
+            explanation: 'Le peuple d\'Israël a erré 40 ans dans le désert sous la conduite de Moïse.',
+            verse: 'Deutéronome 8:2',
+            difficulty: difficulty as 'facile' | 'moyen' | 'difficile',
+            theme
+          }
+        ];
+        setQuestions(fallbackQuestions.slice(0, count));
+      }
     } finally {
       setIsLoading(false);
     }
