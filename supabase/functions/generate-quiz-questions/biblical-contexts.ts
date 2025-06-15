@@ -1,49 +1,51 @@
 
-// Import all context categories
-import { jesusChristContexts } from './contexts/jesus-christ.ts';
-import { newTestamentContexts } from './contexts/new-testament.ts';
-import { apostlesContexts } from './contexts/apostles.ts';
-import { pentateuque } from './contexts/pentateuch.ts';
-import { patriarchsContexts } from './contexts/patriarchs.ts';
-import { kingsContexts } from './contexts/kings.ts';
-import { poeticBooksContexts } from './contexts/poetic-books.ts';
-import { prophetsContexts } from './contexts/prophets.ts';
-import { womenContexts } from './contexts/women.ts';
-import { historicalBooksContexts } from './contexts/historical-books.ts';
-import { overviewContexts } from './contexts/overview.ts';
+import { overviewContext } from './contexts/overview.ts';
+import { pentateuchContext } from './contexts/pentateuch.ts';
+import { historicalBooksContext } from './contexts/historical-books.ts';
+import { poeticBooksContext } from './contexts/poetic-books.ts';
+import { prophetsContext } from './contexts/prophets.ts';
+import { newTestamentContext } from './contexts/new-testament.ts';
+import { jesusChristContext } from './contexts/jesus-christ.ts';
+import { apostlesContext } from './contexts/apostles.ts';
+import { patriarchsContext } from './contexts/patriarchs.ts';
+import { kingsContext } from './contexts/kings.ts';
+import { womenContext } from './contexts/women.ts';
+import { genealogyJesusContext } from './contexts/genealogy-jesus.ts';
 
 export interface BiblicalContext {
-  id: string;
+  key: string;
   title: string;
+  description: string;
+  keywords: string[];
   context: string;
-  keyVerses?: string[];
+  focus_areas: string[];
 }
 
-// Combine all contexts into a single array
-export const biblicalContexts: BiblicalContext[] = [
-  ...jesusChristContexts,
-  ...newTestamentContexts,
-  ...apostlesContexts,
-  ...pentateuque,
-  ...patriarchsContexts,
-  ...kingsContexts,
-  ...poeticBooksContexts,
-  ...prophetsContexts,
-  ...womenContexts,
-  ...historicalBooksContexts,
-  ...overviewContexts
+export const BIBLICAL_CONTEXTS: BiblicalContext[] = [
+  overviewContext,
+  pentateuchContext,
+  historicalBooksContext,
+  poeticBooksContext,
+  prophetsContext,
+  newTestamentContext,
+  jesusChristContext,
+  apostlesContext,
+  patriarchsContext,
+  kingsContext,
+  womenContext,
+  genealogyJesusContext
 ];
 
-export function getBiblicalContext(themeId: string): BiblicalContext {
-  const context = biblicalContexts.find(c => c.id === themeId);
-  if (!context) {
-    console.warn(`⚠️ Thème biblique non trouvé: ${themeId}, utilisation du contexte par défaut`);
-    return {
-      id: 'default',
-      title: 'Connaissance Biblique Générale',
-      context: 'Un sujet biblique fondamental qui mérite une étude approfondie des Écritures saintes. Les questions porteront sur les enseignements, personnages, événements et vérités doctrinales liés à ce thème, en s\'appuyant sur l\'ensemble de la révélation biblique.',
-      keyVerses: ['2 Timothée 3:16', 'Psaume 119:105', '1 Pierre 1:25']
-    };
+export const getBiblicalContext = (theme: string): BiblicalContext => {
+  console.log(`🔍 Recherche du contexte pour le thème: ${theme}`);
+  
+  const context = BIBLICAL_CONTEXTS.find(ctx => ctx.key === theme);
+  
+  if (context) {
+    console.log(`✅ Contexte trouvé: ${context.title}`);
+    return context;
   }
-  return context;
-}
+  
+  console.error(`⚠️ Thème biblique non trouvé: ${theme}, utilisation du contexte par défaut`);
+  return overviewContext; // Contexte par défaut
+};
