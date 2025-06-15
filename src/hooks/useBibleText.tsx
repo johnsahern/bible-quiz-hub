@@ -1,9 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useBibleList } from './useBibleList';
-
-const API_KEY = '5fc64b36cbabb14bb2a73f6945ea3a0d';
-const BASE_URL = 'https://api.scripture.api.bible/v1';
+import { BIBLE_API_CONFIG, getApiHeaders } from '@/config/bibleApi';
 
 export const useBibleText = (bookKey: string, chapter: number, language: string) => {
   const [text, setText] = useState<any>(null);
@@ -31,16 +29,16 @@ export const useBibleText = (bookKey: string, chapter: number, language: string)
         console.log(`Fetching chapter: ${chapterId} from Bible: ${bibleId} (${selectedBible.name})`);
         
         const response = await fetch(
-          `${BASE_URL}/bibles/${bibleId}/chapters/${chapterId}?content-type=text&include-notes=false&include-titles=true&include-chapter-numbers=false&include-verse-numbers=true&include-verse-spans=false`,
+          `${BIBLE_API_CONFIG.BASE_URL}/bibles/${bibleId}/chapters/${chapterId}?content-type=text&include-notes=false&include-titles=true&include-chapter-numbers=false&include-verse-numbers=true&include-verse-spans=false`,
           {
-            headers: {
-              'api-key': API_KEY,
-              'accept': 'application/json'
-            }
+            headers: getApiHeaders()
           }
         );
 
         if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('Clé API invalide. Veuillez vérifier votre configuration.');
+          }
           if (response.status === 404) {
             throw new Error('Chapitre non trouvé');
           }
@@ -107,7 +105,7 @@ export const useBibleText = (bookKey: string, chapter: number, language: string)
 
       } catch (err) {
         console.error('Bible text fetch error:', err);
-        setError('Erreur lors du chargement du texte biblique');
+        setError(err instanceof Error ? err.message : 'Erreur lors du chargement du texte biblique');
       } finally {
         setIsLoading(false);
       }
