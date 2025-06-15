@@ -6,7 +6,8 @@ import {
   Users,
   CheckCircle,
   Puzzle,
-  Grid3x3
+  Grid3x3,
+  Search
 } from 'lucide-react';
 
 interface Profile {
@@ -15,6 +16,7 @@ interface Profile {
   true_false_points: number;
   verse_puzzle_points: number;
   crossword_points: number;
+  word_search_points: number;
   best_score: number;
 }
 
@@ -25,7 +27,7 @@ interface ProfileStatsProps {
 
 const ProfileStats = ({ profile, achievementsCount }: ProfileStatsProps) => {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-7 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-8 gap-4">
       <div className="text-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
         <div className="flex items-center justify-center mb-2">
           <BookOpen className="w-5 h-5 text-yellow-600 mr-1" />
@@ -64,6 +66,14 @@ const ProfileStats = ({ profile, achievementsCount }: ProfileStatsProps) => {
         </div>
         <div className="text-lg sm:text-2xl font-bold text-rose-600">{profile.crossword_points || 0}</div>
         <div className="text-xs sm:text-sm text-gray-600">Mots Croisés</div>
+      </div>
+
+      <div className="text-center p-3 bg-teal-50 rounded-lg border border-teal-200">
+        <div className="flex items-center justify-center mb-2">
+          <Search className="w-5 h-5 text-teal-600 mr-1" />
+        </div>
+        <div className="text-lg sm:text-2xl font-bold text-teal-600">{profile.word_search_points || 0}</div>
+        <div className="text-xs sm:text-sm text-gray-600">Mots Cachés</div>
       </div>
       
       <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">

@@ -5,6 +5,7 @@ import TrueFalseGame from '@/components/games/TrueFalseGame';
 import VersePuzzleGame from '@/components/games/VersePuzzleGame';
 import CrosswordGame from '@/components/games/CrosswordGame';
 import DailyChallengeCard from '@/components/games/DailyChallengeCard';
+import WordSearchGame from '@/components/games/WordSearchGame';
 import { GameMode, TrueFalseQuestion, VersePuzzle, DailyChallenge } from '@/types/gameTypes';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -98,6 +99,8 @@ const GameCenter = () => {
           return <VersePuzzleGame onGameComplete={handleGameComplete} />;
         case 'crossword':
           return <CrosswordGame onGameComplete={handleGameComplete} />;
+        case 'word-search':
+          return <WordSearchGame onGameComplete={handleGameComplete} />;
         default:
           return <div>Mode de jeu en cours de développement</div>;
       }

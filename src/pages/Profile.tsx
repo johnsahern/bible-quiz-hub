@@ -29,7 +29,7 @@ interface Achievement {
   earned_at: string;
 }
 
-// Interface mise à jour pour inclure true_false_points
+// Interface mise à jour pour inclure word_search_points
 interface ExtendedProfile {
   id: string;
   username: string | null;
@@ -43,6 +43,7 @@ interface ExtendedProfile {
   true_false_points: number;
   verse_puzzle_points: number;
   crossword_points: number;
+  word_search_points: number;
   created_at: string;
   updated_at: string;
 }
@@ -123,7 +124,8 @@ const Profile = () => {
     multiplayer_points: profile.multiplayer_points || 0,
     true_false_points: profile.true_false_points || 0,
     verse_puzzle_points: profile.verse_puzzle_points || 0,
-    crossword_points: profile.crossword_points || 0
+    crossword_points: profile.crossword_points || 0,
+    word_search_points: profile.word_search_points || 0
   };
 
   return (
