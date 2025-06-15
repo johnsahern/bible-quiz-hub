@@ -20,6 +20,20 @@ import { parabolesJesusContext } from './contexts/paraboles-jesus.ts';
 import { passionChristContext } from './contexts/passion-christ.ts';
 import { resurrectionContext } from './contexts/resurrection.ts';
 
+// NOUVEAUX CONTEXTES ÉVÉNEMENTS DE JÉSUS
+import { baptemeJesusContext } from './contexts/bapteme-jesus.ts';
+import { transfigurationContext } from './contexts/transfiguration.ts';
+import { ascensionContext } from './contexts/ascension.ts';
+import { enfanceJesusContext } from './contexts/enfance-jesus.ts';
+
+// NOUVEAUX CONTEXTES ÉVANGILES
+import { matthieuContext } from './contexts/matthieu.ts';
+import { marcContext } from './contexts/marc.ts';
+import { lucContext } from './contexts/luc.ts';
+import { jeanEvangelisteContext } from './contexts/jean-evangeliste.ts';
+import { actesApotresContext } from './contexts/actes-apotres.ts';
+import { jeanBaptisteContext } from './contexts/jean-baptiste.ts';
+
 export interface BiblicalContext {
   key: string;
   title: string;
@@ -46,6 +60,20 @@ export const BIBLICAL_CONTEXTS: BiblicalContext[] = [
   parabolesJesusContext,
   passionChristContext,
   resurrectionContext,
+  
+  // Contextes événements de Jésus
+  baptemeJesusContext,
+  transfigurationContext,
+  ascensionContext,
+  enfanceJesusContext,
+  
+  // Contextes Évangiles et NT
+  matthieuContext,
+  marcContext,
+  lucContext,
+  jeanEvangelisteContext,
+  actesApotresContext,
+  jeanBaptisteContext,
   
   // Autres contextes
   ...apostlesContexts,

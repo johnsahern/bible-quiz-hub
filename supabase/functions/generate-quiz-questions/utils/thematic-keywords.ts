@@ -70,6 +70,79 @@ export const strictThematicKeywords: { [key: string]: string[] } = {
     'victoire', 'mort', 'corps', 'glorieux', 'spirituel'
   ],
 
+  // === NOUVEAUX CONTEXTES ÉVÉNEMENTS JÉSUS ===
+  'bapteme-jesus': [
+    'baptême', 'Jean-Baptiste', 'Jésus', 'Jourdain', 'eau', 'immersion',
+    'Esprit-Saint', 'colombe', 'descendre', 'cieux', 'ouverts',
+    'voix', 'Père', 'Fils', 'bien-aimé', 'complaisance', 'agréable',
+    'début', 'ministère', 'manifestation', 'Trinité', 'théophanie'
+  ],
+
+  'transfiguration': [
+    'transfiguration', 'montagne', 'haute', 'Pierre', 'Jacques', 'Jean',
+    'visage', 'soleil', 'vêtements', 'blancs', 'lumière', 'éclatants',
+    'Moïse', 'Élie', 'apparition', 'conversation', 'nuée', 'lumineuse',
+    'voix', 'Père', 'Fils', 'bien-aimé', 'écoutez', 'tentes', 'trois'
+  ],
+
+  'ascension': [
+    'ascension', 'montagne', 'oliviers', 'Béthanie', 'disciples', 'onze',
+    'nuée', 'élevé', 'ciel', 'anges', 'hommes', 'vêtements', 'blancs',
+    'regarder', 'reviendra', 'même', 'manière', 'promesse', 'Esprit-Saint',
+    'Jérusalem', 'attendre', 'puissance', 'témoins', 'bout', 'terre'
+  ],
+
+  'enfance-jesus': [
+    'enfance', 'Jésus', 'naissance', 'Bethléem', 'crèche', 'mangeoire',
+    'bergers', 'champs', 'anges', 'gloire', 'paix', 'hommes',
+    'mages', 'étoile', 'orient', 'or', 'encens', 'myrrhe', 'adoration',
+    'Hérode', 'massacre', 'innocents', 'fuite', 'Égypte', 'Joseph',
+    'Nazareth', 'croissance', 'grâce', 'sagesse', 'temple', 'douze'
+  ],
+
+  // === NOUVEAUX CONTEXTES ÉVANGILES ===
+  'matthieu': [
+    'Matthieu', 'évangile', 'généalogie', 'Abraham', 'David', 'quatorze',
+    'Emmanuel', 'Dieu', 'nous', 'mages', 'étoile', 'or', 'encens', 'myrrhe',
+    'sermon', 'montagne', 'béatitudes', 'heureux', 'pauvres', 'esprit',
+    'Notre', 'Père', 'cieux', 'prière', 'pardon', 'paraboles', 'royaume'
+  ],
+
+  'marc': [
+    'Marc', 'évangile', 'commencement', 'bonne', 'nouvelle', 'Fils', 'Dieu',
+    'Jean-Baptiste', 'précurseur', 'voix', 'désert', 'préparez', 'chemin',
+    'aussitôt', 'immédiatement', 'action', 'mouvement', 'dynamisme',
+    'autorité', 'enseignement', 'démons', 'esprits', 'impurs', 'secret'
+  ],
+
+  'luc': [
+    'Luc', 'évangile', 'Théophile', 'recherche', 'exacte', 'ordre',
+    'Zacharie', 'Élisabeth', 'Jean-Baptiste', 'annonciation', 'Marie',
+    'Magnificat', 'exalte', 'humble', 'miséricorde', 'compassion',
+    'pauvres', 'opprimés', 'bon', 'Samaritain', 'fils', 'prodigue'
+  ],
+
+  'jean-evangeliste': [
+    'Jean', 'évangile', 'Verbe', 'Logos', 'commencement', 'Dieu', 'chair',
+    'lumière', 'ténèbres', 'monde', 'signes', 'sept', 'miracles',
+    'Je suis', 'pain', 'vie', 'berger', 'résurrection', 'chemin',
+    'vérité', 'cep', 'sarments', 'amour', 'bien-aimé', 'disciple'
+  ],
+
+  'actes-apotres': [
+    'Actes', 'apôtres', 'Luc', 'Théophile', 'Esprit-Saint', 'promesse',
+    'Pentecôte', 'langues', 'feu', 'vent', 'Pierre', 'prédication',
+    'trois mille', 'conversion', 'Étienne', 'martyr', 'Saul', 'Paul',
+    'Damas', 'conversion', 'voyages', 'missionnaire', 'païens'
+  ],
+
+  'jean-baptiste': [
+    'Jean-Baptiste', 'précurseur', 'Zacharie', 'Élisabeth', 'Gabriel',
+    'désert', 'Judée', 'prédication', 'repentance', 'baptême', 'Jourdain',
+    'voix', 'crie', 'préparez', 'chemin', 'Élie', 'Agneau', 'Dieu',
+    'Hérode', 'Hérodias', 'prison', 'décapitation', 'Salomé'
+  ],
+
   // === GÉNÉALOGIE ET CONTEXTES SPÉCIAUX ===
   'genealogie-jesus': [
     'Abraham', 'Isaac', 'Jacob', 'Juda', 'David', 'Salomon', 'Joseph', 'Marie',
@@ -91,23 +164,20 @@ export const strictThematicKeywords: { [key: string]: string[] } = {
     'paraboles', 'royaume', 'transfiguration', 'passion', 'résurrection'
   ],
 
-  // === TOUS LES AUTRES THÈMES DE PRODUCTION ===
-  'bapteme-jesus': ['baptême', 'Jean-Baptiste', 'Jourdain', 'Esprit', 'colombe', 'voix', 'cieux', 'Fils', 'bien-aimé'],
-  'transfiguration': ['transfiguration', 'montagne', 'Moïse', 'Élie', 'gloire', 'vêtements', 'blancs', 'nuée', 'voix'],
-  'ascension': ['ascension', 'montagne', 'oliviers', 'nuée', 'anges', 'disciples', 'ciel', 'promesse', 'ret our'],
-  'enfance-jesus': ['enfance', 'Bethléem', 'crèche', 'bergers', 'mages', 'Hérode', 'massacre', 'Égypte', 'Nazareth'],
-  
-  'mathieu': ['Matthieu', 'évangile', 'généalogie', 'mages', 'sermon', 'montagne', 'béatitudes', 'royaume', 'cieux'],
-  'marc': ['Marc', 'évangile', 'action', 'miracle', 'autorité', 'secret', 'messianique', 'serviteur', 'souffrant'],
-  'luc': ['Luc', 'évangile', 'miséricorde', 'paraboles', 'femmes', 'pauvres', 'Esprit-Saint', 'universalisme'],
-  'jean-evangeliste': ['Jean', 'évangile', 'Logos', 'Verbe', 'signes', 'Je suis', 'vie', 'éternelle', 'amour'],
-  
-  'actes-apotres': ['Actes', 'Luc', 'Esprit-Saint', 'Pentecôte', 'apôtres', 'Église', 'primitive', 'mission', 'Paul'],
-  'jean-baptiste': ['Jean-Baptiste', 'précurseur', 'baptême', 'repentance', 'Jourdain', 'Élie', 'Hérode', 'prison'],
-  'sermon-montagne': ['sermon', 'montagne', 'béatitudes', 'sel', 'lumière', 'Notre Père', 'loi', 'prophètes'],
-  'derniere-cene': ['dernière', 'Cène', 'Pâque', 'pain', 'vin', 'corps', 'sang', 'alliance', 'nouvelle'],
-  
-  // Continuer avec tous les autres thèmes...
+  // === TOUS LES AUTRES THÈMES PRODUCTION ===
   'ancien-testament': ['Ancien', 'Testament', 'Loi', 'Prophètes', 'Écrits', 'alliance', 'promesses', 'Messie'],
-  'nouveau-testament': ['Nouveau', 'Testament', 'évangiles', 'Actes', 'épîtres', 'Apocalypse', 'Jésus', 'Christ']
+  'nouveau-testament': ['Nouveau', 'Testament', 'évangiles', 'Actes', 'épîtres', 'Apocalypse', 'Jésus', 'Christ'],
+  
+  // Ajout de tous les autres contextes avec leurs mots-clés spécifiques
+  'vue-densemble': ['Bible', 'Écriture', 'Ancien', 'Nouveau', 'Testament', 'livres', 'alliance', 'salut'],
+  'pentateuque': ['Genèse', 'Exode', 'Lévitique', 'Nombres', 'Deutéronome', 'Moïse', 'Torah', 'création'],
+  'livres-historiques': ['Josué', 'Juges', 'Samuel', 'Rois', 'Chroniques', 'Esdras', 'Néhémie', 'conquête'],
+  'livres-poetiques': ['Job', 'Psaumes', 'Proverbes', 'Ecclésiaste', 'Cantique', 'sagesse', 'louange'],
+  'prophetes': ['Ésaïe', 'Jérémie', 'Ézéchiel', 'Daniel', 'prophétie', 'oracle', 'Messie', 'jugement'],
+  'jesus-christ': ['Jésus', 'Christ', 'Messie', 'Fils', 'Dieu', 'Sauveur', 'incarnation', 'rédemption'],
+  'paul': ['Paul', 'Saul', 'Tarse', 'conversion', 'Damas', 'voyages', 'épîtres', 'justification'],
+  'pierre': ['Pierre', 'Simon', 'Céphas', 'pêcheur', 'clés', 'royaume', 'reniement', 'restauration'],
+  'patriarches': ['Abraham', 'Isaac', 'Jacob', 'Joseph', 'promesses', 'alliance', 'foi', 'obéissance'],
+  'rois': ['Saül', 'David', 'Salomon', 'royaume', 'temple', 'onction', 'fidélité', 'idolâtrie'],
+  'femmes': ['Marie', 'Esther', 'Ruth', 'Déborah', 'Anne', 'Sara', 'Rebecca', 'foi', 'courage']
 };
