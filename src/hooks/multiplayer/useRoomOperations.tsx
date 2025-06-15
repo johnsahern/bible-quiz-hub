@@ -1,4 +1,3 @@
-
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -16,18 +15,17 @@ export const useRoomOperations = (user: any) => {
       console.log('User ID:', user.id);
       console.log('Theme:', theme, 'Difficulty:', difficulty, 'Questions:', questionCount);
       
-      // Étape 1: Test de connexion simple
+      // Étape 1: Test de connexion simple - utiliser la syntaxe correcte pour Supabase
       console.log('📡 Testing basic connection...');
       const { data: testData, error: testError } = await supabase
         .from('quiz_rooms')
-        .select('count(*)')
-        .limit(1);
+        .select('*', { count: 'exact', head: true });
       
       if (testError) {
         console.error('❌ Basic connection test failed:', testError);
         throw new Error(`Connection test failed: ${testError.message}`);
       }
-      console.log('✅ Basic connection works:', testData);
+      console.log('✅ Basic connection works');
 
       // Étape 2: Générer le code de salle
       console.log('🎲 Generating room code...');
