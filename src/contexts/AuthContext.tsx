@@ -12,6 +12,7 @@ interface Profile {
   games_played: number;
   best_score: number;
   favorite_theme: string | null;
+  multiplayer_points: number;
   created_at: string;
   updated_at: string;
 }
