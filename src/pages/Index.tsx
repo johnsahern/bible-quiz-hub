@@ -3,9 +3,8 @@ import React, { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import QuizCard from '@/components/QuizCard';
 import VerseDuJour from '@/components/VerseDuJour';
-import BibleReadingSection from '@/components/BibleReadingSection';
 import ProgressSection from '@/components/ProgressSection';
-import { Brain, Users, Gamepad2 } from 'lucide-react';
+import { Brain, Users, Gamepad2, BookOpen } from 'lucide-react';
 
 const Index = () => {
   const [language, setLanguage] = useState('fr');
@@ -37,7 +36,7 @@ const Index = () => {
             <VerseDuJour language={language} />
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
             <QuizCard
               icon={<Brain className="w-8 h-8" />}
               title="Quiz Solo"
@@ -64,10 +63,16 @@ const Index = () => {
               delay="0.3s"
               route="/games"
             />
-          </div>
 
-          {/* Section Lecture & Audio - Après le Centre de Jeux */}
-          <BibleReadingSection language={language} />
+            <QuizCard
+              icon={<BookOpen className="w-8 h-8" />}
+              title="Lecture de la Bible et Audio"
+              description="Explorez les Écritures par la lecture et l'écoute avec guides audio"
+              color="bg-gradient-to-br from-orange-500 via-red-600 to-pink-600"
+              delay="0.4s"
+              route="/bible-reading"
+            />
+          </div>
 
           {/* Section de progression en bas */}
           <div className="space-y-12">
