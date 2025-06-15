@@ -1,6 +1,15 @@
 
 import { useState, useEffect } from 'react';
 
+const API_KEY = '5fc64b36cbabb14bb2a73f6945ea3a0d';
+const BASE_URL = 'https://api.scripture.api.bible/v1';
+
+// Bible IDs pour l'audio (certaines Bibles ont l'audio, d'autres non)
+const AUDIO_BIBLE_IDS = {
+  fr: 'BDS', // Bible du Semeur
+  en: 'KJV'  // King James Version
+};
+
 export const useBibleAudio = (bookKey: string, chapter: number, language: string) => {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -14,19 +23,45 @@ export const useBibleAudio = (bookKey: string, chapter: number, language: string
       setError(null);
 
       try {
-        // Pour la démo, on utilise une URL audio simulée
-        // En production, on intégrerait l'API Bible.is pour récupérer les vrais liens audio
+        const bibleId = AUDIO_BIBLE_IDS[language as keyof typeof AUDIO_BIBLE_IDS] || AUDIO_BIBLE_IDS.en;
+        const chapterId = `${bookKey}.${chapter}`;
         
-        // Simulation d'un délai réseau
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        console.log(`Fetching audio for chapter: ${chapterId} from Bible: ${bibleId}`);
+        
+        const response = await fetch(
+          `${BASE_URL}/bibles/${bibleId}/chapters/${chapterId}/audio`,
+          {
+            headers: {
+              'api-key': API_KEY,
+              'accept': 'application/json'
+            }
+          }
+        );
 
-        // URL audio de démonstration (vous devrez remplacer par l'API Bible.is)
-        const mockAudioUrl = 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav';
-        
-        setAudioUrl(mockAudioUrl);
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error('Audio non disponible pour ce chapitre');
+          }
+          throw new Error(`Erreur API: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Audio API Response:', data);
+
+        if (data.data && data.data.url) {
+          setAudioUrl(data.data.url);
+        } else {
+          throw new Error('URL audio non trouvée dans la réponse');
+        }
+
       } catch (err) {
-        setError('Erreur lors du chargement de l\'audio');
         console.error('Bible audio fetch error:', err);
+        setError(err instanceof Error ? err.message : 'Erreur lors du chargement de l\'audio');
+        
+        // Fallback vers une URL audio de démonstration si l'API n'a pas d'audio
+        if (err instanceof Error && err.message.includes('404')) {
+          setAudioUrl('https://www.soundjay.com/misc/sounds/bell-ringing-05.wav');
+        }
       } finally {
         setIsLoading(false);
       }
