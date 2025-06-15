@@ -13,6 +13,13 @@ import { womenContext } from './contexts/women.ts';
 import { genealogyJesusContext } from './contexts/genealogy-jesus.ts';
 import { evangelilesContext } from './contexts/evangeliles.ts';
 
+// NOUVEAUX CONTEXTES VIE DE JÉSUS
+import { vieJesusContext } from './contexts/vie-jesus.ts';
+import { miraclesJesusContext } from './contexts/miracles-jesus.ts';
+import { parabolesJesusContext } from './contexts/paraboles-jesus.ts';
+import { passionChristContext } from './contexts/passion-christ.ts';
+import { resurrectionContext } from './contexts/resurrection.ts';
+
 export interface BiblicalContext {
   key: string;
   title: string;
@@ -23,6 +30,7 @@ export interface BiblicalContext {
 }
 
 export const BIBLICAL_CONTEXTS: BiblicalContext[] = [
+  // Contextes de base
   overviewContext,
   pentateuchContext,
   historicalBooksContext,
@@ -31,6 +39,15 @@ export const BIBLICAL_CONTEXTS: BiblicalContext[] = [
   newTestamentContext,
   jesusChristContext,
   evangelilesContext,
+  
+  // Contextes étendus Jésus
+  vieJesusContext,
+  miraclesJesusContext,
+  parabolesJesusContext,
+  passionChristContext,
+  resurrectionContext,
+  
+  // Autres contextes
   ...apostlesContexts,
   patriarchsContext,
   kingsContext,
