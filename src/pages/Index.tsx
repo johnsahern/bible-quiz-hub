@@ -59,7 +59,7 @@ const Index = () => {
               icon={<Gamepad2 className="w-8 h-8" />}
               title="Centre de Jeux"
               description="Collection variée : Vrai/Faux, Puzzles, Mots croisés et défis quotidiens"
-              color="bg-gradient-to-br from-emerald-500 via-green-600 to-teal-600"
+              color="bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-600"
               delay="0.3s"
               route="/games"
             />
@@ -68,7 +68,7 @@ const Index = () => {
               icon={<BookOpen className="w-8 h-8" />}
               title="Lecture de la Bible et Audio"
               description="Explorez les Écritures par la lecture et l'écoute avec guides audio"
-              color="bg-gradient-to-br from-orange-500 via-red-600 to-pink-600"
+              color="bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-600"
               delay="0.4s"
               route="/bible-reading"
             />
