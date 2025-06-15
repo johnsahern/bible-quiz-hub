@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { QuizQuestion } from '@/types/quiz';
 import { RoomStatus, RoomPlayer } from '@/types/multiplayer';
@@ -17,8 +17,19 @@ export const useRealtimeSubscription = ({
   setPlayers,
   setCurrentQuestion
 }: UseRealtimeSubscriptionProps) => {
+  const channelRef = useRef<any>(null);
+
   useEffect(() => {
     if (!roomId) return;
+
+    // Clean up existing channel first
+    if (channelRef.current) {
+      console.log('Cleaning up existing channel');
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+
+    console.log('Setting up realtime subscription for room:', roomId);
 
     const roomChannel = supabase
       .channel(`room-${roomId}`)
@@ -59,11 +70,21 @@ export const useRealtimeSubscription = ({
             setPlayers(prev => prev.filter(p => p.id !== payload.old.id));
           }
         }
-      )
-      .subscribe();
+      );
+
+    // Subscribe and store reference
+    roomChannel.subscribe((status) => {
+      console.log('Subscription status:', status);
+    });
+    
+    channelRef.current = roomChannel;
 
     return () => {
-      supabase.removeChannel(roomChannel);
+      console.log('Cleaning up subscription');
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
     };
-  }, [roomId, setRoom, setPlayers, setCurrentQuestion]);
+  }, [roomId]); // Only depend on roomId to avoid re-subscriptions
 };

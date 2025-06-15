@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { QuizRoom, RoomPlayer } from '@/types/multiplayer';
 import { QuizQuestion } from '@/types/quiz';
@@ -19,14 +19,25 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  console.log('useMultiplayerRoom initialized with:', { roomId, userId: user?.id });
+  console.log('useMultiplayerRoom hook called:', { roomId, userId: user?.id, hookCallCount: Date.now() });
 
-  // Use the smaller hooks
-  const { createRoom: createRoomOperation, joinRoom: joinRoomOperation } = useRoomOperations(user);
-  const { setPlayerReady, leaveRoom: leaveRoomOperation } = usePlayerActions(user, room);
-  const { startQuiz } = useQuizOperations(user, room, isHost);
+  // Memoize the operations to prevent recreating functions
+  const { createRoom: createRoomOperation, joinRoom: joinRoomOperation } = useMemo(
+    () => useRoomOperations(user),
+    [user?.id]
+  );
+  
+  const { setPlayerReady, leaveRoom: leaveRoomOperation } = useMemo(
+    () => usePlayerActions(user, room),
+    [user?.id, room?.id]
+  );
+  
+  const { startQuiz } = useMemo(
+    () => useQuizOperations(user, room, isHost),
+    [user?.id, room?.id, isHost]
+  );
 
-  // Load room data on mount
+  // Load room data on mount - only once per roomId/user combination
   useRoomData({
     roomId,
     user,
@@ -37,16 +48,20 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
     setError
   });
 
-  // Set up realtime subscriptions
+  // Set up realtime subscriptions - memoized callbacks
+  const memoizedSetRoom = useCallback(setRoom, []);
+  const memoizedSetPlayers = useCallback(setPlayers, []);
+  const memoizedSetCurrentQuestion = useCallback(setCurrentQuestion, []);
+
   useRealtimeSubscription({
     roomId,
-    setRoom,
-    setPlayers,
-    setCurrentQuestion
+    setRoom: memoizedSetRoom,
+    setPlayers: memoizedSetPlayers,
+    setCurrentQuestion: memoizedSetCurrentQuestion
   });
 
-  // Wrapper functions to handle loading state
-  const createRoom = async (theme: string, difficulty: string, questionCount: number = 10) => {
+  // Wrapper functions with useCallback to prevent recreating
+  const createRoom = useCallback(async (theme: string, difficulty: string, questionCount: number = 10) => {
     console.log('Creating room with params:', { theme, difficulty, questionCount });
     setLoading(true);
     setError(null);
@@ -59,8 +74,6 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
         setRoom(result);
         setIsHost(true);
         console.log('Room set successfully, isHost=true');
-      } else {
-        console.log('Room creation returned null');
       }
       return result;
     } catch (err) {
@@ -70,9 +83,9 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
     } finally {
       setLoading(false);
     }
-  };
+  }, [createRoomOperation]);
 
-  const joinRoom = async (roomCode: string) => {
+  const joinRoom = useCallback(async (roomCode: string) => {
     console.log('Joining room with code:', roomCode);
     setLoading(true);
     setError(null);
@@ -88,9 +101,9 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
     } finally {
       setLoading(false);
     }
-  };
+  }, [joinRoomOperation]);
 
-  const leaveRoom = async () => {
+  const leaveRoom = useCallback(async () => {
     console.log('Leaving room');
     try {
       await leaveRoomOperation();
@@ -103,7 +116,7 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
     } catch (err) {
       console.error('Error leaving room:', err);
     }
-  };
+  }, [leaveRoomOperation]);
 
   return {
     room,

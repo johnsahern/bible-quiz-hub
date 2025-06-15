@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,9 +15,19 @@ const MultiplayerQuiz: React.FC = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { room, players, isHost, currentQuestion, loading, error, leaveRoom } = useMultiplayerRoom(roomId);
+  
+  // Only call the hook once with memoized roomId
+  const memoizedRoomId = useMemo(() => roomId, [roomId]);
+  const { room, players, isHost, currentQuestion, loading, error, leaveRoom } = useMultiplayerRoom(memoizedRoomId);
 
-  console.log('MultiplayerQuiz render:', { roomId, room, players, loading, error });
+  console.log('MultiplayerQuiz render:', { 
+    roomId: memoizedRoomId, 
+    room: room?.id, 
+    playersCount: players.length, 
+    loading, 
+    error,
+    renderTime: Date.now()
+  });
 
   const handleLeaveRoom = async () => {
     await leaveRoom();
