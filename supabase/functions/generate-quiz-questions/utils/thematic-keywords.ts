@@ -1,84 +1,9 @@
+
 // Mots-clés pour le thème "Vue d'ensemble de la Bible"
 const overviewKeywords = [
   'bible', 'ancien testament', 'nouveau testament', 'écriture', 'verset', 'histoire biblique',
   'personnage biblique', 'événement biblique', 'enseignement biblique', 'doctrine', 'foi', 'chrétien',
-  'église', 'jésus-christ', 'dieu', 'saint-esprit', 'trinité', 'salut', 'rédemption', 'grâce',
-  'amour', 'prière', 'adoration', 'louange', 'prophétie', 'miracle', 'parabole', 'apôtre', 'disciple',
-  'prophète', 'roi', 'prêtre', 'sacrifice', 'alliance', 'commandement', 'loi', 'péché', 'repentir',
-  'pardon', 'jugement', 'ciel', 'enfer', 'résurrection', 'vie éternelle', 'royaume de dieu', 'paradis',
-  'ange', 'démon', 'satan', 'diable', 'tentation', 'épreuve', 'souffrance', 'persévérance', 'victoire',
-  'paix', 'joie', 'espérance', 'vérité', 'justice', 'sagesse', 'connaissance', 'compréhension',
-  'sainteté', 'pureté', 'humilité', 'obéissance', 'fidélité', 'persévérance', 'amour fraternel',
-  'compassion', 'miséricorde', 'bonté', 'douceur', 'maîtrise de soi', 'patience', 'longanimité',
-  'bienveillance', 'charité', 'aumône', 'offrande', 'dîme', 'culte', 'sacrement', 'ordonnance',
-  'évangile', 'bonne nouvelle', 'témoignage', 'mission', 'évangélisation', 'discipolat', 'croix',
-  'sang de jésus', 'rédempteur', 'sauveur', 'libérateur', 'consolateur', 'avocat', 'médiateur',
-  'berger', 'porte', 'chemin', 'lumière', 'sel', 'levain', 'semence', 'moisson', 'vigne', 'olivier',
-  'arbre de vie', 'eau vive', 'pain de vie', 'rocher', 'forteresse', 'bouclier', 'épée', 'armure',
-  'couronne', 'trône', 'sceptre', 'royaume', 'ville', 'temple', 'maison', 'famille', 'mariage',
-  'enfant', 'parent', 'frère', 'sœur', 'ami', 'voisin', 'étranger', 'pauvre', 'riche', 'esclave',
-  'libre', 'gouvernement', 'nation', 'peuple', 'langue', 'culture', 'art', 'musique', 'danse',
-  'théâtre', 'littérature', 'poésie', 'prose', 'histoire', 'géographie', 'science', 'technologie',
-  'médecine', 'éducation', 'travail', 'économie', 'politique', 'justice sociale', 'environnement',
-  'paix mondiale', 'unité', 'diversité', 'tolérance', 'respect', 'dialogue', 'coopération',
-  'développement', 'progrès', 'avenir', 'destinée', 'éternité', 'amour éternel', 'joie éternelle',
-  'paix éternelle', 'vie éternelle', 'présence de dieu', 'gloire de dieu', 'puissance de dieu',
-  'sagesse de dieu', 'connaissance de dieu', 'amour de dieu', 'grâce de dieu', 'miséricorde de dieu',
-  'bonté de dieu', 'fidélité de dieu', 'justice de dieu', 'sainteté de dieu', 'vérité de dieu',
-  'parole de dieu', 'esprit de dieu', 'royaume de dieu', 'volonté de dieu', 'plan de dieu',
-  'promesse de dieu', 'appel de dieu', 'don de dieu', 'bénédiction de dieu', 'protection de dieu',
-  'direction de dieu', 'consolation de dieu', 'guérison de dieu', 'miracle de dieu', 'intervention de dieu',
-  'présence de dieu', 'gloire de dieu', 'puissance de dieu', 'sagesse de dieu', 'connaissance de dieu',
-  'amour de dieu', 'grâce de dieu', 'miséricorde de dieu', 'bonté de dieu', 'fidélité de dieu',
-  'justice de dieu', 'sainteté de dieu', 'vérité de dieu', 'parole de dieu', 'esprit de dieu',
-  'royaume de dieu', 'volonté de dieu', 'plan de dieu', 'promesse de dieu', 'appel de dieu',
-  'don de dieu', 'bénédiction de dieu', 'protection de dieu', 'direction de dieu', 'consolation de dieu',
-  'guérison de dieu', 'miracle de dieu', 'intervention de dieu'
-];
-
-// Mots-clés pour le thème "Vie de Jésus"
-const vieJesusKeywords = [
-  'jésus', 'christ', 'vie de jésus', 'naissance', 'ministère', 'miracles', 'paraboles', 'enseignements',
-  'passion', 'crucifixion', 'résurrection', 'ascension', 'rédempteur', 'sauveur', 'messie', 'fils de dieu',
-  'fils de l\'homme', 'seigneur', 'roi', 'prêtre', 'prophète', 'disciple', 'apôtre', 'marie', 'joseph',
-  'jean-baptiste', 'pierre', 'jacques', 'jean', 'judas', 'philippe', 'barthélemy', 'thomas', 'matthieu',
-  'simon', 'thaddée', 'jacques le mineur', 'paul', 'étienne', 'pilate', 'hérode', 'caïphe', 'anne',
-  'pharisiens', 'sadducéens', 'scribes', 'docteurs de la loi', 'peuple', 'foule', 'enfants', 'femmes',
-  'pêcheurs', 'collecteurs d\'impôts', 'lépreux', 'aveugles', 'boiteux', 'sourds', 'muets', 'possédés',
-  'malades', 'pauvres', 'riches', 'soldats', 'gouverneurs', 'rois', 'empereurs', 'césar', 'rome',
-  'jérusalem', 'bethléem', 'nazareth', 'galilée', 'judée', 'samarie', 'jordanie', 'mer de galilée',
-  'mont des oliviers', 'géthsémani', 'golgotha', 'tombeau', 'cène', 'eucharistie', 'pâque', 'fête',
-  'sabbat', 'synagogue', 'temple', 'prière', 'jeûne', 'aumône', 'amour', 'foi', 'espérance', 'paix',
-  'joie', 'vérité', 'justice', 'sagesse', 'connaissance', 'compréhension', 'sainteté', 'pureté',
-  'humilité', 'obéissance', 'fidélité', 'persévérance', 'amour fraternel', 'compassion', 'miséricorde',
-  'bonté', 'douceur', 'maîtrise de soi', 'patience', 'longanimité', 'bienveillance', 'charité',
-  'aumône', 'offrande', 'dîme', 'culte', 'sacrement', 'ordonnance', 'évangile', 'bonne nouvelle',
-  'témoignage', 'mission', 'évangélisation', 'discipolat', 'croix', 'sang de jésus', 'rédempteur',
-  'sauveur', 'libérateur', 'consolateur', 'avocat', 'médiateur', 'berger', 'porte', 'chemin',
-  'lumière', 'sel', 'levain', 'semence', 'moisson', 'vigne', 'olivier', 'arbre de vie', 'eau vive',
-  'pain de vie', 'rocher', 'forteresse', 'bouclier', 'épée', 'armure', 'couronne', 'trône', 'sceptre',
-  'royaume', 'ville', 'temple', 'maison', 'famille', 'mariage', 'enfant', 'parent', 'frère', 'sœur',
-  'ami', 'voisin', 'étranger', 'pauvre', 'riche', 'esclave', 'libre', 'gouvernement', 'nation',
-  'peuple', 'langue', 'culture', 'art', 'musique', 'danse', 'théâtre', 'littérature', 'poésie',
-  'prose', 'histoire', 'géographie', 'science', 'technologie', 'médecine', 'éducation', 'travail',
-  'économie', 'politique', 'justice sociale', 'environnement', 'paix mondiale', 'unité', 'diversité',
-  'tolérance', 'respect', 'dialogue', 'coopération', 'développement', 'progrès', 'avenir', 'destinée',
-  'éternité', 'amour éternel', 'joie éternelle', 'paix éternelle', 'vie éternelle', 'présence de dieu',
-  'gloire de dieu', 'puissance de dieu', 'sagesse de dieu', 'connaissance de dieu', 'amour de dieu',
-  'grâce de dieu', 'miséricorde de dieu', 'bonté de dieu', 'fidélité de dieu', 'justice de dieu',
-  'sainteté de dieu', 'vérité de dieu', 'parole de dieu', 'esprit de dieu', 'royaume de dieu',
-  'volonté de dieu', 'plan de dieu', 'promesse de dieu', 'appel de dieu', 'don de dieu',
-  'bénédiction de dieu', 'protection de dieu', 'direction de dieu', 'consolation de dieu',
-  'guérison de dieu', 'miracle de dieu', 'intervention de dieu'
-];
-
-// Mots-clés pour Ruth
-const ruthKeywords = [
-  'Ruth', 'Moabite', 'Naomi', 'belle-fille', 'fidélité', 'Boaz', 'glanage', 
-  'rédemption', 'David', 'lignée', 'Orpa', 'Élimélec', 'Machlon', 'Kiljon',
-  'Bethléhem', 'Moab', 'veuve', 'épis', 'rédempteur', 'rachat', 'Obed',
-  'hessed', 'loyauté', 'providence', 'aire', 'battage', 'pieds', 'couverture',
-  'parent', 'généalogie', 'ancêtre', 'Isaï', 'messianique'
+  'église', 'jésus-christ', 'dieu', 'saint-esprit', 'trinité', 'salut', 'rédemption', 'grâce'
 ];
 
 // Mots-clés pour la Genèse
@@ -124,10 +49,74 @@ const jugesKeywords = [
   'Philistins', 'Dalila', 'force', 'cheveux', 'Barak', 'Sisera'
 ];
 
+// Mots-clés pour Ruth
+const ruthKeywords = [
+  'Ruth', 'Moabite', 'Naomi', 'belle-fille', 'fidélité', 'Boaz', 'glanage', 
+  'rédemption', 'David', 'lignée', 'Orpa', 'Élimélec', 'Machlon', 'Kiljon'
+];
+
+// Mots-clés pour Matthieu
+const matthieuKeywords = [
+  'Matthieu', 'évangile', 'généalogie', 'mages', 'sermon montagne', 'béatitudes', 
+  'royaume cieux', 'paraboles', 'Emmanuel', 'accomplissement'
+];
+
+// Mots-clés pour Marc
+const marcKeywords = [
+  'Marc', 'évangile', 'serviteur', 'aussitôt', 'miracles', 'secret messianique',
+  'action', 'dynamisme', 'autorité', 'passion'
+];
+
+// Mots-clés pour Luc
+const lucKeywords = [
+  'Luc', 'évangile', 'miséricorde', 'paraboles', 'bon Samaritain', 'fils prodigue',
+  'universalisme', 'compassion', 'pauvres', 'Magnificat'
+];
+
+// Mots-clés pour Jean
+const jeanEvangelisteKeywords = [
+  'Jean', 'évangile', 'Verbe', 'signes', 'Je suis', 'amour', 'vie éternelle',
+  'lumière', 'ténèbres', 'gloire', 'bien-aimé'
+];
+
+// Mots-clés pour l'Ascension
+const ascensionKeywords = [
+  'ascension', 'montagne', 'oliviers', 'disciples', 'nuée', 'ciel', 'anges',
+  'promesse', 'Esprit-Saint', 'témoins', 'retour'
+];
+
+// Mots-clés pour les Actes
+const actesApotresKeywords = [
+  'Actes', 'apôtres', 'Pentecôte', 'Esprit-Saint', 'Pierre', 'Paul', 'Étienne',
+  'conversion', 'mission', 'Église primitive'
+];
+
+// Mots-clés pour l'enfance de Jésus
+const enfanceJesusKeywords = [
+  'enfance', 'Jésus', 'naissance', 'Bethléem', 'bergers', 'mages', 'Hérode',
+  'fuite', 'Égypte', 'Nazareth', 'temple', 'douze ans'
+];
+
+// Mots-clés pour le baptême de Jésus
+const baptemeJesusKeywords = [
+  'baptême', 'Jean-Baptiste', 'Jourdain', 'Esprit-Saint', 'colombe', 'voix',
+  'Père', 'Fils bien-aimé', 'Trinité', 'ministère'
+];
+
+// Mots-clés pour Jean-Baptiste
+const jeanBaptisteKeywords = [
+  'Jean-Baptiste', 'précurseur', 'Zacharie', 'Élisabeth', 'désert', 'repentance',
+  'Agneau de Dieu', 'Hérode', 'décapitation', 'diminuer', 'croître'
+];
+
+// Mots-clés pour la Transfiguration
+const transfigurationKeywords = [
+  'transfiguration', 'montagne', 'Pierre', 'Jacques', 'Jean', 'Moïse', 'Élie',
+  'visage', 'lumière', 'nuée', 'voix', 'Père', 'éclatants'
+];
+
 export const strictThematicKeywords: Record<string, string[]> = {
-  'overview': overviewKeywords,
-  'vie-jesus': vieJesusKeywords,
-  'ruth': ruthKeywords,
+  'vue-densemble': overviewKeywords,
   'genese': geneseKeywords,
   'exode': exodeKeywords,
   'levitique': levitiqueKeywords,
@@ -135,11 +124,21 @@ export const strictThematicKeywords: Record<string, string[]> = {
   'deuteronome': deuteronomeKeywords,
   'josue': josueKeywords,
   'juges': jugesKeywords,
-  // Les autres thèmes utilisent les mots-clés génériques pour l'instant
+  'ruth': ruthKeywords,
+  'matthieu': matthieuKeywords,
+  'marc': marcKeywords,
+  'luc': lucKeywords,
+  'jean-evangeliste': jeanEvangelisteKeywords,
+  'ascension': ascensionKeywords,
+  'actes-apotres': actesApotresKeywords,
+  'enfance-jesus': enfanceJesusKeywords,
+  'bapteme-jesus': baptemeJesusKeywords,
+  'jean-baptiste': jeanBaptisteKeywords,
+  'transfiguration': transfigurationKeywords,
+  
+  // Thèmes combinés
   'pentateuque': [...geneseKeywords, ...exodeKeywords, ...levitiqueKeywords, ...nombresKeywords, ...deuteronomeKeywords],
   'livres-historiques': [...josueKeywords, ...jugesKeywords, ...ruthKeywords],
-  'matthieu': ['Matthieu', 'évangile', 'généalogie', 'mages', 'sermon montagne', 'béatitudes', 'royaume cieux'],
-  'marc': ['Marc', 'évangile', 'serviteur', 'aussitôt', 'miracles', 'secret messianique'],
-  'luc': ['Luc', 'évangile', 'miséricorde', 'paraboles', 'bon Samaritain', 'fils prodigue'],
-  'jean-evangeliste': ['Jean', 'évangile', 'Verbe', 'signes', 'Je suis', 'amour', 'vie éternelle']
+  'evangeliles': [...matthieuKeywords, ...marcKeywords, ...lucKeywords, ...jeanEvangelisteKeywords],
+  'nouveau-testament': [...matthieuKeywords, ...marcKeywords, ...lucKeywords, ...jeanEvangelisteKeywords, ...actesApotresKeywords]
 };
