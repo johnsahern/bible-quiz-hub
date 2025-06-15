@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, BookOpen, Loader2, AlertCircle } from 'lucide-react';
-import { useBibleText } from '@/hooks/useBibleText';
+import { ChevronLeft, ChevronRight, BookOpen, Loader2, AlertCircle, Info } from 'lucide-react';
+import { useLocalBibleText } from '@/hooks/useLocalBibleText';
 import BibleInfo from './BibleInfo';
 
 interface BibleReaderProps {
@@ -16,7 +16,7 @@ interface BibleReaderProps {
 }
 
 const BibleReader = ({ book, chapter, language, onChapterChange }: BibleReaderProps) => {
-  const { text, isLoading, error } = useBibleText(book.key, chapter, language);
+  const { text, isLoading, error } = useLocalBibleText(book.key, chapter);
   const [fontSize, setFontSize] = useState('text-base');
 
   const fontSizes = [
@@ -63,12 +63,15 @@ const BibleReader = ({ book, chapter, language, onChapterChange }: BibleReaderPr
     return (
       <div className="space-y-4">
         <BibleInfo bibleInfo={text?.bibleInfo} language={language} />
-        <Card className="min-h-96 border-0 shadow-lg bg-red-50">
+        <Card className="min-h-96 border-0 shadow-lg bg-orange-50">
           <CardContent className="flex items-center justify-center h-96">
-            <div className="text-center">
-              <AlertCircle className="w-8 h-8 mx-auto mb-4 text-red-500" />
-              <p className="text-red-600 font-medium">Erreur lors du chargement</p>
-              <p className="text-red-500 text-sm mt-2">{error}</p>
+            <div className="text-center max-w-md">
+              <Info className="w-8 h-8 mx-auto mb-4 text-orange-500" />
+              <p className="text-orange-600 font-medium">Chapitre non disponible</p>
+              <p className="text-orange-500 text-sm mt-2">{error}</p>
+              <p className="text-xs text-gray-500 mt-4">
+                Note: Cette version utilise une base de données locale avec un nombre limité de chapitres.
+              </p>
             </div>
           </CardContent>
         </Card>

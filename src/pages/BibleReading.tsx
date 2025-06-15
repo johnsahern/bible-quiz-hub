@@ -1,34 +1,33 @@
-
 import React, { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import BibleBookSelector from '@/components/bible/BibleBookSelector';
 import BibleReader from '@/components/bible/BibleReader';
-import BibleAudioPlayer from '@/components/bible/BibleAudioPlayer';
+import LocalBibleNotice from '@/components/bible/LocalBibleNotice';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Headphones, Languages } from 'lucide-react';
+import { BookOpen, Database, Languages } from 'lucide-react';
 
 const BibleReading = () => {
   const [language, setLanguage] = useState('fr');
   const [selectedBook, setSelectedBook] = useState(null);
   const [selectedChapter, setSelectedChapter] = useState(1);
-  const [viewMode, setViewMode] = useState('reading'); // 'reading', 'audio', 'combined'
+  const [viewMode, setViewMode] = useState('reading'); // 'reading', 'info', 'combined'
 
   const translations = {
     fr: {
-      title: "Lecture de la Bible et Audio",
-      subtitle: "Explorez les Écritures par la lecture et l'écoute",
+      title: "Lecture de la Bible",
+      subtitle: "Explorez les Écritures avec notre base de données locale",
       reading: "Lecture",
-      audio: "Audio",
-      combined: "Lecture + Audio",
+      info: "Informations",
+      combined: "Lecture + Info",
       selectBook: "Sélectionnez un livre pour commencer"
     },
     en: {
-      title: "Bible Reading and Audio",
-      subtitle: "Explore the Scriptures through reading and listening",
+      title: "Bible Reading",
+      subtitle: "Explore the Scriptures with our local database",
       reading: "Reading",
-      audio: "Audio", 
-      combined: "Reading + Audio",
+      info: "Information", 
+      combined: "Reading + Info",
       selectBook: "Select a book to get started"
     }
   };
@@ -71,13 +70,13 @@ const BibleReading = () => {
                 {t.reading}
               </Button>
               <Button
-                variant={viewMode === 'audio' ? 'default' : 'outline'}
-                onClick={() => setViewMode('audio')}
+                variant={viewMode === 'info' ? 'default' : 'outline'}
+                onClick={() => setViewMode('info')}
                 className="flex items-center gap-2"
                 size="sm"
               >
-                <Headphones className="w-4 h-4" />
-                {t.audio}
+                <Database className="w-4 h-4" />
+                {t.info}
               </Button>
               <Button
                 variant={viewMode === 'combined' ? 'default' : 'outline'}
@@ -114,12 +113,11 @@ const BibleReading = () => {
                 </Card>
               ) : (
                 <div className="space-y-6">
-                  {/* Audio Player */}
-                  {(viewMode === 'audio' || viewMode === 'combined') && (
-                    <BibleAudioPlayer
+                  {/* Info Notice */}
+                  {(viewMode === 'info' || viewMode === 'combined') && (
+                    <LocalBibleNotice
                       book={selectedBook}
                       chapter={selectedChapter}
-                      language={language}
                     />
                   )}
 
