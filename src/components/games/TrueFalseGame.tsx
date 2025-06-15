@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, Clock, Star, ArrowLeft } from 'lucide-react';
 import { TrueFalseQuestion } from '@/types/gameTypes';
 import { useTrueFalseQuestions } from '@/hooks/useTrueFalseQuestions';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import TrueFalseGameSetup from './TrueFalseGameSetup';
 
 interface TrueFalseGameProps {
@@ -14,13 +16,21 @@ interface TrueFalseGameProps {
 
 const TrueFalseGame = ({ onGameComplete }: TrueFalseGameProps) => {
   const { questions, isLoading, error, generateQuestions } = useTrueFalseQuestions();
+  const { user } = useAuth();
   const [gameState, setGameState] = useState<'setup' | 'playing' | 'completed'>('setup');
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<boolean | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
   const [gameStartTime, setGameStartTime] = useState<number>(0);
+  const [questionStartTime, setQuestionStartTime] = useState<number>(0);
+  const [gameSettings, setGameSettings] = useState<{
+    theme: string;
+    difficulty: string;
+    questionCount: number;
+  } | null>(null);
 
   useEffect(() => {
     if (gameState !== 'playing') return;
@@ -40,11 +50,32 @@ const TrueFalseGame = ({ onGameComplete }: TrueFalseGameProps) => {
 
   const handleStartGame = async (theme: string, difficulty: string, questionCount: number) => {
     await generateQuestions(theme, difficulty, questionCount);
+    setGameSettings({ theme, difficulty, questionCount });
     setGameState('playing');
     setGameStartTime(Date.now());
+    setQuestionStartTime(Date.now());
     setCurrentQuestion(0);
     setScore(0);
+    setCorrectAnswers(0);
     setTimeLeft(30);
+  };
+
+  const calculatePoints = (isCorrect: boolean, difficulty: string, responseTime: number): number => {
+    if (!isCorrect) return 0;
+
+    // Points de base selon la difficulté
+    const basePoints = {
+      'facile': 10,
+      'moyen': 20,
+      'difficile': 30
+    }[difficulty] || 10;
+
+    // Points bonus selon le temps de réaction (30 seconds max, 10-30 points bonus)
+    const maxTime = 30;
+    const timeBonus = Math.round(10 + ((maxTime - responseTime) / maxTime) * 20);
+    const clampedTimeBonus = Math.max(10, Math.min(30, timeBonus));
+
+    return basePoints + clampedTimeBonus;
   };
 
   const handleTimeUp = () => {
@@ -57,12 +88,16 @@ const TrueFalseGame = ({ onGameComplete }: TrueFalseGameProps) => {
   const handleAnswerSelect = (answer: boolean) => {
     if (selectedAnswer !== null) return;
     
+    const responseTime = Math.round((Date.now() - questionStartTime) / 1000);
+    const isCorrect = answer === questions[currentQuestion].isTrue;
+    
     setSelectedAnswer(answer);
     setShowResult(true);
     
-    const isCorrect = answer === questions[currentQuestion].isTrue;
     if (isCorrect) {
-      setScore(prev => prev + (timeLeft > 15 ? 100 : timeLeft > 5 ? 75 : 50));
+      setCorrectAnswers(prev => prev + 1);
+      const points = calculatePoints(isCorrect, gameSettings?.difficulty || 'moyen', responseTime);
+      setScore(prev => prev + points);
     }
     
     setTimeout(nextQuestion, 3000);
@@ -74,19 +109,52 @@ const TrueFalseGame = ({ onGameComplete }: TrueFalseGameProps) => {
       setSelectedAnswer(null);
       setShowResult(false);
       setTimeLeft(30);
+      setQuestionStartTime(Date.now());
     } else {
-      const timeSpent = Math.floor((Date.now() - gameStartTime) / 1000);
-      setGameState('completed');
-      onGameComplete(score, timeSpent);
+      completeGame();
     }
+  };
+
+  const completeGame = async () => {
+    const timeSpent = Math.floor((Date.now() - gameStartTime) / 1000);
+    
+    // Sauvegarder l'historique du jeu
+    if (user && gameSettings) {
+      try {
+        const { error } = await supabase
+          .from('true_false_history')
+          .insert({
+            user_id: user.id,
+            theme: gameSettings.theme,
+            difficulty: gameSettings.difficulty,
+            total_questions: questions.length,
+            correct_answers: correctAnswers,
+            total_points: score,
+            time_spent: timeSpent
+          });
+
+        if (error) {
+          console.error('Erreur sauvegarde historique Vrai/Faux:', error);
+        } else {
+          console.log('✅ Historique Vrai/Faux sauvegardé avec succès');
+        }
+      } catch (err) {
+        console.error('Erreur lors de la sauvegarde:', err);
+      }
+    }
+
+    setGameState('completed');
+    onGameComplete(score, timeSpent);
   };
 
   const handleBackToSetup = () => {
     setGameState('setup');
     setCurrentQuestion(0);
     setScore(0);
+    setCorrectAnswers(0);
     setSelectedAnswer(null);
     setShowResult(false);
+    setGameSettings(null);
   };
 
   if (error) {
@@ -231,6 +299,13 @@ const TrueFalseGame = ({ onGameComplete }: TrueFalseGameProps) => {
                   <p className="text-xs text-blue-600 mt-2 font-medium">
                     {question.verse}
                   </p>
+                )}
+                {showResult && selectedAnswer === question.isTrue && (
+                  <div className="mt-2 p-2 bg-green-100 rounded border border-green-300">
+                    <p className="text-sm text-green-700 font-medium">
+                      +{calculatePoints(true, gameSettings?.difficulty || 'moyen', Math.round((Date.now() - questionStartTime) / 1000))} points !
+                    </p>
+                  </div>
                 )}
               </div>
             )}

@@ -30,7 +30,7 @@ interface Achievement {
   earned_at: string;
 }
 
-// Interface mise à jour pour inclure multiplayer_points
+// Interface mise à jour pour inclure true_false_points
 interface ExtendedProfile {
   id: string;
   username: string | null;
@@ -41,6 +41,7 @@ interface ExtendedProfile {
   best_score: number;
   favorite_theme: string | null;
   multiplayer_points: number;
+  true_false_points: number;
   created_at: string;
   updated_at: string;
 }
@@ -112,13 +113,14 @@ const Profile = () => {
     );
   };
 
-  // Créer un profil étendu avec multiplayer_points
+  // Créer un profil étendu avec true_false_points
   const extendedProfile: ExtendedProfile = {
     ...profile,
     total_points: profile.total_points || 0,
     games_played: profile.games_played || 0,
     best_score: profile.best_score || 0,
-    multiplayer_points: profile.multiplayer_points || 0
+    multiplayer_points: profile.multiplayer_points || 0,
+    true_false_points: profile.true_false_points || 0
   };
 
   return (

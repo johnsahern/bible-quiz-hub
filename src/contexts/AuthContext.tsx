@@ -13,6 +13,7 @@ interface Profile {
   best_score: number;
   favorite_theme: string | null;
   multiplayer_points: number;
+  true_false_points: number;
   created_at: string;
   updated_at: string;
 }

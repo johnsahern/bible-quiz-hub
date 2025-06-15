@@ -20,6 +20,7 @@ export type Database = {
           id: string
           multiplayer_points: number | null
           total_points: number | null
+          true_false_points: number | null
           updated_at: string | null
           username: string | null
         }
@@ -33,6 +34,7 @@ export type Database = {
           id: string
           multiplayer_points?: number | null
           total_points?: number | null
+          true_false_points?: number | null
           updated_at?: string | null
           username?: string | null
         }
@@ -46,6 +48,7 @@ export type Database = {
           id?: string
           multiplayer_points?: number | null
           total_points?: number | null
+          true_false_points?: number | null
           updated_at?: string | null
           username?: string | null
         }
@@ -226,6 +229,42 @@ export type Database = {
           started_at?: string | null
           status?: string
           theme?: string
+        }
+        Relationships: []
+      }
+      true_false_history: {
+        Row: {
+          correct_answers: number
+          created_at: string
+          difficulty: string
+          id: string
+          theme: string
+          time_spent: number
+          total_points: number
+          total_questions: number
+          user_id: string
+        }
+        Insert: {
+          correct_answers: number
+          created_at?: string
+          difficulty: string
+          id?: string
+          theme: string
+          time_spent: number
+          total_points: number
+          total_questions: number
+          user_id: string
+        }
+        Update: {
+          correct_answers?: number
+          created_at?: string
+          difficulty?: string
+          id?: string
+          theme?: string
+          time_spent?: number
+          total_points?: number
+          total_questions?: number
+          user_id?: string
         }
         Relationships: []
       }

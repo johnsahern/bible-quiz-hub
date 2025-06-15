@@ -14,7 +14,8 @@ import {
   Save,
   Share2,
   LogOut,
-  Users
+  Users,
+  CheckCircle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -28,6 +29,7 @@ interface Profile {
   best_score: number;
   favorite_theme: string | null;
   multiplayer_points: number;
+  true_false_points: number;
   created_at: string;
   updated_at: string;
 }
@@ -74,7 +76,7 @@ const ProfileHeader = ({ profile, achievementsCount, onUpdateProfile, onSignOut 
   };
 
   const shareProfile = async () => {
-    const shareText = `Découvrez mon profil BibleQuiz+ ! ${profile.total_points} points solo, ${profile.multiplayer_points || 0} points multijoueur 🏆`;
+    const shareText = `Découvrez mon profil BibleQuiz+ ! ${profile.total_points} points solo, ${profile.multiplayer_points || 0} points multijoueur, ${profile.true_false_points || 0} points Vrai/Faux 🏆`;
     
     if (navigator.share) {
       try {
@@ -178,7 +180,7 @@ const ProfileHeader = ({ profile, achievementsCount, onUpdateProfile, onSignOut 
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-6 gap-4">
             <div className="text-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
               <div className="flex items-center justify-center mb-2">
                 <BookOpen className="w-5 h-5 text-yellow-600 mr-1" />
@@ -193,6 +195,14 @@ const ProfileHeader = ({ profile, achievementsCount, onUpdateProfile, onSignOut 
               </div>
               <div className="text-lg sm:text-2xl font-bold text-purple-600">{profile.multiplayer_points || 0}</div>
               <div className="text-xs sm:text-sm text-gray-600">Points Multi</div>
+            </div>
+
+            <div className="text-center p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+              <div className="flex items-center justify-center mb-2">
+                <CheckCircle className="w-5 h-5 text-emerald-600 mr-1" />
+              </div>
+              <div className="text-lg sm:text-2xl font-bold text-emerald-600">{profile.true_false_points || 0}</div>
+              <div className="text-xs sm:text-sm text-gray-600">Vrai/Faux</div>
             </div>
             
             <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
