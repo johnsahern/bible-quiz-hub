@@ -14,6 +14,17 @@ import { genealogyJesusContext } from './contexts/genealogy-jesus.ts';
 import { evangelilesContext } from './contexts/evangeliles.ts';
 import { ruthContext } from './contexts/ruth.ts';
 
+// NOUVEAUX CONTEXTES PENTATEUQUE
+import { geneseContext } from './contexts/genese.ts';
+import { exodeContext } from './contexts/exode.ts';
+import { levitiqueContext } from './contexts/levitique.ts';
+import { nombresContext } from './contexts/nombres.ts';
+import { deuteronomeContext } from './contexts/deuteronome.ts';
+
+// NOUVEAUX CONTEXTES HISTORIQUES
+import { josueContext } from './contexts/josue.ts';
+import { jugesContext } from './contexts/juges.ts';
+
 // NOUVEAUX CONTEXTES VIE DE JÉSUS
 import { vieJesusContext } from './contexts/vie-jesus.ts';
 import { miraclesJesusContext } from './contexts/miracles-jesus.ts';
@@ -47,28 +58,32 @@ export interface BiblicalContext {
 export const BIBLICAL_CONTEXTS: BiblicalContext[] = [
   // Contextes de base
   overviewContext,
+  
+  // Pentateuque complet
   pentateuchContext,
+  geneseContext,
+  exodeContext,
+  levitiqueContext,
+  nombresContext,
+  deuteronomeContext,
+  
+  // Livres historiques
   historicalBooksContext,
+  josueContext,
+  jugesContext,
+  ruthContext,
+  
+  // Livres poétiques
   poeticBooksContext,
+  
+  // Prophètes
   prophetsContext,
+  
+  // Nouveau Testament
   newTestamentContext,
-  jesusChristContext,
   evangelilesContext,
   
-  // Contextes étendus Jésus
-  vieJesusContext,
-  miraclesJesusContext,
-  parabolesJesusContext,
-  passionChristContext,
-  resurrectionContext,
-  
-  // Contextes événements de Jésus
-  baptemeJesusContext,
-  transfigurationContext,
-  ascensionContext,
-  enfanceJesusContext,
-  
-  // Contextes Évangiles et NT
+  // Évangiles spécifiques
   matthieuContext,
   marcContext,
   lucContext,
@@ -76,8 +91,17 @@ export const BIBLICAL_CONTEXTS: BiblicalContext[] = [
   actesApotresContext,
   jeanBaptisteContext,
   
-  // Contextes spécifiques
-  ruthContext,
+  // Vie de Jésus détaillée
+  jesusChristContext,
+  vieJesusContext,
+  enfanceJesusContext,
+  baptemeJesusContext,
+  miraclesJesusContext,
+  parabolesJesusContext,
+  transfigurationContext,
+  passionChristContext,
+  resurrectionContext,
+  ascensionContext,
   
   // Autres contextes
   ...apostlesContexts,

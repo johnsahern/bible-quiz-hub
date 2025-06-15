@@ -1,4 +1,3 @@
-
 // Mots-clés pour le thème "Vue d'ensemble de la Bible"
 const overviewKeywords = [
   'bible', 'ancien testament', 'nouveau testament', 'écriture', 'verset', 'histoire biblique',
@@ -82,8 +81,65 @@ const ruthKeywords = [
   'parent', 'généalogie', 'ancêtre', 'Isaï', 'messianique'
 ];
 
+// Mots-clés pour la Genèse
+const geneseKeywords = [
+  'Genèse', 'création', 'commencement', 'Dieu', 'cieux', 'terre', 'lumière', 'ténèbres',
+  'Adam', 'Ève', 'Éden', 'serpent', 'chute', 'péché', 'Caïn', 'Abel', 'Noé', 'déluge',
+  'arche', 'alliance', 'arc-en-ciel', 'Babel', 'tour', 'Abraham', 'Isaac', 'Jacob'
+];
+
+// Mots-clés pour l'Exode
+const exodeKeywords = [
+  'Exode', 'Moïse', 'Égypte', 'pharaon', 'esclavage', 'plaies', 'Pâque', 'mer Rouge',
+  'Sinaï', 'Décalogue', 'commandements', 'veau d\'or', 'tabernacle', 'Aaron'
+];
+
+// Mots-clés pour le Lévitique
+const levitiqueKeywords = [
+  'Lévitique', 'sacrifices', 'holocauste', 'prêtres', 'Aaron', 'pureté', 'sainteté',
+  'Yom Kippour', 'bouc émissaire', 'fêtes', 'jubilé', 'sabbat'
+];
+
+// Mots-clés pour les Nombres
+const nombresKeywords = [
+  'Nombres', 'recensement', 'désert', 'espions', 'Caleb', 'Josué', 'rébellion',
+  'Coré', 'verge Aaron', 'serpent airain', 'Balaam', 'quarante ans'
+];
+
+// Mots-clés pour le Deutéronome
+const deuteronomeKeywords = [
+  'Deutéronome', 'Shema', 'Écoute Israël', 'aimer Dieu', 'bénédictions', 'malédictions',
+  'alliance', 'Moïse', 'mort', 'Nébo', 'Josué', 'terre promise'
+];
+
+// Mots-clés pour Josué
+const josueKeywords = [
+  'Josué', 'conquête', 'Canaan', 'Jéricho', 'Rahab', 'Jourdain', 'miracle',
+  'Acan', 'Aï', 'Gabaonites', 'soleil arrêté', 'partage terre'
+];
+
+// Mots-clés pour les Juges
+const jugesKeywords = [
+  'Juges', 'cycle', 'Déborah', 'Gédéon', 'Samson', 'Jephthé', 'delivreurs',
+  'Philistins', 'Dalila', 'force', 'cheveux', 'Barak', 'Sisera'
+];
+
 export const strictThematicKeywords: Record<string, string[]> = {
   'overview': overviewKeywords,
   'vie-jesus': vieJesusKeywords,
   'ruth': ruthKeywords,
+  'genese': geneseKeywords,
+  'exode': exodeKeywords,
+  'levitique': levitiqueKeywords,
+  'nombres': nombresKeywords,
+  'deuteronome': deuteronomeKeywords,
+  'josue': josueKeywords,
+  'juges': jugesKeywords,
+  // Les autres thèmes utilisent les mots-clés génériques pour l'instant
+  'pentateuque': [...geneseKeywords, ...exodeKeywords, ...levitiqueKeywords, ...nombresKeywords, ...deuteronomeKeywords],
+  'livres-historiques': [...josueKeywords, ...jugesKeywords, ...ruthKeywords],
+  'matthieu': ['Matthieu', 'évangile', 'généalogie', 'mages', 'sermon montagne', 'béatitudes', 'royaume cieux'],
+  'marc': ['Marc', 'évangile', 'serviteur', 'aussitôt', 'miracles', 'secret messianique'],
+  'luc': ['Luc', 'évangile', 'miséricorde', 'paraboles', 'bon Samaritain', 'fils prodigue'],
+  'jean-evangeliste': ['Jean', 'évangile', 'Verbe', 'signes', 'Je suis', 'amour', 'vie éternelle']
 };
