@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { TrueFalseQuestion } from '@/types/gameTypes';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UseTrueFalseQuestionsReturn {
   questions: TrueFalseQuestion[];
@@ -21,24 +22,19 @@ export const useTrueFalseQuestions = (): UseTrueFalseQuestionsReturn => {
     try {
       console.log('🎯 Génération de questions Vrai/Faux...', { theme, difficulty, count });
 
-      const response = await fetch('/functions/v1/generate-true-false-questions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // Utiliser supabase.functions.invoke au lieu de fetch direct
+      const { data, error: functionError } = await supabase.functions.invoke('generate-true-false-questions', {
+        body: {
           theme,
           difficulty,
           questionCount: count
-        }),
+        }
       });
 
-      if (!response.ok) {
-        throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+      if (functionError) {
+        throw new Error(functionError.message);
       }
 
-      const data = await response.json();
-      
       if (data.error) {
         throw new Error(data.error);
       }
