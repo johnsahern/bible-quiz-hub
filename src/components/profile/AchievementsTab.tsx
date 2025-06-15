@@ -1,6 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trophy } from 'lucide-react';
+import AchievementCard from '@/components/achievements/AchievementCard';
 
 interface Achievement {
   id: string;
@@ -20,7 +21,7 @@ const AchievementsTab = ({ achievements }: AchievementsTabProps) => {
       <CardHeader>
         <CardTitle className="flex items-center text-lg sm:text-xl">
           <Trophy className="w-5 h-5 mr-2" />
-          Achievements
+          Achievements ({achievements.length})
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -33,20 +34,7 @@ const AchievementsTab = ({ achievements }: AchievementsTabProps) => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {achievements.map((achievement) => (
-              <div key={achievement.id} className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg border border-amber-200 hover:shadow-md transition-shadow">
-                <div className="flex items-start space-x-3">
-                  <div className="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Trophy className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-amber-800 truncate">{achievement.achievement_name}</div>
-                    <div className="text-sm text-amber-700 mt-1">{achievement.description}</div>
-                    <div className="text-xs text-amber-600 mt-2">
-                      {new Date(achievement.earned_at).toLocaleDateString('fr-FR')}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <AchievementCard key={achievement.id} achievement={achievement} />
             ))}
           </div>
         )}
