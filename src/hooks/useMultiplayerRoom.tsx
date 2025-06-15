@@ -1,5 +1,5 @@
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { QuizRoom, RoomPlayer } from '@/types/multiplayer';
 import { QuizQuestion } from '@/types/quiz';
@@ -18,13 +18,20 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
   const [currentQuestion, setCurrentQuestion] = useState<QuizQuestion | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Use ref to track if operations have been created to prevent recreating
+  const operationsRef = useRef<any>(null);
+
+  // Create operations only once
+  if (!operationsRef.current && user) {
+    operationsRef.current = {
+      roomOperations: useRoomOperations(user),
+      playerActions: usePlayerActions(user, room),
+      quizOperations: useQuizOperations(user, room, isHost)
+    };
+  }
 
   console.log('useMultiplayerRoom hook called:', { roomId, userId: user?.id, hookCallCount: Date.now() });
-
-  // Memoize operations hooks to prevent recreating them
-  const roomOperations = useMemo(() => useRoomOperations(user), [user]);
-  const playerActions = useMemo(() => usePlayerActions(user, room), [user, room]);
-  const quizOperations = useMemo(() => useQuizOperations(user, room, isHost), [user, room, isHost]);
 
   // Load room data on mount - seulement si roomId est fourni
   useRoomData({
@@ -52,7 +59,7 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
     setError(null);
     
     try {
-      const result = await roomOperations.createRoom(theme, difficulty, questionCount);
+      const result = await operationsRef.current?.roomOperations?.createRoom(theme, difficulty, questionCount);
       console.log('Room creation result:', result);
       
       if (result) {
@@ -68,7 +75,7 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
     } finally {
       setLoading(false);
     }
-  }, [roomOperations]);
+  }, []);
 
   const joinRoom = useCallback(async (roomCode: string) => {
     console.log('Joining room with code:', roomCode);
@@ -76,7 +83,7 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
     setError(null);
     
     try {
-      const success = await roomOperations.joinRoom(roomCode);
+      const success = await operationsRef.current?.roomOperations?.joinRoom(roomCode);
       console.log('Join room result:', success);
       return success;
     } catch (err) {
@@ -86,12 +93,12 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
     } finally {
       setLoading(false);
     }
-  }, [roomOperations]);
+  }, []);
 
   const leaveRoom = useCallback(async () => {
     console.log('Leaving room');
     try {
-      await playerActions.leaveRoom();
+      await operationsRef.current?.playerActions?.leaveRoom();
       setRoom(null);
       setPlayers([]);
       setIsHost(false);
@@ -101,7 +108,15 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
     } catch (err) {
       console.error('Error leaving room:', err);
     }
-  }, [playerActions]);
+  }, []);
+
+  const setPlayerReady = useCallback(async (ready: boolean = true) => {
+    await operationsRef.current?.playerActions?.setPlayerReady(ready);
+  }, []);
+
+  const startQuiz = useCallback(async () => {
+    await operationsRef.current?.quizOperations?.startQuiz();
+  }, []);
 
   return {
     room,
@@ -112,8 +127,8 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
     error,
     createRoom,
     joinRoom,
-    setPlayerReady: playerActions.setPlayerReady,
-    startQuiz: quizOperations.startQuiz,
+    setPlayerReady,
+    startQuiz,
     leaveRoom
   };
 };
