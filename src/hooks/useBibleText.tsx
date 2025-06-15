@@ -1,32 +1,34 @@
 
 import { useState, useEffect } from 'react';
+import { useBibleList } from './useBibleList';
 
 const API_KEY = '5fc64b36cbabb14bb2a73f6945ea3a0d';
 const BASE_URL = 'https://api.scripture.api.bible/v1';
-
-// Bible IDs pour différentes langues
-const BIBLE_IDS = {
-  fr: 'BDS', // Bible du Semeur
-  en: 'KJV'  // King James Version
-};
 
 export const useBibleText = (bookKey: string, chapter: number, language: string) => {
   const [text, setText] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { getBibleByLanguage, isLoading: bibleListLoading } = useBibleList();
 
   useEffect(() => {
     const fetchBibleText = async () => {
-      if (!bookKey || !chapter) return;
+      if (!bookKey || !chapter || bibleListLoading) return;
 
       setIsLoading(true);
       setError(null);
 
       try {
-        const bibleId = BIBLE_IDS[language as keyof typeof BIBLE_IDS] || BIBLE_IDS.en;
+        const selectedBible = getBibleByLanguage(language);
+        
+        if (!selectedBible) {
+          throw new Error('Aucune Bible disponible pour cette langue');
+        }
+
+        const bibleId = selectedBible.id;
         const chapterId = `${bookKey}.${chapter}`;
         
-        console.log(`Fetching chapter: ${chapterId} from Bible: ${bibleId}`);
+        console.log(`Fetching chapter: ${chapterId} from Bible: ${bibleId} (${selectedBible.name})`);
         
         const response = await fetch(
           `${BASE_URL}/bibles/${bibleId}/chapters/${chapterId}?content-type=text&include-notes=false&include-titles=true&include-chapter-numbers=false&include-verse-numbers=true&include-verse-spans=false`,
@@ -39,6 +41,9 @@ export const useBibleText = (bookKey: string, chapter: number, language: string)
         );
 
         if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error('Chapitre non trouvé');
+          }
           throw new Error(`Erreur API: ${response.status}`);
         }
 
@@ -93,7 +98,11 @@ export const useBibleText = (bookKey: string, chapter: number, language: string)
               number: 1,
               text: data.data.content.replace(/<[^>]*>/g, '').trim() || 'Contenu non disponible'
             }
-          ]
+          ],
+          bibleInfo: {
+            id: selectedBible.id,
+            name: selectedBible.name
+          }
         });
 
       } catch (err) {
@@ -105,7 +114,7 @@ export const useBibleText = (bookKey: string, chapter: number, language: string)
     };
 
     fetchBibleText();
-  }, [bookKey, chapter, language]);
+  }, [bookKey, chapter, language, bibleListLoading, getBibleByLanguage]);
 
   return { text, isLoading, error };
 };

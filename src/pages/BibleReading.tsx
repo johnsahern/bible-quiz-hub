@@ -21,7 +21,7 @@ const BibleReading = () => {
       reading: "Lecture",
       audio: "Audio",
       combined: "Lecture + Audio",
-      selectBook: "Sélectionnez un livre"
+      selectBook: "Sélectionnez un livre pour commencer"
     },
     en: {
       title: "Bible Reading and Audio",
@@ -29,38 +29,43 @@ const BibleReading = () => {
       reading: "Reading",
       audio: "Audio", 
       combined: "Reading + Audio",
-      selectBook: "Select a book"
+      selectBook: "Select a book to get started"
     }
   };
 
   const t = translations[language as keyof typeof translations];
+
+  const handleChapterChange = (chapter: number) => {
+    setSelectedChapter(chapter);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <Navigation language={language} setLanguage={setLanguage} />
       
       <div className="pt-20">
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto px-4 py-8">
           {/* Header */}
-          <header className="text-center mb-12">
+          <header className="text-center mb-8">
             <div className="relative">
-              <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-700 via-purple-700 to-indigo-700 bg-clip-text text-transparent mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-700 via-purple-700 to-indigo-700 bg-clip-text text-transparent mb-4">
                 {t.title}
               </h1>
               <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full blur-sm opacity-60 animate-pulse"></div>
             </div>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               {t.subtitle}
             </p>
           </header>
 
           {/* Mode Selection */}
-          <Card className="mb-8 p-6 bg-white/70 backdrop-blur-sm border-0 shadow-lg">
-            <div className="flex flex-wrap justify-center gap-4">
+          <Card className="mb-6 p-4 bg-white/70 backdrop-blur-sm border-0 shadow-lg">
+            <div className="flex flex-wrap justify-center gap-3">
               <Button
                 variant={viewMode === 'reading' ? 'default' : 'outline'}
                 onClick={() => setViewMode('reading')}
                 className="flex items-center gap-2"
+                size="sm"
               >
                 <BookOpen className="w-4 h-4" />
                 {t.reading}
@@ -69,6 +74,7 @@ const BibleReading = () => {
                 variant={viewMode === 'audio' ? 'default' : 'outline'}
                 onClick={() => setViewMode('audio')}
                 className="flex items-center gap-2"
+                size="sm"
               >
                 <Headphones className="w-4 h-4" />
                 {t.audio}
@@ -77,6 +83,7 @@ const BibleReading = () => {
                 variant={viewMode === 'combined' ? 'default' : 'outline'}
                 onClick={() => setViewMode('combined')}
                 className="flex items-center gap-2"
+                size="sm"
               >
                 <Languages className="w-4 h-4" />
                 {t.combined}
@@ -85,7 +92,7 @@ const BibleReading = () => {
           </Card>
 
           {/* Main Content */}
-          <div className="grid lg:grid-cols-4 gap-8">
+          <div className="grid lg:grid-cols-4 gap-6">
             {/* Book Selector */}
             <div className="lg:col-span-1">
               <BibleBookSelector 
@@ -122,6 +129,7 @@ const BibleReading = () => {
                       book={selectedBook}
                       chapter={selectedChapter}
                       language={language}
+                      onChapterChange={handleChapterChange}
                     />
                   )}
                 </div>

@@ -12,9 +12,12 @@ import {
   SkipBack, 
   SkipForward,
   Headphones,
-  Loader2
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 import { useBibleAudio } from '@/hooks/useBibleAudio';
+import BibleInfo from './BibleInfo';
+import { useBibleText } from '@/hooks/useBibleText';
 
 interface BibleAudioPlayerProps {
   book: any;
@@ -31,6 +34,7 @@ const BibleAudioPlayer = ({ book, chapter, language }: BibleAudioPlayerProps) =>
   const [isMuted, setIsMuted] = useState(false);
 
   const { audioUrl, isLoading, error } = useBibleAudio(book.key, chapter, language);
+  const { text } = useBibleText(book.key, chapter, language);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -94,6 +98,13 @@ const BibleAudioPlayer = ({ book, chapter, language }: BibleAudioPlayerProps) =>
     }
   };
 
+  const skip = (seconds: number) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.currentTime = Math.max(0, Math.min(duration, audio.currentTime + seconds));
+  };
+
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
@@ -102,139 +113,152 @@ const BibleAudioPlayer = ({ book, chapter, language }: BibleAudioPlayerProps) =>
 
   if (isLoading) {
     return (
-      <Card 
-        className="border-0 shadow-lg"
-        style={{
-          background: `linear-gradient(135deg, ${book.colors.primary}15, ${book.colors.secondary}15)`
-        }}
-      >
-        <CardContent className="flex items-center justify-center p-12">
-          <div className="text-center">
-            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">Chargement de l'audio...</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="space-y-4">
+        <BibleInfo bibleInfo={text?.bibleInfo} language={language} />
+        <Card 
+          className="border-0 shadow-lg"
+          style={{
+            background: `linear-gradient(135deg, ${book.colors.primary}15, ${book.colors.secondary}15)`
+          }}
+        >
+          <CardContent className="flex items-center justify-center p-12">
+            <div className="text-center">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
+              <p className="text-gray-600">Chargement de l'audio...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   if (error || !audioUrl) {
     return (
-      <Card className="border-0 shadow-lg bg-red-50">
-        <CardContent className="flex items-center justify-center p-12">
-          <div className="text-center">
-            <Headphones className="w-8 h-8 mx-auto mb-4 text-red-400" />
-            <p className="text-red-600">Audio non disponible</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="space-y-4">
+        <BibleInfo bibleInfo={text?.bibleInfo} language={language} />
+        <Card className="border-0 shadow-lg bg-orange-50">
+          <CardContent className="flex items-center justify-center p-12">
+            <div className="text-center">
+              <AlertCircle className="w-8 h-8 mx-auto mb-4 text-orange-500" />
+              <p className="text-orange-600 font-medium">Audio non disponible</p>
+              <p className="text-orange-500 text-sm mt-2">
+                {error || 'Aucun audio trouvé pour ce chapitre'}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   return (
-    <Card 
-      className="border-0 shadow-lg"
-      style={{
-        background: `linear-gradient(135deg, ${book.colors.primary}10, ${book.colors.secondary}10)`
-      }}
-    >
-      <CardHeader 
-        className="pb-4"
+    <div className="space-y-4">
+      <BibleInfo bibleInfo={text?.bibleInfo} language={language} />
+      
+      <Card 
+        className="border-0 shadow-lg"
         style={{
-          background: `linear-gradient(135deg, ${book.colors.primary}, ${book.colors.secondary})`
+          background: `linear-gradient(135deg, ${book.colors.primary}10, ${book.colors.secondary}10)`
         }}
       >
-        <CardTitle className="flex items-center gap-3 text-white">
-          <Headphones className="w-6 h-6" />
-          <div>
-            <h3 className="text-xl font-bold">
-              {language === 'fr' ? book.name.fr : book.name.en}
-            </h3>
-            <p className="text-sm opacity-90">Chapitre {chapter} - Audio</p>
-          </div>
-        </CardTitle>
-      </CardHeader>
+        <CardHeader 
+          className="pb-4"
+          style={{
+            background: `linear-gradient(135deg, ${book.colors.primary}, ${book.colors.secondary})`
+          }}
+        >
+          <CardTitle className="flex items-center gap-3 text-white">
+            <Headphones className="w-6 h-6" />
+            <div>
+              <h3 className="text-xl font-bold">
+                {language === 'fr' ? book.name.fr : book.name.en}
+              </h3>
+              <p className="text-sm opacity-90">Chapitre {chapter} - Audio</p>
+            </div>
+          </CardTitle>
+        </CardHeader>
 
-      <CardContent className="p-6">
-        <audio ref={audioRef} src={audioUrl} preload="metadata" />
-        
-        {/* Progress Bar */}
-        <div className="space-y-2 mb-6">
-          <Slider
-            value={[currentTime]}
-            max={duration || 100}
-            step={1}
-            onValueChange={handleSeek}
-            className="w-full"
-          />
-          <div className="flex justify-between text-sm text-gray-500">
-            <span>{formatTime(currentTime)}</span>
-            <span>{formatTime(duration)}</span>
-          </div>
-        </div>
-
-        {/* Controls */}
-        <div className="flex items-center justify-center gap-4 mb-6">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {/* Skip back 30s */}}
-            className="rounded-full"
-          >
-            <SkipBack className="w-4 h-4" />
-          </Button>
-
-          <Button
-            onClick={togglePlay}
-            size="lg"
-            className="rounded-full w-14 h-14"
-            style={{
-              background: `linear-gradient(135deg, ${book.colors.primary}, ${book.colors.secondary})`
-            }}
-          >
-            {isPlaying ? (
-              <Pause className="w-6 h-6" />
-            ) : (
-              <Play className="w-6 h-6 ml-1" />
-            )}
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {/* Skip forward 30s */}}
-            className="rounded-full"
-          >
-            <SkipForward className="w-4 h-4" />
-          </Button>
-        </div>
-
-        {/* Volume Control */}
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleMute}
-          >
-            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-          </Button>
+        <CardContent className="p-6">
+          <audio ref={audioRef} src={audioUrl} preload="metadata" />
           
-          <div className="flex-1">
+          {/* Progress Bar */}
+          <div className="space-y-2 mb-6">
             <Slider
-              value={[isMuted ? 0 : volume]}
-              max={1}
-              step={0.1}
-              onValueChange={handleVolumeChange}
+              value={[currentTime]}
+              max={duration || 100}
+              step={1}
+              onValueChange={handleSeek}
               className="w-full"
             />
+            <div className="flex justify-between text-sm text-gray-500">
+              <span>{formatTime(currentTime)}</span>
+              <span>{formatTime(duration)}</span>
+            </div>
           </div>
-          
-          <Badge variant="outline" className="text-xs min-w-12 justify-center">
-            {Math.round((isMuted ? 0 : volume) * 100)}%
-          </Badge>
-        </div>
-      </CardContent>
-    </Card>
+
+          {/* Controls */}
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => skip(-30)}
+              className="rounded-full"
+            >
+              <SkipBack className="w-4 h-4" />
+            </Button>
+
+            <Button
+              onClick={togglePlay}
+              size="lg"
+              className="rounded-full w-14 h-14"
+              style={{
+                background: `linear-gradient(135deg, ${book.colors.primary}, ${book.colors.secondary})`
+              }}
+            >
+              {isPlaying ? (
+                <Pause className="w-6 h-6" />
+              ) : (
+                <Play className="w-6 h-6 ml-1" />
+              )}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => skip(30)}
+              className="rounded-full"
+            >
+              <SkipForward className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {/* Volume Control */}
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleMute}
+            >
+              {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            </Button>
+            
+            <div className="flex-1">
+              <Slider
+                value={[isMuted ? 0 : volume]}
+                max={1}
+                step={0.1}
+                onValueChange={handleVolumeChange}
+                className="w-full"
+              />
+            </div>
+            
+            <Badge variant="outline" className="text-xs min-w-12 justify-center">
+              {Math.round((isMuted ? 0 : volume) * 100)}%
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
