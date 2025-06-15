@@ -13,7 +13,8 @@ import {
   Edit, 
   Save,
   Share2,
-  LogOut
+  LogOut,
+  Users
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -26,6 +27,7 @@ interface Profile {
   games_played: number;
   best_score: number;
   favorite_theme: string | null;
+  multiplayer_points: number;
   created_at: string;
   updated_at: string;
 }
@@ -71,7 +73,7 @@ const ProfileHeader = ({ profile, onUpdateProfile, onSignOut }: ProfileHeaderPro
   };
 
   const shareProfile = async () => {
-    const shareText = `Découvrez mon profil BibleQuiz+ ! ${profile.total_points} points, ${profile.games_played} quiz joués 🏆`;
+    const shareText = `Découvrez mon profil BibleQuiz+ ! ${profile.total_points} points solo, ${profile.multiplayer_points || 0} points multijoueur 🏆`;
     
     if (navigator.share) {
       try {
@@ -175,13 +177,21 @@ const ProfileHeader = ({ profile, onUpdateProfile, onSignOut }: ProfileHeaderPro
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
             <div className="text-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
               <div className="flex items-center justify-center mb-2">
-                <Trophy className="w-5 h-5 text-yellow-600 mr-1" />
+                <BookOpen className="w-5 h-5 text-yellow-600 mr-1" />
               </div>
               <div className="text-lg sm:text-2xl font-bold text-yellow-600">{profile.total_points}</div>
-              <div className="text-xs sm:text-sm text-gray-600">Points</div>
+              <div className="text-xs sm:text-sm text-gray-600">Points Solo</div>
+            </div>
+            
+            <div className="text-center p-3 bg-purple-50 rounded-lg border border-purple-200">
+              <div className="flex items-center justify-center mb-2">
+                <Users className="w-5 h-5 text-purple-600 mr-1" />
+              </div>
+              <div className="text-lg sm:text-2xl font-bold text-purple-600">{profile.multiplayer_points || 0}</div>
+              <div className="text-xs sm:text-sm text-gray-600">Points Multi</div>
             </div>
             
             <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
@@ -194,17 +204,17 @@ const ProfileHeader = ({ profile, onUpdateProfile, onSignOut }: ProfileHeaderPro
             
             <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
               <div className="flex items-center justify-center mb-2">
-                <BookOpen className="w-5 h-5 text-blue-600 mr-1" />
+                <Trophy className="w-5 h-5 text-blue-600 mr-1" />
               </div>
               <div className="text-lg sm:text-2xl font-bold text-blue-600">{profile.games_played}</div>
               <div className="text-xs sm:text-sm text-gray-600">Quiz Joués</div>
             </div>
             
-            <div className="text-center p-3 bg-purple-50 rounded-lg border border-purple-200">
+            <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center justify-center mb-2">
-                <Clock className="w-5 h-5 text-purple-600 mr-1" />
+                <Clock className="w-5 h-5 text-gray-600 mr-1" />
               </div>
-              <div className="text-sm sm:text-lg font-bold text-purple-600">
+              <div className="text-sm sm:text-lg font-bold text-gray-600">
                 {/* This will be passed as achievements count */}
                 0
               </div>

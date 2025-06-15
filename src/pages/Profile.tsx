@@ -118,7 +118,8 @@ const Profile = () => {
             ...profile,
             total_points: profile.total_points || 0,
             games_played: profile.games_played || 0,
-            best_score: profile.best_score || 0
+            best_score: profile.best_score || 0,
+            multiplayer_points: profile.multiplayer_points || 0
           }}
           onUpdateProfile={updateProfile}
           onSignOut={handleSignOut}

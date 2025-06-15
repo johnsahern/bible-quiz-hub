@@ -18,6 +18,7 @@ export type Database = {
           full_name: string | null
           games_played: number | null
           id: string
+          multiplayer_points: number | null
           total_points: number | null
           updated_at: string | null
           username: string | null
@@ -30,6 +31,7 @@ export type Database = {
           full_name?: string | null
           games_played?: number | null
           id: string
+          multiplayer_points?: number | null
           total_points?: number | null
           updated_at?: string | null
           username?: string | null
@@ -42,6 +44,7 @@ export type Database = {
           full_name?: string | null
           games_played?: number | null
           id?: string
+          multiplayer_points?: number | null
           total_points?: number | null
           updated_at?: string | null
           username?: string | null
