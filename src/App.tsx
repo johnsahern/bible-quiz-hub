@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import SoloQuiz from "./pages/SoloQuiz";
+import MultiplayerSetup from "./pages/MultiplayerSetup";
 import MultiplayerQuiz from "./pages/MultiplayerQuiz";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
@@ -25,6 +26,7 @@ const App: React.FC = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/quiz-solo" element={<SoloQuiz />} />
+            <Route path="/quiz-multijoueur" element={<MultiplayerSetup />} />
             <Route path="/quiz-multijoueur/:roomId" element={<MultiplayerQuiz />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/profile" element={<Profile />} />

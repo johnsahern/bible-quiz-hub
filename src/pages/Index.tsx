@@ -89,6 +89,7 @@ const Index = () => {
             description="Défiez vos amis et votre famille"
             color="bg-gradient-to-br from-purple-500 to-purple-600"
             delay="0.2s"
+            route="/quiz-multijoueur"
           />
           
           <QuizCard
