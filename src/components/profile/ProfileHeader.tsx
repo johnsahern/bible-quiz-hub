@@ -183,7 +183,7 @@ const ProfileHeader = ({ profile, achievementsCount, onUpdateProfile, onSignOut 
               <div className="flex items-center justify-center mb-2">
                 <BookOpen className="w-5 h-5 text-yellow-600 mr-1" />
               </div>
-              <div className="text-lg sm:text-2xl font-bold text-yellow-600">{profile.total_points}</div>
+              <div className="text-lg sm:text-2xl font-bold text-yellow-600">{profile.total_points || 0}</div>
               <div className="text-xs sm:text-sm text-gray-600">Points Solo</div>
             </div>
             
@@ -199,7 +199,7 @@ const ProfileHeader = ({ profile, achievementsCount, onUpdateProfile, onSignOut 
               <div className="flex items-center justify-center mb-2">
                 <Target className="w-5 h-5 text-green-600 mr-1" />
               </div>
-              <div className="text-lg sm:text-2xl font-bold text-green-600">{profile.best_score}</div>
+              <div className="text-lg sm:text-2xl font-bold text-green-600">{profile.best_score || 0}</div>
               <div className="text-xs sm:text-sm text-gray-600">Meilleur Score</div>
             </div>
             
@@ -207,7 +207,7 @@ const ProfileHeader = ({ profile, achievementsCount, onUpdateProfile, onSignOut 
               <div className="flex items-center justify-center mb-2">
                 <Trophy className="w-5 h-5 text-blue-600 mr-1" />
               </div>
-              <div className="text-lg sm:text-2xl font-bold text-blue-600">{profile.games_played}</div>
+              <div className="text-lg sm:text-2xl font-bold text-blue-600">{profile.games_played || 0}</div>
               <div className="text-xs sm:text-sm text-gray-600">Quiz Joués</div>
             </div>
             
