@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -11,38 +12,22 @@ export const useRoomOperations = (user: any) => {
     }
 
     try {
-      console.log('🔥 STARTING ROOM CREATION PROCESS');
-      console.log('User ID:', user.id);
-      console.log('Theme:', theme, 'Difficulty:', difficulty, 'Questions:', questionCount);
+      console.log('🚀 SIMPLE ROOM CREATION START');
+      console.log('User:', user.id);
       
-      // Étape 1: Test de connexion simple - utiliser la syntaxe correcte pour Supabase
-      console.log('📡 Testing basic connection...');
-      const { data: testData, error: testError } = await supabase
-        .from('quiz_rooms')
-        .select('*', { count: 'exact', head: true });
-      
-      if (testError) {
-        console.error('❌ Basic connection test failed:', testError);
-        throw new Error(`Connection test failed: ${testError.message}`);
-      }
-      console.log('✅ Basic connection works');
-
-      // Étape 2: Générer le code de salle
-      console.log('🎲 Generating room code...');
+      // Générer le code de salle directement
       const { data: codeData, error: codeError } = await supabase.rpc('generate_room_code');
       
       if (codeError) {
-        console.error('❌ Room code generation failed:', codeError);
+        console.error('❌ Code generation failed:', codeError);
         throw new Error(`Code generation failed: ${codeError.message}`);
       }
       
-      const roomCode = codeData;
-      console.log('✅ Room code generated:', roomCode);
+      console.log('✅ Room code:', codeData);
 
-      // Étape 3: Créer la salle SANS l'hôte d'abord
-      console.log('🏠 Creating room...');
+      // Créer la salle directement
       const roomData = {
-        room_code: roomCode,
+        room_code: codeData,
         host_id: user.id,
         theme,
         difficulty,
@@ -51,7 +36,7 @@ export const useRoomOperations = (user: any) => {
         max_players: 8
       };
       
-      console.log('📝 Room data to insert:', roomData);
+      console.log('📝 Creating room with data:', roomData);
       
       const { data: createdRoom, error: roomError } = await supabase
         .from('quiz_rooms')
@@ -64,25 +49,17 @@ export const useRoomOperations = (user: any) => {
         throw new Error(`Room creation failed: ${roomError.message}`);
       }
 
-      console.log('✅ Room created successfully:', createdRoom);
+      console.log('✅ Room created:', createdRoom.id);
 
-      // Étape 4: Récupérer le profil utilisateur
-      console.log('👤 Fetching user profile...');
-      const { data: profile, error: profileError } = await supabase
+      // Ajouter l'hôte comme joueur avec une approche très simple
+      const { data: profile } = await supabase
         .from('profiles')
         .select('username')
         .eq('id', user.id)
-        .maybeSingle();
-
-      if (profileError) {
-        console.warn('⚠️ Profile fetch error (continuing with default):', profileError);
-      }
+        .single();
 
       const username = profile?.username || `User-${user.id.slice(0, 6)}`;
-      console.log('✅ Username resolved:', username);
-
-      // Étape 5: Ajouter l'hôte comme joueur SÉPARÉMENT
-      console.log('🎮 Adding host as player...');
+      
       const playerData = {
         room_id: createdRoom.id,
         user_id: user.id,
@@ -92,40 +69,28 @@ export const useRoomOperations = (user: any) => {
         correct_answers: 0
       };
 
-      console.log('📝 Player data to insert:', playerData);
+      console.log('👤 Adding host as player:', playerData);
 
-      // Test d'insertion avec gestion d'erreur détaillée
-      const { data: playerResult, error: joinError } = await supabase
+      const { error: joinError } = await supabase
         .from('quiz_room_players')
-        .insert(playerData)
-        .select()
-        .single();
+        .insert(playerData);
 
       if (joinError) {
-        console.error('❌ CRITICAL: Host join failed:', {
-          error: joinError,
-          code: joinError.code,
-          message: joinError.message,
-          details: joinError.details,
-          hint: joinError.hint
-        });
-        
-        // Ne pas faire échouer complètement - la salle existe déjà
-        console.warn('⚠️ Room created but host could not join automatically');
+        console.error('❌ Host join failed:', joinError);
+        // Ne pas faire échouer - la salle existe
         toast({
-          title: "Salle créée avec avertissement",
-          description: `Salle ${roomCode} créée mais problème de connexion automatique`,
-          variant: "destructive"
+          title: "Salle créée",
+          description: `Code: ${codeData} (rejoignez manuellement si besoin)`,
         });
       } else {
-        console.log('✅ Host joined successfully:', playerResult);
+        console.log('✅ Host joined successfully');
         toast({
           title: "Salle créée !",
-          description: `Code de la salle: ${roomCode}`,
+          description: `Code de la salle: ${codeData}`,
         });
       }
 
-      console.log('🎉 ROOM CREATION PROCESS COMPLETED');
+      console.log('🎉 ROOM CREATION COMPLETED');
       
       return {
         ...createdRoom,
@@ -134,11 +99,7 @@ export const useRoomOperations = (user: any) => {
       };
 
     } catch (err: any) {
-      console.error('💥 FATAL ERROR in room creation:', {
-        error: err,
-        message: err.message,
-        stack: err.stack
-      });
+      console.error('💥 CREATION ERROR:', err);
       
       toast({
         title: "Erreur de création",
@@ -156,7 +117,7 @@ export const useRoomOperations = (user: any) => {
     }
 
     try {
-      console.log('🚪 STARTING JOIN ROOM PROCESS');
+      console.log('🚪 SIMPLE JOIN PROCESS START');
       console.log('Room code:', roomCode, 'User ID:', user.id);
       
       // Chercher la salle
@@ -177,7 +138,7 @@ export const useRoomOperations = (user: any) => {
         return false;
       }
 
-      console.log('✅ Room found:', roomData);
+      console.log('✅ Room found:', roomData.id);
 
       // Vérifier le nombre de joueurs
       const { count } = await supabase
@@ -199,7 +160,7 @@ export const useRoomOperations = (user: any) => {
         .from('profiles')
         .select('username')
         .eq('id', user.id)
-        .maybeSingle();
+        .single();
 
       const username = profile?.username || `Player-${user.id.slice(0, 6)}`;
 
