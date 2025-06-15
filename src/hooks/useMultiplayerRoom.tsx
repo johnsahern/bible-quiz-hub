@@ -1,5 +1,5 @@
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { QuizRoom, RoomPlayer } from '@/types/multiplayer';
 import { QuizQuestion } from '@/types/quiz';
@@ -19,17 +19,22 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  console.log('useMultiplayerRoom hook called:', { roomId, userId: user?.id, hookCallCount: Date.now() });
+  // Stabilize roomId to prevent unnecessary re-renders
+  const stableRoomId = useMemo(() => roomId, [roomId]);
+  const userId = user?.id;
 
-  // Create operations with stable dependencies
-  const roomOperations = useRoomOperations(user);
-  const playerActions = usePlayerActions(user, room);
-  const quizOperations = useQuizOperations(user, room, isHost);
+  // Create operations with memoized user object
+  const memoizedUser = useMemo(() => user, [user?.id]);
+  const memoizedRoom = useMemo(() => room, [room?.id]);
+
+  const roomOperations = useRoomOperations(memoizedUser);
+  const playerActions = usePlayerActions(memoizedUser, memoizedRoom);
+  const quizOperations = useQuizOperations(memoizedUser, memoizedRoom, isHost);
 
   // Load room data on mount - only if roomId is provided
   useRoomData({
-    roomId,
-    user,
+    roomId: stableRoomId,
+    user: memoizedUser,
     setRoom,
     setIsHost,
     setCurrentQuestion,
@@ -39,7 +44,7 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
 
   // Set up realtime subscriptions - only if roomId is provided  
   useRealtimeSubscription({
-    roomId,
+    roomId: stableRoomId,
     setRoom,
     setPlayers,
     setCurrentQuestion

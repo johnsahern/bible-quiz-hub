@@ -25,40 +25,39 @@ export const useRoomData = ({
 }: UseRoomDataProps) => {
   const isLoadingRef = useRef(false);
   const lastLoadedRoomId = useRef<string | null>(null);
+  const userId = user?.id;
 
   useEffect(() => {
-    const safeRoomId = roomId || null;
-    const userId = user?.id || null;
-    
     // Early return if no roomId or user
-    if (!safeRoomId || !userId) {
-      console.log('Missing roomId or user for useRoomData:', { roomId: safeRoomId, userId });
+    if (!roomId || !userId) {
+      console.log('Missing roomId or user for useRoomData:', { roomId, userId });
       return;
     }
 
     // Skip if already loaded this room
-    if (lastLoadedRoomId.current === safeRoomId) {
-      console.log('Skipping duplicate room data load for:', safeRoomId);
+    if (lastLoadedRoomId.current === roomId) {
+      console.log('Skipping duplicate room data load for:', roomId);
       return;
     }
 
     // Skip if already loading
     if (isLoadingRef.current) {
+      console.log('Already loading room data, skipping...');
       return;
     }
 
     const loadRoomData = async () => {
       isLoadingRef.current = true;
-      lastLoadedRoomId.current = safeRoomId;
+      lastLoadedRoomId.current = roomId;
 
       try {
-        console.log('Loading room data for room:', safeRoomId);
+        console.log('Loading room data for room:', roomId);
         
         // Charger la salle
         const { data: roomData, error: roomError } = await supabase
           .from('quiz_rooms')
           .select('*')
-          .eq('id', safeRoomId)
+          .eq('id', roomId)
           .single();
 
         if (roomError) {
@@ -89,11 +88,11 @@ export const useRoomData = ({
         }
 
         // Charger les joueurs
-        console.log('Loading players for room:', safeRoomId);
+        console.log('Loading players for room:', roomId);
         const { data: playersData, error: playersError } = await supabase
           .from('quiz_room_players')
           .select('*')
-          .eq('room_id', safeRoomId)
+          .eq('room_id', roomId)
           .order('joined_at');
 
         if (playersError) {
@@ -116,5 +115,5 @@ export const useRoomData = ({
     };
 
     loadRoomData();
-  }, [roomId, user?.id]);
+  }, [roomId, userId]); // Only depend on primitive values
 };

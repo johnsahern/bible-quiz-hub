@@ -22,9 +22,7 @@ export const useRealtimeSubscription = ({
   const currentRoomIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const safeRoomId = roomId || null;
-    
-    if (!safeRoomId) {
+    if (!roomId) {
       // Clean up if no roomId
       if (channelRef.current) {
         console.log('Cleaning up subscription - no roomId');
@@ -37,8 +35,8 @@ export const useRealtimeSubscription = ({
     }
 
     // Skip if already subscribed to the same room
-    if (isSubscribedRef.current && currentRoomIdRef.current === safeRoomId) {
-      console.log('Already subscribed to room:', safeRoomId);
+    if (isSubscribedRef.current && currentRoomIdRef.current === roomId) {
+      console.log('Already subscribed to room:', roomId);
       return;
     }
 
@@ -50,12 +48,12 @@ export const useRealtimeSubscription = ({
       isSubscribedRef.current = false;
     }
 
-    console.log('Setting up realtime subscription for room:', safeRoomId);
+    console.log('Setting up realtime subscription for room:', roomId);
 
     const roomChannel = supabase
-      .channel(`room-${safeRoomId}`)
+      .channel(`room-${roomId}`)
       .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'quiz_rooms', filter: `id=eq.${safeRoomId}` },
+        { event: '*', schema: 'public', table: 'quiz_rooms', filter: `id=eq.${roomId}` },
         (payload) => {
           console.log('Room update:', payload);
           if (payload.eventType === 'UPDATE') {
@@ -77,7 +75,7 @@ export const useRealtimeSubscription = ({
         }
       )
       .on('postgres_changes',
-        { event: '*', schema: 'public', table: 'quiz_room_players', filter: `room_id=eq.${safeRoomId}` },
+        { event: '*', schema: 'public', table: 'quiz_room_players', filter: `room_id=eq.${roomId}` },
         (payload) => {
           console.log('Players update:', payload);
           
@@ -98,7 +96,7 @@ export const useRealtimeSubscription = ({
       console.log('Subscription status:', status);
       if (status === 'SUBSCRIBED') {
         isSubscribedRef.current = true;
-        currentRoomIdRef.current = safeRoomId;
+        currentRoomIdRef.current = roomId;
       }
     });
     

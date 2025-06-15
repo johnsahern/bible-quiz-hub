@@ -1,10 +1,10 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, Crown, Clock, Trophy, ArrowLeft } from 'lucide-react';
+import { Users, Clock, ArrowLeft } from 'lucide-react';
 import { useMultiplayerRoom } from '@/hooks/useMultiplayerRoom';
 import { useAuth } from '@/contexts/AuthContext';
 import MultiplayerLobby from '@/components/multiplayer/MultiplayerLobby';
@@ -16,18 +16,8 @@ const MultiplayerQuiz: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   
-  // Only call the hook once with memoized roomId
-  const memoizedRoomId = useMemo(() => roomId, [roomId]);
-  const { room, players, isHost, currentQuestion, loading, error, leaveRoom } = useMultiplayerRoom(memoizedRoomId);
-
-  console.log('MultiplayerQuiz render:', { 
-    roomId: memoizedRoomId, 
-    room: room?.id, 
-    playersCount: players.length, 
-    loading, 
-    error,
-    renderTime: Date.now()
-  });
+  // Only call the hook once with stable roomId
+  const { room, players, isHost, currentQuestion, loading, error, leaveRoom } = useMultiplayerRoom(roomId);
 
   const handleLeaveRoom = async () => {
     await leaveRoom();
