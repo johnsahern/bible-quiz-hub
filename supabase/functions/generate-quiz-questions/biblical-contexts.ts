@@ -1,4 +1,5 @@
 
+
 import { overviewContext } from './contexts/overview.ts';
 import { pentateuchContext } from './contexts/pentateuch.ts';
 import { historicalBooksContext } from './contexts/historical-books.ts';
@@ -23,31 +24,31 @@ import { esdrasContext } from './contexts/esdras.ts';
 import { nehemieContext } from './contexts/nehemie.ts';
 import { estherContext } from './contexts/esther.ts';
 
-// NOUVEAUX CONTEXTES PENTATEUQUE
+// CONTEXTES PENTATEUQUE
 import { geneseContext } from './contexts/genese.ts';
 import { exodeContext } from './contexts/exode.ts';
 import { levitiqueContext } from './contexts/levitique.ts';
 import { nombresContext } from './contexts/nombres.ts';
 import { deuteronomeContext } from './contexts/deuteronome.ts';
 
-// NOUVEAUX CONTEXTES HISTORIQUES
+// CONTEXTES HISTORIQUES
 import { josueContext } from './contexts/josue.ts';
 import { jugesContext } from './contexts/juges.ts';
 
-// NOUVEAUX CONTEXTES VIE DE JÉSUS
+// CONTEXTES VIE DE JÉSUS
 import { vieJesusContext } from './contexts/vie-jesus.ts';
 import { miraclesJesusContext } from './contexts/miracles-jesus.ts';
 import { parabolesJesusContext } from './contexts/paraboles-jesus.ts';
 import { passionChristContext } from './contexts/passion-christ.ts';
 import { resurrectionContext } from './contexts/resurrection.ts';
 
-// NOUVEAUX CONTEXTES ÉVÉNEMENTS DE JÉSUS
+// CONTEXTES ÉVÉNEMENTS DE JÉSUS
 import { baptemeJesusContext } from './contexts/bapteme-jesus.ts';
 import { transfigurationContext } from './contexts/transfiguration.ts';
 import { ascensionContext } from './contexts/ascension.ts';
 import { enfanceJesusContext } from './contexts/enfance-jesus.ts';
 
-// NOUVEAUX CONTEXTES ÉVANGILES
+// CONTEXTES ÉVANGILES
 import { matthieuContext } from './contexts/matthieu.ts';
 import { marcContext } from './contexts/marc.ts';
 import { lucContext } from './contexts/luc.ts';
@@ -55,12 +56,35 @@ import { jeanEvangelisteContext } from './contexts/jean-evangeliste.ts';
 import { actesApotresContext } from './contexts/actes-apotres.ts';
 import { jeanBaptisteContext } from './contexts/jean-baptiste.ts';
 
-// NOUVEAUX CONTEXTES LIVRES POÉTIQUES
+// CONTEXTES LIVRES POÉTIQUES
 import { jobContext } from './contexts/job.ts';
 import { psaumesContext } from './contexts/psaumes.ts';
 import { proverbesContext } from './contexts/proverbes.ts';
 import { ecclesiasteContext } from './contexts/ecclesiaste.ts';
 import { cantiqueContext } from './contexts/cantique-cantiques.ts';
+
+// NOUVEAUX CONTEXTES PROPHÈTES
+import { esaieContext } from './contexts/esaie.ts';
+import { jeremieContext } from './contexts/jeremie.ts';
+import { ezechielContext } from './contexts/ezechiel.ts';
+import { danielContext } from './contexts/daniel.ts';
+import { oseeContext } from './contexts/osee.ts';
+import { joelContext } from './contexts/joel.ts';
+import { amosContext } from './contexts/amos.ts';
+import { jonasContext } from './contexts/jonas.ts';
+import { micheeContext } from './contexts/michee.ts';
+
+// NOUVEAUX CONTEXTES ÉPÎTRES
+import { romainsContext } from './contexts/romains.ts';
+import { corinthiensContext } from './contexts/corinthiens.ts';
+import { galatesContext } from './contexts/galates.ts';
+import { ephesiensContext } from './contexts/ephesiens.ts';
+
+// NOUVEAUX CONTEXTES PERSONNAGES
+import { abrahamContext } from './contexts/abraham.ts';
+import { davidContext } from './contexts/david.ts';
+import { salomonContext } from './contexts/salomon.ts';
+import { moiseContext } from './contexts/moise.ts';
 
 export interface BiblicalContext {
   key: string;
@@ -106,8 +130,17 @@ export const BIBLICAL_CONTEXTS: BiblicalContext[] = [
   ecclesiasteContext,
   cantiqueContext,
   
-  // Prophètes
+  // Prophètes complets
   prophetsContext,
+  esaieContext,
+  jeremieContext,
+  ezechielContext,
+  danielContext,
+  oseeContext,
+  joelContext,
+  amosContext,
+  jonasContext,
+  micheeContext,
   
   // Nouveau Testament
   newTestamentContext,
@@ -121,6 +154,12 @@ export const BIBLICAL_CONTEXTS: BiblicalContext[] = [
   actesApotresContext,
   jeanBaptisteContext,
   
+  // Épîtres
+  romainsContext,
+  corinthiensContext,
+  galatesContext,
+  ephesiensContext,
+  
   // Vie de Jésus détaillée
   jesusChristContext,
   vieJesusContext,
@@ -132,6 +171,12 @@ export const BIBLICAL_CONTEXTS: BiblicalContext[] = [
   passionChristContext,
   resurrectionContext,
   ascensionContext,
+  
+  // Personnages bibliques
+  abrahamContext,
+  davidContext,
+  salomonContext,
+  moiseContext,
   
   // Autres contextes
   ...apostlesContexts,

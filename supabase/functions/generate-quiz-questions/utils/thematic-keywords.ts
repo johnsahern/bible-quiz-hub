@@ -185,6 +185,94 @@ const transfigurationKeywords = [
   'visage', 'lumière', 'nuée', 'voix', 'Père', 'éclatants'
 ];
 
+// Nouveaux mots-clés pour les prophètes
+const esaieKeywords = [
+  'Ésaïe', 'prophète', 'évangéliste', 'vision', 'temple', 'séraphins', 'saint',
+  'Emmanuel', 'vierge', 'serviteur', 'souffrant', 'consolez', 'peuple'
+];
+
+const jeremieKeywords = [
+  'Jérémie', 'prophète', 'larmes', 'nouvelle', 'alliance', 'cœur', 'Babylone',
+  'captivité', 'soixante-dix', 'ans', 'vocation', 'jeune'
+];
+
+const ezechielKeywords = [
+  'Ézéchiel', 'visions', 'quatre', 'êtres', 'vivants', 'roues', 'vallée',
+  'ossements', 'secs', 'cœur', 'pierre', 'chair'
+];
+
+const danielKeywords = [
+  'Daniel', 'Babylone', 'Nabucadnetsar', 'statue', 'fournaise', 'lions',
+  'visions', 'soixante-dix', 'semaines'
+];
+
+const oseeKeywords = [
+  'Osée', 'Gomer', 'prostituée', 'amour', 'fidèle', 'fiançailles', 'justice',
+  'miséricorde', 'connaîtras', 'Éternel'
+];
+
+const joelKeywords = [
+  'Joël', 'sauterelles', 'jour', 'Éternel', 'esprit', 'toute', 'chair',
+  'prophétiseront', 'visions', 'songes'
+];
+
+const amosKeywords = [
+  'Amos', 'berger', 'Tekoa', 'justice', 'roule', 'eaux', 'équité', 'torrent',
+  'oppression', 'pauvres'
+];
+
+const jonasKeywords = [
+  'Jonas', 'Ninive', 'fuis', 'Tarsis', 'tempête', 'poisson', 'trois', 'jours',
+  'prêche', 'repentit', 'ricin'
+];
+
+const micheeKeywords = [
+  'Michée', 'Bethléem', 'Éphrata', 'sortira', 'dominer', 'Israël', 'justice',
+  'miséricorde', 'marcher', 'humblement'
+];
+
+// Nouveaux mots-clés pour les épîtres
+const romainsKeywords = [
+  'Romains', 'Paul', 'évangile', 'puissance', 'justice', 'foi', 'juste', 'vivra',
+  'tous', 'péché', 'justifiés', 'grâce', 'Abraham'
+];
+
+const corinthiensKeywords = [
+  'Corinthiens', 'divisions', 'sagesse', 'croix', 'folie', 'temple', 'charité',
+  'amour', 'langues', 'résurrection'
+];
+
+const galatesKeywords = [
+  'Galates', 'évangile', 'autre', 'anathème', 'justifié', 'œuvres', 'loi', 'foi',
+  'liberté', 'circoncision', 'fruits', 'esprit'
+];
+
+const ephesiensKeywords = [
+  'Éphésiens', 'béni', 'bénédictions', 'spirituelles', 'élus', 'prédestinés',
+  'grâce', 'sauvés', 'œuvres', 'armure', 'Dieu'
+];
+
+// Nouveaux mots-clés pour les personnages
+const abrahamKeywords = [
+  'Abraham', 'Abram', 'Our', 'va-t\'en', 'pays', 'nation', 'bénirai', 'alliance',
+  'circoncision', 'Isaac', 'sacrifice', 'Morija'
+];
+
+const davidKeywords = [
+  'David', 'berger', 'onction', 'Goliath', 'fronde', 'pierre', 'Jonathan',
+  'Saül', 'roi', 'psaumes'
+];
+
+const salomonKeywords = [
+  'Salomon', 'sagesse', 'temple', 'construction', 'reine', 'Saba', 'richesses',
+  'or', 'jugement', 'deux', 'femmes'
+];
+
+const moiseKeywords = [
+  'Moïse', 'Égypte', 'buisson', 'ardent', 'pharaon', 'plaies', 'Pâque', 'mer',
+  'Rouge', 'Sinaï', 'Loi'
+];
+
 export const strictThematicKeywords: Record<string, string[]> = {
   'vue-densemble': overviewKeywords,
   'genese': geneseKeywords,
@@ -225,5 +313,28 @@ export const strictThematicKeywords: Record<string, string[]> = {
   'livres-historiques': [...josueKeywords, ...jugesKeywords, ...ruthKeywords, ...samuel1Keywords, ...samuel2Keywords],
   'livres-poetiques': [...jobKeywords, ...psaumesKeywords, ...proverbesKeywords, ...ecclesiasteKeywords, ...cantiqueKeywords],
   'evangeliles': [...matthieuKeywords, ...marcKeywords, ...lucKeywords, ...jeanEvangelisteKeywords],
-  'nouveau-testament': [...matthieuKeywords, ...marcKeywords, ...lucKeywords, ...jeanEvangelisteKeywords, ...actesApotresKeywords]
+  'nouveau-testament': [...matthieuKeywords, ...marcKeywords, ...lucKeywords, ...jeanEvangelisteKeywords, ...actesApotresKeywords],
+  
+  // Nouveaux prophètes
+  'esaie': esaieKeywords,
+  'jeremie': jeremieKeywords,
+  'ezechiel': ezechielKeywords,
+  'daniel': danielKeywords,
+  'osee': oseeKeywords,
+  'joel': joelKeywords,
+  'amos': amosKeywords,
+  'jonas': jonasKeywords,
+  'michee': micheeKeywords,
+  
+  // Nouvelles épîtres
+  'romains': romainsKeywords,
+  'corinthiens': corinthiensKeywords,
+  'galates': galatesKeywords,
+  'ephesiens': ephesiensKeywords,
+  
+  // Nouveaux personnages
+  'abraham': abrahamKeywords,
+  'david': davidKeywords,
+  'salomon': salomonKeywords,
+  'moise': moiseKeywords,
 };
