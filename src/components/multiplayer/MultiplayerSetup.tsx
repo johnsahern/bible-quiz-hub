@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +16,7 @@ import { useRoomOperations } from '@/hooks/multiplayer/useRoomOperations';
 const MultiplayerSetup: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const roomOperations = useRoomOperations(user);
+  const roomOperations = useRoomOperations(user?.id);
   
   // État pour créer une salle
   const [createForm, setCreateForm] = useState({
