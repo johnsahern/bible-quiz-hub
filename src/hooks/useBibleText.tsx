@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useBibleList } from './useBibleList';
-import { BIBLE_API_CONFIG, getApiHeaders } from '@/config/bibleApi';
+import { BIBLE_API_CONFIG, getApiHeaders, isApiConfigured } from '@/config/bibleApi';
 
 export const useBibleText = (bookKey: string, chapter: number, language: string) => {
   const [text, setText] = useState<any>(null);
@@ -9,18 +9,12 @@ export const useBibleText = (bookKey: string, chapter: number, language: string)
   const [error, setError] = useState<string | null>(null);
   const { getBibleByLanguage, isLoading: bibleListLoading } = useBibleList();
 
-  // Cache pour éviter les appels répétés
-  const [cache, setCache] = useState<Map<string, any>>(new Map());
-
   const fetchBibleText = useCallback(async () => {
     if (!bookKey || !chapter || bibleListLoading) return;
 
-    const cacheKey = `${bookKey}-${chapter}-${language}`;
-    
-    // Vérifier le cache d'abord
-    if (cache.has(cacheKey)) {
-      console.log('Using cached text for:', cacheKey);
-      setText(cache.get(cacheKey));
+    // Vérifier la configuration
+    if (!isApiConfigured()) {
+      setError('Configuration requise: Ajoutez votre clé API dans src/config/bibleApi.ts');
       return;
     }
 
@@ -31,7 +25,7 @@ export const useBibleText = (bookKey: string, chapter: number, language: string)
       const selectedBible = getBibleByLanguage(language);
       
       if (!selectedBible) {
-        throw new Error('Aucune Bible disponible pour cette langue');
+        throw new Error('Aucune Bible disponible pour cette langue. Vérifiez votre clé API.');
       }
 
       const bibleId = selectedBible.id;
@@ -48,7 +42,7 @@ export const useBibleText = (bookKey: string, chapter: number, language: string)
 
       if (!response.ok) {
         if (response.status === 401) {
-          throw new Error('Clé API invalide. Veuillez vérifier votre configuration.');
+          throw new Error('Clé API invalide. Mettez à jour votre clé dans src/config/bibleApi.ts');
         }
         if (response.status === 404) {
           throw new Error('Chapitre non trouvé');
@@ -57,7 +51,7 @@ export const useBibleText = (bookKey: string, chapter: number, language: string)
       }
 
       const data = await response.json();
-      console.log('API Response received successfully');
+      console.log('Text API Response received successfully');
 
       // Parser le contenu HTML pour extraire les versets
       const parser = new DOMParser();
@@ -78,7 +72,7 @@ export const useBibleText = (bookKey: string, chapter: number, language: string)
         }
       });
 
-      // Si pas de versets trouvés avec la méthode ci-dessus, essayer une approche différente
+      // Si pas de versets trouvés, essayer une approche différente
       if (verses.length === 0) {
         const textContent = doc.body?.textContent || data.data.content;
         const lines = textContent.split('\n').filter(line => line.trim());
@@ -114,8 +108,6 @@ export const useBibleText = (bookKey: string, chapter: number, language: string)
         }
       };
 
-      // Mettre en cache le résultat
-      setCache(prev => new Map(prev).set(cacheKey, result));
       setText(result);
 
     } catch (err) {
@@ -124,7 +116,7 @@ export const useBibleText = (bookKey: string, chapter: number, language: string)
     } finally {
       setIsLoading(false);
     }
-  }, [bookKey, chapter, language, bibleListLoading, getBibleByLanguage, cache]);
+  }, [bookKey, chapter, language, bibleListLoading, getBibleByLanguage]);
 
   useEffect(() => {
     fetchBibleText();

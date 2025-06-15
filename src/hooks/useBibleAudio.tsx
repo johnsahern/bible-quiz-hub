@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useBibleList } from './useBibleList';
-import { BIBLE_API_CONFIG, getApiHeaders } from '@/config/bibleApi';
+import { BIBLE_API_CONFIG, getApiHeaders, isApiConfigured } from '@/config/bibleApi';
 
 export const useBibleAudio = (bookKey: string, chapter: number, language: string) => {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -9,18 +9,12 @@ export const useBibleAudio = (bookKey: string, chapter: number, language: string
   const [error, setError] = useState<string | null>(null);
   const { getBibleByLanguage, isLoading: bibleListLoading } = useBibleList();
 
-  // Cache pour éviter les appels répétés
-  const [audioCache, setAudioCache] = useState<Map<string, string | null>>(new Map());
-
   const fetchBibleAudio = useCallback(async () => {
     if (!bookKey || !chapter || bibleListLoading) return;
 
-    const cacheKey = `${bookKey}-${chapter}-${language}`;
-    
-    // Vérifier le cache d'abord
-    if (audioCache.has(cacheKey)) {
-      console.log('Using cached audio for:', cacheKey);
-      setAudioUrl(audioCache.get(cacheKey));
+    // Vérifier la configuration
+    if (!isApiConfigured()) {
+      setError('Configuration requise: Ajoutez votre clé API dans src/config/bibleApi.ts');
       return;
     }
 
@@ -31,7 +25,7 @@ export const useBibleAudio = (bookKey: string, chapter: number, language: string
       const selectedBible = getBibleByLanguage(language);
       
       if (!selectedBible) {
-        throw new Error('Aucune Bible disponible pour cette langue');
+        throw new Error('Aucune Bible disponible pour cette langue. Vérifiez votre clé API.');
       }
 
       const bibleId = selectedBible.id;
@@ -48,10 +42,12 @@ export const useBibleAudio = (bookKey: string, chapter: number, language: string
 
       if (!response.ok) {
         if (response.status === 401) {
-          throw new Error('Clé API invalide. Veuillez vérifier votre configuration.');
+          throw new Error('Clé API invalide. Mettez à jour votre clé dans src/config/bibleApi.ts');
         }
         if (response.status === 404) {
-          throw new Error('Audio non disponible pour ce chapitre');
+          setError('Audio non disponible pour ce chapitre dans cette version de la Bible');
+          setAudioUrl(null);
+          return;
         }
         throw new Error(`Erreur API: ${response.status}`);
       }
@@ -60,13 +56,10 @@ export const useBibleAudio = (bookKey: string, chapter: number, language: string
       console.log('Audio API Response received successfully');
 
       const url = data.data?.url || null;
-      
-      // Mettre en cache le résultat
-      setAudioCache(prev => new Map(prev).set(cacheKey, url));
       setAudioUrl(url);
 
       if (!url) {
-        throw new Error('URL audio non trouvée dans la réponse');
+        setError('URL audio non trouvée dans la réponse');
       }
 
     } catch (err) {
@@ -76,7 +69,7 @@ export const useBibleAudio = (bookKey: string, chapter: number, language: string
     } finally {
       setIsLoading(false);
     }
-  }, [bookKey, chapter, language, bibleListLoading, getBibleByLanguage, audioCache]);
+  }, [bookKey, chapter, language, bibleListLoading, getBibleByLanguage]);
 
   useEffect(() => {
     fetchBibleAudio();

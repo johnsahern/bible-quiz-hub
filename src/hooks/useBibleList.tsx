@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { BIBLE_API_CONFIG, getApiHeaders } from '@/config/bibleApi';
+import { BIBLE_API_CONFIG, getApiHeaders, isApiConfigured } from '@/config/bibleApi';
 
 interface Bible {
   id: string;
@@ -22,6 +22,13 @@ export const useBibleList = () => {
 
   useEffect(() => {
     const fetchBibles = async () => {
+      // Vérifier la configuration de l'API
+      if (!isApiConfigured()) {
+        setError('Configuration requise: Veuillez ajouter votre clé API dans src/config/bibleApi.ts. Obtenez-la gratuitement sur https://scripture.api.bible');
+        setIsLoading(false);
+        return;
+      }
+
       try {
         console.log('Fetching available Bibles...');
         
@@ -31,13 +38,13 @@ export const useBibleList = () => {
 
         if (!response.ok) {
           if (response.status === 401) {
-            throw new Error('Clé API invalide. Veuillez vérifier votre clé API sur scripture.api.bible');
+            throw new Error('Clé API invalide. Vérifiez votre clé sur https://scripture.api.bible et mettez-la à jour dans src/config/bibleApi.ts');
           }
           throw new Error(`Erreur API: ${response.status}`);
         }
 
         const data = await response.json();
-        console.log('Available Bibles:', data);
+        console.log('Available Bibles:', data.data?.length || 0, 'Bibles found');
         
         setBibles(data.data || []);
       } catch (err) {
@@ -53,68 +60,50 @@ export const useBibleList = () => {
 
   const getBibleByLanguage = (languageCode: string) => {
     console.log(`Looking for Bible in language: ${languageCode}`);
-    console.log('Available bibles:', bibles.map(b => ({ id: b.id, name: b.name, lang: b.language.id })));
     
+    if (bibles.length === 0) {
+      console.log('No bibles available');
+      return null;
+    }
+
+    // Obtenir les IDs préférés pour la langue
+    const preferredIds = BIBLE_API_CONFIG.PREFERRED_BIBLES[languageCode as keyof typeof BIBLE_API_CONFIG.PREFERRED_BIBLES] || [];
+    
+    // Chercher d'abord par ID préféré
+    for (const preferredId of preferredIds) {
+      const bible = bibles.find(b => b.id === preferredId);
+      if (bible) {
+        console.log(`Found preferred Bible: ${bible.name} (${bible.id})`);
+        return bible;
+      }
+    }
+
+    // Chercher par langue et nom contenant "Louis Segond" ou "Segond"
     if (languageCode === 'fr') {
-      // Recherche prioritaire: Louis Segond français
-      const louisSegondFr = bibles.find(bible => 
-        (bible.name.toLowerCase().includes('louis segond') || 
-         bible.name.toLowerCase().includes('segond') ||
-         bible.id.toLowerCase().includes('lsg')) &&
-        (bible.language.id.toLowerCase().includes('fr') ||
-         bible.language.id.toLowerCase().includes('french'))
+      const segond = bibles.find(bible => 
+        (bible.language.id.toLowerCase().includes('fr') || bible.language.name.toLowerCase().includes('french')) &&
+        (bible.name.toLowerCase().includes('louis segond') || bible.name.toLowerCase().includes('segond'))
       );
       
-      if (louisSegondFr) {
-        console.log('Found Louis Segond French:', louisSegondFr);
-        return louisSegondFr;
+      if (segond) {
+        console.log('Found Louis Segond:', segond);
+        return segond;
       }
-      
-      // Fallback: n'importe quelle Bible française
-      const frenchBible = bibles.find(bible => 
-        bible.language.id.toLowerCase().includes('fr') ||
-        bible.language.id.toLowerCase().includes('french')
-      );
-      
-      console.log('Using French fallback:', frenchBible);
-      return frenchBible;
     }
     
-    if (languageCode === 'en') {
-      // Recherche prioritaire: Louis Segond anglais ou KJV
-      const louisSegondEn = bibles.find(bible => 
-        (bible.name.toLowerCase().includes('louis segond') || 
-         bible.name.toLowerCase().includes('segond') ||
-         bible.id.toLowerCase().includes('lsg')) &&
-        (bible.language.id.toLowerCase().includes('en') ||
-         bible.language.id.toLowerCase().includes('english'))
-      );
-      
-      if (louisSegondEn) {
-        console.log('Found Louis Segond English:', louisSegondEn);
-        return louisSegondEn;
-      }
-      
-      // Fallback: KJV ou autre Bible anglaise
-      const kjv = bibles.find(bible => 
-        bible.id === 'KJV' || 
-        bible.name.toLowerCase().includes('king james')
-      );
-      
-      if (kjv) {
-        console.log('Using KJV:', kjv);
-        return kjv;
-      }
-      
-      const englishBible = bibles.find(bible => 
-        bible.language.id.toLowerCase().includes('en') ||
-        bible.language.id.toLowerCase().includes('english')
-      );
-      
-      console.log('Using English fallback:', englishBible);
-      return englishBible;
-    }
+    // Fallback: première Bible de la langue demandée
+    const languageBible = bibles.find(bible => 
+      bible.language.id.toLowerCase().includes(languageCode.toLowerCase()) ||
+      bible.language.name.toLowerCase().includes(languageCode === 'fr' ? 'french' : 'english')
+    );
     
+    if (languageBible) {
+      console.log('Using language fallback:', languageBible);
+      return languageBible;
+    }
+
+    // Dernier recours: première Bible disponible
+    console.log('Using first available Bible:', bibles[0]);
     return bibles[0];
   };
 
