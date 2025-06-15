@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { QuizQuestion } from '@/types/quiz';
 import { RoomStatus, RoomPlayer } from '@/types/multiplayer';
@@ -26,6 +26,82 @@ export const useRoomData = ({
   const isLoadingRef = useRef(false);
   const lastLoadedRoomId = useRef<string | null>(null);
 
+  const loadRoomData = useCallback(async () => {
+    if (!roomId || !user?.id || isLoadingRef.current) return;
+    
+    // Éviter les chargements multiples pour la même salle
+    if (lastLoadedRoomId.current === roomId) {
+      console.log('Skipping duplicate room data load for:', roomId);
+      return;
+    }
+    
+    isLoadingRef.current = true;
+    lastLoadedRoomId.current = roomId;
+
+    try {
+      console.log('Loading room data for room:', roomId);
+      
+      // Charger la salle
+      const { data: roomData, error: roomError } = await supabase
+        .from('quiz_rooms')
+        .select('*')
+        .eq('id', roomId)
+        .single();
+
+      if (roomError) {
+        console.error('Room loading error:', roomError);
+        throw roomError;
+      }
+
+      if (!roomData) {
+        setError('Salle introuvable');
+        return;
+      }
+
+      console.log('Room data loaded:', roomData);
+
+      setRoom({
+        ...roomData,
+        status: roomData.status as RoomStatus,
+        questions: Array.isArray(roomData.questions) ? roomData.questions : []
+      });
+      setIsHost(roomData.host_id === user.id);
+
+      // Charger la question actuelle si le quiz est en cours
+      if (roomData.status === 'playing' && roomData.questions && roomData.current_question !== null) {
+        const questions = Array.isArray(roomData.questions) ? roomData.questions : [];
+        if (questions.length > roomData.current_question) {
+          setCurrentQuestion(questions[roomData.current_question] as unknown as QuizQuestion);
+        }
+      }
+
+      // Charger les joueurs
+      console.log('Loading players for room:', roomId);
+      const { data: playersData, error: playersError } = await supabase
+        .from('quiz_room_players')
+        .select('*')
+        .eq('room_id', roomId)
+        .order('joined_at');
+
+      if (playersError) {
+        console.error('Players loading error:', playersError);
+        throw playersError;
+      }
+
+      console.log('Players data loaded:', playersData);
+      setPlayers(playersData || []);
+      
+      // Clear any previous errors
+      setError(null);
+      
+    } catch (err) {
+      console.error('Erreur lors du chargement de la salle:', err);
+      setError('Impossible de charger la salle');
+    } finally {
+      isLoadingRef.current = false;
+    }
+  }, [roomId, user?.id, setRoom, setIsHost, setCurrentQuestion, setPlayers, setError]);
+
   useEffect(() => {
     // Vérifier que les paramètres requis sont présents
     if (!roomId || !user?.id) {
@@ -33,82 +109,6 @@ export const useRoomData = ({
       return;
     }
 
-    // Éviter les chargements multiples pour la même salle
-    if (isLoadingRef.current || lastLoadedRoomId.current === roomId) {
-      console.log('Skipping duplicate room data load for:', roomId);
-      return;
-    }
-
-    const loadRoomData = async () => {
-      if (isLoadingRef.current) return;
-      
-      isLoadingRef.current = true;
-      lastLoadedRoomId.current = roomId;
-
-      try {
-        console.log('Loading room data for room:', roomId);
-        
-        // Charger la salle
-        const { data: roomData, error: roomError } = await supabase
-          .from('quiz_rooms')
-          .select('*')
-          .eq('id', roomId)
-          .single();
-
-        if (roomError) {
-          console.error('Room loading error:', roomError);
-          throw roomError;
-        }
-
-        if (!roomData) {
-          setError('Salle introuvable');
-          return;
-        }
-
-        console.log('Room data loaded:', roomData);
-
-        setRoom({
-          ...roomData,
-          status: roomData.status as RoomStatus,
-          questions: Array.isArray(roomData.questions) ? roomData.questions : []
-        });
-        setIsHost(roomData.host_id === user.id);
-
-        // Charger la question actuelle si le quiz est en cours
-        if (roomData.status === 'playing' && roomData.questions && roomData.current_question !== null) {
-          const questions = Array.isArray(roomData.questions) ? roomData.questions : [];
-          if (questions.length > roomData.current_question) {
-            setCurrentQuestion(questions[roomData.current_question] as unknown as QuizQuestion);
-          }
-        }
-
-        // Charger les joueurs
-        console.log('Loading players for room:', roomId);
-        const { data: playersData, error: playersError } = await supabase
-          .from('quiz_room_players')
-          .select('*')
-          .eq('room_id', roomId)
-          .order('joined_at');
-
-        if (playersError) {
-          console.error('Players loading error:', playersError);
-          throw playersError;
-        }
-
-        console.log('Players data loaded:', playersData);
-        setPlayers(playersData || []);
-        
-        // Clear any previous errors
-        setError(null);
-        
-      } catch (err) {
-        console.error('Erreur lors du chargement de la salle:', err);
-        setError('Impossible de charger la salle');
-      } finally {
-        isLoadingRef.current = false;
-      }
-    };
-
     loadRoomData();
-  }, [roomId, user?.id]);
+  }, [loadRoomData]);
 };
