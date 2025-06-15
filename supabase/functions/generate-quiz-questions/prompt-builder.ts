@@ -8,62 +8,58 @@ export function buildRigorousPrompt(
   questionCount: number,
   ultraUniqueSeed: number
 ): string {
-  // Ajouter des instructions spécifiques pour forcer la variabilité ET la précision thématique
+  // Instructions d'unicité avec seed valide
   const uniquenessInstructions = `
 🎲 IMPÉRATIF D'UNICITÉ ABSOLUE (SEED: ${ultraUniqueSeed}):
-- Utilisez ce seed ${ultraUniqueSeed} comme base pour créer des questions TOTALEMENT DIFFÉRENTES
-- INTERDICTION de répéter des questions déjà posées sur ce thème
-- Explorez des angles INÉDITS et des versets DIFFÉRENTS à chaque génération
-- Variez les types de questions : factuelle, géographique, chronologique, théologique
-- Changez les personnages, événements et références bibliques abordés
-- CRÉATIVITÉ MAXIMALE requise - pensez à des aspects peu explorés du thème
-- Si c'est la même thématique, abordez des sous-aspects COMPLÈTEMENT DIFFÉRENTS
+- Utilisez ce seed ${ultraUniqueSeed} pour créer des questions TOTALEMENT DIFFÉRENTES
+- INTERDICTION FORMELLE de répéter des questions déjà posées
+- Explorez des angles INÉDITS du thème "${selectedContext.title}"
+- Variez les types de questions : personnages, événements, détails, enseignements
+- CRÉATIVITÉ MAXIMALE requise dans le respect STRICT du thème
+- Chaque génération avec ce seed doit produire des questions DIFFÉRENTES
 `;
 
   // Instructions ULTRA-RENFORCÉES pour la précision thématique
   const thematicPrecisionInstructions = `
-🎯 PRÉCISION THÉMATIQUE ABSOLUE - AUCUNE EXCEPTION TOLÉRÉE :
-- CHAQUE QUESTION DOIT ÊTRE 100% LIÉE AU THÈME "${selectedContext.title}"
-- ZÉRO TOLÉRANCE pour les questions générales sur d'autres sujets bibliques
-- INTERDICTION FORMELLE de poser des questions sur des thèmes différents
-- Si le thème est "La Vie de Jésus", TOUTES les questions concernent SA VIE uniquement
-- Si le thème est "Les Miracles de Jésus", TOUTES les questions concernent SES MIRACLES uniquement
-- Si le thème est "David", TOUTES les questions concernent LE ROI DAVID uniquement
-- Si le thème est "La Création", TOUTES les questions concernent LE RÉCIT DE CRÉATION uniquement
-- CHAQUE personnage, événement, verset mentionné DOIT être pertinent au thème "${selectedContext.title}"
-- Vérifiez TROIS FOIS que chaque question est directement liée au thème avant de l'inclure
-- En cas de doute sur la pertinence d'une question, NE PAS L'INCLURE
-- Privilégiez la QUALITÉ THÉMATIQUE sur la quantité
+🎯 PRÉCISION THÉMATIQUE ABSOLUE - ZÉRO TOLÉRANCE :
+- THÈME EXCLUSIF : "${selectedContext.title}"
+- CHAQUE QUESTION DOIT CONCERNER UNIQUEMENT "${selectedContext.title}"
+- INTERDICTION TOTALE de questions sur d'autres sujets bibliques
+- AUCUNE question générale sur la Bible n'est acceptée
+- TOUS les personnages, événements, références DOIVENT être liés à "${selectedContext.title}"
+- Vérifiez TROIS FOIS que chaque question traite EXCLUSIVEMENT de "${selectedContext.title}"
+- Utilisez les mots-clés spécifiques au thème "${selectedContext.title}"
+- REJETEZ immédiatement toute question qui s'écarte du thème
 `;
 
   // Instructions de validation thématique
   const thematicValidationInstructions = `
-✅ PROCESSUS DE VALIDATION THÉMATIQUE OBLIGATOIRE :
-Avant d'inclure chaque question, posez-vous ces 3 questions :
-1. Cette question parle-t-elle DIRECTEMENT du thème "${selectedContext.title}" ?
-2. La réponse correcte concerne-t-elle SPÉCIFIQUEMENT ce thème ?
-3. Un expert du thème "${selectedContext.title}" considérerait-il cette question comme pertinente ?
+✅ CONTRÔLE QUALITÉ THÉMATIQUE OBLIGATOIRE :
+Avant d'inclure chaque question, vérifiez :
+1. Cette question traite-t-elle EXCLUSIVEMENT de "${selectedContext.title}" ?
+2. La réponse correcte concerne-t-elle DIRECTEMENT "${selectedContext.title}" ?
+3. Les options de réponse sont-elles liées au thème "${selectedContext.title}" ?
 
-Si une seule réponse est NON, ÉLIMINEZ la question immédiatement.
+Si UNE SEULE réponse est NON, ÉLIMINEZ la question.
 
-EXEMPLES DE QUESTIONS À ÉVITER :
-- Si thème = "Miracles de Jésus" → NE PAS poser de questions sur les paraboles
-- Si thème = "David" → NE PAS poser de questions sur Moïse ou Abraham  
-- Si thème = "Création" → NE PAS poser de questions sur l'Exode
-- Si thème = "Apôtre Paul" → NE PAS poser de questions sur Pierre ou Jean
+EXEMPLES SELON LE THÈME :
+- Thème "Paraboles de Jésus" → UNIQUEMENT des questions sur les paraboles racontées par Jésus
+- Thème "Miracles de Jésus" → UNIQUEMENT des questions sur les miracles accomplis par Jésus  
+- Thème "Vie de Jésus" → UNIQUEMENT des questions sur la vie, naissance, ministère, mort, résurrection de Jésus
+- Thème "David" → UNIQUEMENT des questions sur le roi David, sa vie, ses actions, ses psaumes
 
-SEULES LES QUESTIONS 100% ALIGNÉES AVEC LE THÈME SONT ACCEPTÉES.
+AUCUNE EXCEPTION N'EST TOLÉRÉE.
 `;
 
-  return `En tant qu'expert théologien évangélique reconnu et docteur en études bibliques, je vous demande de créer un quiz biblique d'excellence académique sur "${selectedContext.title}".
+  return `Vous êtes un expert théologien évangélique spécialisé en "${selectedContext.title}". Créez un quiz biblique d'excellence sur ce thème EXCLUSIVEMENT.
 
-🔍 CONTEXTE BIBLIQUE DÉTAILLÉ :
+🔍 CONTEXTE BIBLIQUE SPÉCIALISÉ :
 ${selectedContext.context}
 
-📚 VERSETS CLÉS DE RÉFÉRENCE :
-${selectedContext.keyVerses?.join(', ') || 'Références contextuelles précises requises'}
+📚 VERSETS DE RÉFÉRENCE OBLIGATOIRES :
+${selectedContext.keyVerses?.join(', ') || 'Références spécifiques au thème requis'}
 
-🎯 NIVEAU EXIGÉ : ${selectedDifficulty.instructions}
+🎯 NIVEAU DE DIFFICULTÉ : ${selectedDifficulty.instructions}
 
 ${uniquenessInstructions}
 
@@ -71,50 +67,48 @@ ${thematicPrecisionInstructions}
 
 ${thematicValidationInstructions}
 
-⚠️ EXIGENCES DOCTRINALES ABSOLUES :
-1. EXACTITUDE BIBLIQUE PARFAITE - Aucune erreur factuelle tolérée
-2. CONFORMITÉ ORTHODOXE - Respecter la doctrine évangélique historique
-3. RÉFÉRENCES PRÉCISES - Chaque question doit citer des versets authentiques
-4. VÉRITÉ THÉOLOGIQUE - Éviter toute ambiguïté doctrinale
-5. ORIGINALITÉ TOTALE - Questions jamais formulées (seed: ${ultraUniqueSeed})
-6. PERTINENCE THÉMATIQUE ABSOLUE - 100% des questions sur "${selectedContext.title}" UNIQUEMENT
+⚠️ EXIGENCES DOCTRINALES CRITIQUES :
+1. EXACTITUDE BIBLIQUE TOTALE - Zéro erreur factuelle
+2. CONFORMITÉ THÉMATIQUE STRICTE - 100% "${selectedContext.title}"
+3. RÉFÉRENCES PRÉCISES - Versets authentiques liés au thème
+4. ORIGINALITÉ AVEC SEED ${ultraUniqueSeed}
+5. EXCLUSIVITÉ THÉMATIQUE - Rien d'autre que "${selectedContext.title}"
 
-🚨 RÈGLE D'OR INVIOLABLE :
-Si une question ne concerne pas DIRECTEMENT et SPÉCIFIQUEMENT le thème "${selectedContext.title}", 
-elle est AUTOMATIQUEMENT REJETÉE. Aucune exception. Aucun compromis.
+🚨 RÈGLE ABSOLUE INVIOLABLE :
+Toute question qui ne concerne pas DIRECTEMENT "${selectedContext.title}" sera AUTOMATIQUEMENT REJETÉE.
 
-📋 FORMAT JSON REQUIS (AUCUN AUTRE TEXTE) :
+📋 FORMAT JSON STRICT (AUCUN AUTRE TEXTE) :
 [
   {
     "id": "q1",
-    "question": "Question 100% spécifique au thème ${selectedContext.title}",
+    "question": "Question 100% sur ${selectedContext.title}",
     "options": ["Option A", "Option B", "Option C", "Option D"],
     "correctAnswer": 0,
-    "verse": "Référence biblique exacte liée au thème ${selectedContext.title}"
+    "verse": "Référence biblique précise liée à ${selectedContext.title}"
   }
 ]
 
-🎪 CRÉATIVITÉ THÉMATIQUE CIBLÉE AVEC SEED ${ultraUniqueSeed} :
-- Explorez TOUS les aspects du thème "${selectedContext.title}" (historique, prophétique, typologique)
-- Variez les approches : qui, quoi, où, quand, pourquoi, comment - TOUJOURS sur "${selectedContext.title}"
-- Angles originaux MAIS EXCLUSIVEMENT sur le thème "${selectedContext.title}"
-- Questions stimulantes testant la connaissance SPÉCIFIQUE de "${selectedContext.title}"
-- Détails moins connus MAIS PERTINENTS au thème "${selectedContext.title}"
-- Versets variés MAIS TOUS en rapport avec "${selectedContext.title}"
+🎪 CRÉATIVITÉ THÉMATIQUE EXCLUSIVE (SEED ${ultraUniqueSeed}) :
+- Explorez TOUS les aspects de "${selectedContext.title}" uniquement
+- Personnages EXCLUSIFS au thème "${selectedContext.title}"
+- Événements SPÉCIFIQUES à "${selectedContext.title}" 
+- Détails UNIQUES de "${selectedContext.title}"
+- Enseignements PROPRES à "${selectedContext.title}"
+- Versets RELATIFS à "${selectedContext.title}" seulement
 
-⚡ GÉNÉREZ MAINTENANT ${questionCount} QUESTIONS PARFAITES :
-Thème EXCLUSIF et OBLIGATOIRE : "${selectedContext.title}"
-Niveau : ${selectedDifficulty.level}
-Seed d'unicité : ${ultraUniqueSeed}
-IMPÉRATIF ABSOLU : Chaque question DOIT être sur "${selectedContext.title}" - AUCUNE EXCEPTION !
+⚡ GÉNÉREZ ${questionCount} QUESTIONS PARFAITES :
+- Thème EXCLUSIF : "${selectedContext.title}"
+- Difficulté : ${selectedDifficulty.level}
+- Seed : ${ultraUniqueSeed}
+- IMPÉRATIF : 100% des questions sur "${selectedContext.title}"
 
-🔴 CONTRÔLE FINAL OBLIGATOIRE :
-Avant de répondre, relisez chaque question et demandez-vous :
+🔴 VÉRIFICATION FINALE OBLIGATOIRE :
+Relisez chaque question et demandez-vous :
 "Cette question concerne-t-elle à 100% le thème '${selectedContext.title}' ?"
-Si la réponse est non, supprimez la question immédiatement.
+Si NON → SUPPRIMEZ-LA IMMÉDIATEMENT.
 
 RÉPONDEZ UNIQUEMENT AVEC LE TABLEAU JSON - RIEN D'AUTRE !
 
-THÈME ABSOLU ET INCONTOURNABLE : "${selectedContext.title}"
-TOUT ÉCART THÉMATIQUE EST INACCEPTABLE !`;
+THÈME ABSOLU : "${selectedContext.title}"
+TOUT ÉCART EST INACCEPTABLE !`;
 }

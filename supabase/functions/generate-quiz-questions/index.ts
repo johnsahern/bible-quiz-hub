@@ -26,7 +26,7 @@ serve(async (req) => {
   }
 
   try {
-    console.log('🚀 Starting BIBLICAL QUIZ generation with Gemini 1.5 Flash...');
+    console.log('🚀 GÉNÉRATION QUIZ BIBLIQUE THÉMATIQUE STRICTE avec Gemini 1.5 Flash...');
     
     if (!geminiApiKey) {
       console.error('❌ Gemini API key not found');
@@ -34,28 +34,29 @@ serve(async (req) => {
     }
 
     const { theme, difficulty, questionCount }: QuizRequest = await req.json();
-    console.log('📝 Request params:', { theme, difficulty, questionCount });
+    console.log('📝 PARAMÈTRES REÇUS:', { theme, difficulty, questionCount });
+
+    // Validation des paramètres d'entrée
+    if (!theme || !difficulty || !questionCount) {
+      throw new Error('Paramètres manquants : theme, difficulty, questionCount requis');
+    }
 
     // Récupération du contexte et des instructions de difficulté
     const selectedContext = getBiblicalContext(theme);
     const selectedDifficulty = getDifficultyInstruction(difficulty);
 
-    // Génération du seed unique
+    console.log('📖 THÈME SÉLECTIONNÉ:', selectedContext.title);
+    console.log('🎯 DIFFICULTÉ:', selectedDifficulty.level);
+
+    // Génération du seed unique VALIDE (pas NaN)
     const ultraUniqueSeed = generateUniqueSeed(theme, difficulty, questionCount);
+    console.log('🎲 SEED UNIQUE GÉNÉRÉ:', ultraUniqueSeed);
 
-    console.log('🎲 Ultra-unique seed generated:', ultraUniqueSeed);
-    console.log('📖 Biblical theme:', selectedContext.title);
-    console.log('🎯 Difficulty level:', selectedDifficulty.level);
-
-    // Construction du prompt théologique RENFORCÉ
+    // Construction du prompt théologique ULTRA-STRICT
     const rigorousPrompt = buildRigorousPrompt(selectedContext, selectedDifficulty, questionCount, ultraUniqueSeed);
 
-    console.log('📋 PROMPT THÉOLOGIQUE ULTRA-RIGOUREUX ENVOYÉ :');
-    console.log('=' .repeat(80));
-    console.log(rigorousPrompt);
-    console.log('='.repeat(80));
-
-    console.log('🤖 Appel à Gemini-1.5-Flash avec validation thématique renforcée, seed:', ultraUniqueSeed);
+    console.log('📋 PROMPT THÉMATIQUE ULTRA-STRICT CONSTRUIT');
+    console.log('🤖 APPEL GEMINI avec validation thématique renforcée...');
 
     // Appel à l'API Gemini 1.5 Flash avec configuration optimisée
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
@@ -70,9 +71,9 @@ serve(async (req) => {
           }]
         }],
         generationConfig: {
-          temperature: 0.6, // Légèrement plus bas pour plus de cohérence
-          topK: 35,
-          topP: 0.85,
+          temperature: 0.7, // Légèrement plus haut pour plus de créativité
+          topK: 40,
+          topP: 0.9,
           maxOutputTokens: 8000,
           candidateCount: 1,
         },
@@ -102,7 +103,7 @@ serve(async (req) => {
       console.error('❌ Erreur API Gemini 1.5:', response.status, errorText);
       
       if (response.status === 429) {
-        throw new Error('Quota Gemini dépassé. Veuillez vérifier votre plan.');
+        throw new Error('Quota Gemini dépassé. Veuillez réessayer plus tard.');
       } else if (response.status === 401 || response.status === 403) {
         throw new Error('Clé API Gemini invalide ou non autorisée.');
       } else {
@@ -111,7 +112,7 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('📡 RÉPONSE COMPLÈTE GEMINI 1.5:', JSON.stringify(data, null, 2));
+    console.log('📡 RÉPONSE GEMINI REÇUE avec succès');
 
     const generatedContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
@@ -120,32 +121,39 @@ serve(async (req) => {
       throw new Error('Gemini 1.5 n\'a généré aucun contenu valide');
     }
 
-    console.log('📄 CONTENU BRUT GEMINI 1.5:', generatedContent);
+    console.log('📄 Contenu généré extrait avec succès');
 
     // Nettoyage et parsing du JSON
     const jsonContent = cleanJsonResponse(generatedContent);
-    console.log('🧹 JSON EXTRAIT ET NETTOYÉ:', jsonContent);
+    console.log('🧹 JSON extrait et nettoyé');
 
     let questions;
     try {
       questions = JSON.parse(jsonContent);
     } catch (parseError) {
       console.error('❌ Échec du parsing JSON:', parseError);
-      console.log('📄 Contenu défaillant:', jsonContent);
       throw new Error('Impossible de parser la réponse JSON de Gemini 1.5');
     }
 
+    console.log(`📊 ${questions.length} questions brutes reçues`);
+
     // Validation structurelle des questions
     const structurallyValidQuestions = validateQuestions(questions, questionCount);
+    console.log(`✅ ${structurallyValidQuestions.length} questions structurellement valides`);
     
-    // Validation thématique supplémentaire
+    // Validation thématique STRICTE
     const thematicallyValidQuestions = validateThematicRelevance(structurallyValidQuestions, theme);
+    console.log(`🎯 ${thematicallyValidQuestions.length} questions thématiquement conformes`);
 
-    console.log(`✅ SUCCÈS TOTAL ! ${thematicallyValidQuestions.length} QUESTIONS BIBLIQUES PARFAITES ET THÉMATIQUEMENT CONFORMES GÉNÉRÉES avec Gemini 1.5`);
-    console.log('📖 APERÇU DES QUESTIONS CRÉÉES :');
+    if (thematicallyValidQuestions.length === 0) {
+      throw new Error(`Aucune question valide générée pour le thème "${selectedContext.title}". Veuillez réessayer.`);
+    }
+
+    console.log(`✅ SUCCÈS TOTAL ! ${thematicallyValidQuestions.length} QUESTIONS PARFAITES GÉNÉRÉES`);
+    console.log('📖 QUESTIONS CRÉÉES POUR LE THÈME:', selectedContext.title);
+
     thematicallyValidQuestions.forEach((q, i) => {
       console.log(`${i + 1}. ${q.question.substring(0, 80)}...`);
-      console.log(`   Réponse: ${q.options[q.correctAnswer]} (${q.verse || 'Pas de verset'})`);
     });
 
     return new Response(JSON.stringify({ questions: thematicallyValidQuestions }), {
@@ -153,11 +161,11 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('❌ ERREUR FATALE dans generate-quiz-questions:', error);
+    console.error('❌ ERREUR FATALE dans la génération du quiz:', error);
     
     return new Response(JSON.stringify({ 
       error: error.message,
-      details: 'Échec de la génération du quiz biblique avec validation thématique renforcée',
+      details: 'Échec de la génération du quiz avec validation thématique stricte',
       timestamp: new Date().toISOString()
     }), {
       status: 500,

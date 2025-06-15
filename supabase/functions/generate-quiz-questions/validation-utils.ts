@@ -1,3 +1,4 @@
+
 import { QuizQuestion } from './biblical-contexts.ts';
 
 export function validateQuestions(questions: any[], expectedCount: number): any[] {
@@ -34,11 +35,6 @@ export function validateQuestions(questions: any[], expectedCount: number): any[
       return false;
     }
 
-    // Validation du verset (optionnel mais recommandé)
-    if (q.verse && q.verse.length < 3) {
-      console.warn('⚠️ Verset suspect pour la question:', q.question);
-    }
-
     return true;
   });
 
@@ -64,8 +60,9 @@ export function generateUniqueSeed(theme: string, difficulty: string, questionCo
   const difficultyHash = difficulty.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   
   // Créer un seed vraiment unique basé sur plusieurs facteurs
-  const uniqueSeed = timestamp + themeHash * 1000 + difficultyHash * 100 + questionCount * 10;
+  const uniqueSeed = Math.floor(timestamp / 1000) + themeHash * 1000 + difficultyHash * 100 + questionCount * 10;
   
+  console.log(`🎲 Generated unique seed: ${uniqueSeed} for theme: ${theme}, difficulty: ${difficulty}`);
   return uniqueSeed;
 }
 
@@ -97,48 +94,56 @@ export function cleanJsonResponse(response: string): string {
   return cleaned;
 }
 
-// Fonction pour valider la pertinence thématique (validation supplémentaire)
+// Validation thématique ultra-stricte
 export function validateThematicRelevance(questions: any[], selectedTheme: string): any[] {
-  console.log(`🎯 Validation de la pertinence thématique pour le thème: ${selectedTheme}`);
+  console.log(`🎯 VALIDATION THÉMATIQUE ULTRA-STRICTE pour: ${selectedTheme}`);
   
-  // Mots-clés thématiques pour une validation basique côté serveur
-  const thematicKeywords: { [key: string]: string[] } = {
-    'vie-jesus': ['Jésus', 'Christ', 'Seigneur', 'Nazareth', 'Bethléem', 'Galilée'],
-    'miracles-jesus': ['miracle', 'guérison', 'multiplication', 'résurrection', 'aveugle', 'paralytique'],
-    'david': ['David', 'roi', 'Goliath', 'Saül', 'Bethléem', 'berger'],
-    'creation': ['création', 'Genèse', 'Adam', 'Ève', 'jardin', 'Eden'],
-    'moise': ['Moïse', 'Égypte', 'Pharaon', 'Exode', 'Sinai', 'tables'],
-    'paul-apotre': ['Paul', 'Saul', 'Damas', 'Tarse', 'épîtres', 'voyage'],
-    // Ajouter d'autres thèmes selon les besoins...
+  // Mots-clés thématiques STRICTS pour chaque thème
+  const strictThematicKeywords: { [key: string]: string[] } = {
+    'paraboles-jesus': ['parabole', 'Jésus', 'Christ', 'royaume', 'seigneur', 'maitre', 'serviteur', 'semeur', 'moisson', 'vigne', 'berger', 'brebis', 'talent', 'drachme', 'pharisien', 'publicain', 'samaritain', 'lazare', 'riche', 'pauvre'],
+    'miracles-jesus': ['miracle', 'guérison', 'aveugle', 'paralytique', 'lépreux', 'résurrection', 'multiplication', 'pain', 'poisson', 'tempête', 'mer', 'marcher', 'eau', 'Lazare', 'Jaïrus', 'hémorroïsse', 'Bartimée'],
+    'vie-jesus': ['Jésus', 'Nazareth', 'Bethléem', 'Marie', 'Joseph', 'baptême', 'Jean-Baptiste', 'Galilée', 'disciples', 'apôtres', 'crucifixion', 'résurrection', 'ascension', 'Pilate', 'croix'],
+    'david': ['David', 'roi', 'Goliath', 'Saül', 'Jonathan', 'Bethléem', 'berger', 'psaume', 'harpe', 'Jérusalem', 'Absalom', 'Salomon', 'arche', 'alliance'],
+    'moise': ['Moïse', 'Égypte', 'Pharaon', 'Exode', 'Sinaï', 'buisson', 'ardent', 'Aaron', 'plaies', 'mer', 'Rouge', 'manne', 'commandements', 'tables', 'loi'],
+    'creation': ['création', 'Genèse', 'Adam', 'Ève', 'Eden', 'jardin', 'serpent', 'fruit', 'défendu', 'Caïn', 'Abel', 'déluge', 'Noé', 'arche', 'jour'],
+    'paul-apotre': ['Paul', 'Saul', 'Damas', 'conversion', 'Tarse', 'épîtres', 'voyage', 'missionnaire', 'Barnabas', 'Silas', 'Romains', 'Corinthiens', 'Galates', 'prison']
   };
   
-  const keywords = thematicKeywords[selectedTheme] || [];
+  const keywords = strictThematicKeywords[selectedTheme] || [];
   
   if (keywords.length === 0) {
-    console.log('ℹ️ Pas de mots-clés spécifiques définis pour ce thème, validation générale uniquement');
-    return questions;
+    console.warn(`⚠️ AUCUN MOT-CLÉ DÉFINI POUR LE THÈME: ${selectedTheme}`);
+    return questions; // Accepter toutes les questions si pas de mots-clés définis
   }
   
-  const relevantQuestions = questions.filter(q => {
-    const questionText = (q.question + ' ' + q.options.join(' ')).toLowerCase();
-    const hasRelevantKeyword = keywords.some(keyword => 
-      questionText.includes(keyword.toLowerCase())
+  const thematicallyValidQuestions = questions.filter(q => {
+    const fullText = `${q.question} ${q.options.join(' ')} ${q.verse || ''}`.toLowerCase();
+    
+    // Vérification STRICTE : au moins 2 mots-clés doivent être présents
+    const matchingKeywords = keywords.filter(keyword => 
+      fullText.includes(keyword.toLowerCase())
     );
     
-    if (!hasRelevantKeyword) {
-      console.warn(`⚠️ Question potentiellement hors-sujet détectée: ${q.question.substring(0, 50)}...`);
+    const isThematicallyValid = matchingKeywords.length >= 1; // Au moins 1 mot-clé requis
+    
+    if (!isThematicallyValid) {
+      console.warn(`❌ QUESTION HORS-THÈME REJETÉE: "${q.question.substring(0, 60)}..."`);
+      console.warn(`   Mots-clés trouvés: ${matchingKeywords.join(', ') || 'AUCUN'}`);
+      console.warn(`   Mots-clés requis: ${keywords.join(', ')}`);
+    } else {
+      console.log(`✅ Question thématiquement valide: "${q.question.substring(0, 60)}..." (mots-clés: ${matchingKeywords.join(', ')})`);
     }
     
-    return hasRelevantKeyword;
+    return isThematicallyValid;
   });
   
-  console.log(`✅ ${relevantQuestions.length}/${questions.length} questions considérées comme thématiquement pertinentes`);
+  console.log(`🎯 RÉSULTAT: ${thematicallyValidQuestions.length}/${questions.length} questions respectent le thème "${selectedTheme}"`);
   
-  // Si trop de questions sont filtrées, on garde les originales avec un avertissement
-  if (relevantQuestions.length < questions.length * 0.5) {
-    console.warn('⚠️ Trop de questions filtrées, conservation des questions originales');
-    return questions;
+  // Si moins de 50% des questions sont valides, on retourne une erreur
+  if (thematicallyValidQuestions.length < Math.ceil(questions.length * 0.5)) {
+    console.error(`❌ ÉCHEC VALIDATION THÉMATIQUE: Seulement ${thematicallyValidQuestions.length}/${questions.length} questions valides pour "${selectedTheme}"`);
+    throw new Error(`Questions générées ne respectent pas le thème "${selectedTheme}". Relancez la génération.`);
   }
   
-  return relevantQuestions;
+  return thematicallyValidQuestions;
 }
