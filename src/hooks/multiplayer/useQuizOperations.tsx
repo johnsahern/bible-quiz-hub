@@ -16,14 +16,28 @@ export const useQuizOperations = (userId?: string, roomId?: string, isHost: bool
     try {
       console.log('🎮 Starting quiz for room:', roomId);
 
-      // Generate questions via edge function
+      // First, get the room data to use the correct theme, difficulty and question count
+      const { data: roomData, error: roomError } = await supabase
+        .from('quiz_rooms')
+        .select('theme, difficulty, question_count')
+        .eq('id', roomId)
+        .single();
+
+      if (roomError || !roomData) {
+        console.error('❌ Failed to get room data:', roomError);
+        throw new Error('Impossible de récupérer les données de la salle');
+      }
+
+      console.log('📋 Room data for quiz generation:', roomData);
+
+      // Generate questions via edge function with proper parameters
       const { data: questionsData, error: questionsError } = await supabase.functions.invoke(
         'generate-quiz-questions',
         {
           body: { 
-            theme: 'general', // You might want to pass the actual theme
-            difficulty: 'facile', // You might want to pass the actual difficulty
-            count: 10
+            theme: roomData.theme,
+            difficulty: roomData.difficulty,
+            questionCount: roomData.question_count
           }
         }
       );
@@ -32,6 +46,13 @@ export const useQuizOperations = (userId?: string, roomId?: string, isHost: bool
         console.error('❌ Questions generation failed:', questionsError);
         throw questionsError;
       }
+
+      if (!questionsData?.questions || questionsData.questions.length === 0) {
+        console.error('❌ No questions generated');
+        throw new Error('Aucune question générée');
+      }
+
+      console.log('✅ Questions generated:', questionsData.questions.length);
 
       // Update room with questions and start quiz
       const { error: updateError } = await supabase
@@ -60,7 +81,7 @@ export const useQuizOperations = (userId?: string, roomId?: string, isHost: bool
       console.error('💥 Error starting quiz:', err);
       toast({
         title: "Erreur",
-        description: "Impossible de démarrer le quiz",
+        description: err.message || "Impossible de démarrer le quiz",
         variant: "destructive",
       });
       return false;
