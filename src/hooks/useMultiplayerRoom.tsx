@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { QuizRoom, RoomPlayer } from '@/types/multiplayer';
 import { QuizQuestion } from '@/types/quiz';
@@ -21,10 +21,10 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
 
   console.log('useMultiplayerRoom hook called:', { roomId, userId: user?.id, hookCallCount: Date.now() });
 
-  // Operations hooks - always called
-  const roomOperations = useRoomOperations(user);
-  const playerActions = usePlayerActions(user, room);
-  const quizOperations = useQuizOperations(user, room, isHost);
+  // Memoize operations hooks to prevent recreating them
+  const roomOperations = useMemo(() => useRoomOperations(user), [user]);
+  const playerActions = useMemo(() => usePlayerActions(user, room), [user, room]);
+  const quizOperations = useMemo(() => useQuizOperations(user, room, isHost), [user, room, isHost]);
 
   // Load room data on mount - seulement si roomId est fourni
   useRoomData({

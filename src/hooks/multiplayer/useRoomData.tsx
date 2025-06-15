@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { QuizQuestion } from '@/types/quiz';
 import { RoomStatus, RoomPlayer } from '@/types/multiplayer';
@@ -23,6 +23,9 @@ export const useRoomData = ({
   setPlayers,
   setError
 }: UseRoomDataProps) => {
+  const isLoadingRef = useRef(false);
+  const lastLoadedRoomId = useRef<string | null>(null);
+
   useEffect(() => {
     // Vérifier que les paramètres requis sont présents
     if (!roomId || !user?.id) {
@@ -30,7 +33,18 @@ export const useRoomData = ({
       return;
     }
 
+    // Éviter les chargements multiples pour la même salle
+    if (isLoadingRef.current || lastLoadedRoomId.current === roomId) {
+      console.log('Skipping duplicate room data load for:', roomId);
+      return;
+    }
+
     const loadRoomData = async () => {
+      if (isLoadingRef.current) return;
+      
+      isLoadingRef.current = true;
+      lastLoadedRoomId.current = roomId;
+
       try {
         console.log('Loading room data for room:', roomId);
         
@@ -90,9 +104,11 @@ export const useRoomData = ({
       } catch (err) {
         console.error('Erreur lors du chargement de la salle:', err);
         setError('Impossible de charger la salle');
+      } finally {
+        isLoadingRef.current = false;
       }
     };
 
     loadRoomData();
-  }, [roomId, user?.id]); // Simplifier les dépendances pour éviter undefined
+  }, [roomId, user?.id]);
 };

@@ -19,9 +19,26 @@ export const useRealtimeSubscription = ({
 }: UseRealtimeSubscriptionProps) => {
   const channelRef = useRef<any>(null);
   const isSubscribedRef = useRef(false);
+  const currentRoomIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!roomId || isSubscribedRef.current) return;
+    if (!roomId) {
+      // Clean up if no roomId
+      if (channelRef.current) {
+        console.log('Cleaning up subscription - no roomId');
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+        isSubscribedRef.current = false;
+        currentRoomIdRef.current = null;
+      }
+      return;
+    }
+
+    // Skip if already subscribed to the same room
+    if (isSubscribedRef.current && currentRoomIdRef.current === roomId) {
+      console.log('Already subscribed to room:', roomId);
+      return;
+    }
 
     // Clean up existing channel first
     if (channelRef.current) {
@@ -79,6 +96,7 @@ export const useRealtimeSubscription = ({
       console.log('Subscription status:', status);
       if (status === 'SUBSCRIBED') {
         isSubscribedRef.current = true;
+        currentRoomIdRef.current = roomId;
       }
     });
     
@@ -90,6 +108,7 @@ export const useRealtimeSubscription = ({
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
         isSubscribedRef.current = false;
+        currentRoomIdRef.current = null;
       }
     };
   }, [roomId]); // Only depend on roomId to avoid re-subscriptions
