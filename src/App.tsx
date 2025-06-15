@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -13,6 +12,7 @@ import MultiplayerQuiz from "./pages/MultiplayerQuiz";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import GameCenter from "./pages/GameCenter";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +26,7 @@ const App: React.FC = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/quiz-solo" element={<SoloQuiz />} />
+            <Route path="/games" element={<GameCenter />} />
             <Route path="/quiz-multijoueur" element={<MultiplayerSetup />} />
             <Route path="/quiz-multijoueur/:roomId" element={<MultiplayerQuiz />} />
             <Route path="/auth" element={<Auth />} />
