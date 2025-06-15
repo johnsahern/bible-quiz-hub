@@ -22,19 +22,19 @@ export interface VersePuzzle {
 }
 
 export interface CrosswordClue {
-  id: string;
+  word: string;
   clue: string;
-  answer: string;
   direction: 'horizontal' | 'vertical';
   startRow: number;
   startCol: number;
+  length: number;
 }
 
 export interface CrosswordGame {
   id: string;
-  title: string;
   theme: string;
-  clues: CrosswordClue[];
+  gridSize: number;
+  words: CrosswordClue[];
   grid: (string | null)[][];
   difficulty: 'facile' | 'moyen' | 'difficile';
 }

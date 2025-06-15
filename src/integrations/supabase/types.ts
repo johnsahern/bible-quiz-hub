@@ -9,11 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      crossword_history: {
+        Row: {
+          completed_clues: number
+          created_at: string
+          difficulty: string
+          id: string
+          theme: string
+          time_spent: number
+          total_clues: number
+          total_points: number
+          user_id: string
+        }
+        Insert: {
+          completed_clues: number
+          created_at?: string
+          difficulty: string
+          id?: string
+          theme: string
+          time_spent: number
+          total_clues: number
+          total_points: number
+          user_id: string
+        }
+        Update: {
+          completed_clues?: number
+          created_at?: string
+          difficulty?: string
+          id?: string
+          theme?: string
+          time_spent?: number
+          total_clues?: number
+          total_points?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           best_score: number | null
           created_at: string | null
+          crossword_points: number | null
           favorite_theme: string | null
           full_name: string | null
           games_played: number | null
@@ -29,6 +66,7 @@ export type Database = {
           avatar_url?: string | null
           best_score?: number | null
           created_at?: string | null
+          crossword_points?: number | null
           favorite_theme?: string | null
           full_name?: string | null
           games_played?: number | null
@@ -44,6 +82,7 @@ export type Database = {
           avatar_url?: string | null
           best_score?: number | null
           created_at?: string | null
+          crossword_points?: number | null
           favorite_theme?: string | null
           full_name?: string | null
           games_played?: number | null

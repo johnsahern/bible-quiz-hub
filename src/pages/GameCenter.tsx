@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import GameModeSelector from '@/components/games/GameModeSelector';
 import TrueFalseGame from '@/components/games/TrueFalseGame';
 import VersePuzzleGame from '@/components/games/VersePuzzleGame';
+import CrosswordGame from '@/components/games/CrosswordGame';
 import DailyChallengeCard from '@/components/games/DailyChallengeCard';
 import { GameMode, TrueFalseQuestion, VersePuzzle, DailyChallenge } from '@/types/gameTypes';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -88,16 +89,20 @@ const GameCenter = () => {
           <GameModeSelector onModeSelect={handleModeSelect} />
         </div>;
     }
+
     if (gameState === 'playing') {
       switch (selectedMode) {
         case 'true-false':
           return <TrueFalseGame onGameComplete={handleGameComplete} />;
         case 'verse-puzzle':
           return <VersePuzzleGame onGameComplete={handleGameComplete} />;
+        case 'crossword':
+          return <CrosswordGame onGameComplete={handleGameComplete} />;
         default:
           return <div>Mode de jeu en cours de développement</div>;
       }
     }
+
     if (gameState === 'results' && gameResult) {
       return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4">
           <div className="max-w-2xl mx-auto">

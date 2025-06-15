@@ -42,6 +42,7 @@ interface ExtendedProfile {
   multiplayer_points: number;
   true_false_points: number;
   verse_puzzle_points: number;
+  crossword_points: number;
   created_at: string;
   updated_at: string;
 }
@@ -113,7 +114,7 @@ const Profile = () => {
     );
   };
 
-  // Créer un profil étendu avec true_false_points
+  // Créer un profil étendu avec tous les types de points
   const extendedProfile: ExtendedProfile = {
     ...profile,
     total_points: profile.total_points || 0,
@@ -121,7 +122,8 @@ const Profile = () => {
     best_score: profile.best_score || 0,
     multiplayer_points: profile.multiplayer_points || 0,
     true_false_points: profile.true_false_points || 0,
-    verse_puzzle_points: profile.verse_puzzle_points || 0
+    verse_puzzle_points: profile.verse_puzzle_points || 0,
+    crossword_points: profile.crossword_points || 0
   };
 
   return (

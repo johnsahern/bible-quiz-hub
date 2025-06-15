@@ -15,7 +15,8 @@ import {
   LogOut,
   Users,
   CheckCircle,
-  Puzzle
+  Puzzle,
+  Grid3x3
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -30,6 +31,8 @@ interface Profile {
   favorite_theme: string | null;
   multiplayer_points: number;
   true_false_points: number;
+  verse_puzzle_points: number;
+  crossword_points: number;
   created_at: string;
   updated_at: string;
 }
@@ -180,7 +183,7 @@ const ProfileHeader = ({ profile, achievementsCount, onUpdateProfile, onSignOut 
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-7 gap-4">
             <div className="text-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
               <div className="flex items-center justify-center mb-2">
                 <BookOpen className="w-5 h-5 text-yellow-600 mr-1" />
@@ -204,6 +207,22 @@ const ProfileHeader = ({ profile, achievementsCount, onUpdateProfile, onSignOut 
               <div className="text-lg sm:text-2xl font-bold text-emerald-600">{profile.true_false_points || 0}</div>
               <div className="text-xs sm:text-sm text-gray-600">Vrai/Faux</div>
             </div>
+
+            <div className="text-center p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+              <div className="flex items-center justify-center mb-2">
+                <Puzzle className="w-5 h-5 text-indigo-600 mr-1" />
+              </div>
+              <div className="text-lg sm:text-2xl font-bold text-indigo-600">{profile.verse_puzzle_points || 0}</div>
+              <div className="text-xs sm:text-sm text-gray-600">Puzzles</div>
+            </div>
+
+            <div className="text-center p-3 bg-rose-50 rounded-lg border border-rose-200">
+              <div className="flex items-center justify-center mb-2">
+                <Grid3x3 className="w-5 h-5 text-rose-600 mr-1" />
+              </div>
+              <div className="text-lg sm:text-2xl font-bold text-rose-600">{profile.crossword_points || 0}</div>
+              <div className="text-xs sm:text-sm text-gray-600">Mots Croisés</div>
+            </div>
             
             <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
               <div className="flex items-center justify-center mb-2">
@@ -211,14 +230,6 @@ const ProfileHeader = ({ profile, achievementsCount, onUpdateProfile, onSignOut 
               </div>
               <div className="text-lg sm:text-2xl font-bold text-green-600">{profile.best_score || 0}</div>
               <div className="text-xs sm:text-sm text-gray-600">Meilleur Score</div>
-            </div>
-            
-            <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-center justify-center mb-2">
-                <Trophy className="w-5 h-5 text-blue-600 mr-1" />
-              </div>
-              <div className="text-lg sm:text-2xl font-bold text-blue-600">{profile.games_played || 0}</div>
-              <div className="text-xs sm:text-sm text-gray-600">Quiz Joués</div>
             </div>
             
             <div className="text-center p-3 bg-amber-50 rounded-lg border border-amber-200">
