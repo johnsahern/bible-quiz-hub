@@ -6,6 +6,11 @@ import { joinRoom as joinRoomUtil, addPlayerToRoom } from './playerManagement';
 
 export const useRoomOperations = (user: any) => {
   const createRoom = useCallback(async (theme: string, difficulty: string, questionCount: number = 10) => {
+    if (!user?.id) {
+      console.log('❌ No user available for room creation');
+      return null;
+    }
+
     console.log('🎯 Creating room with theme:', theme, 'difficulty:', difficulty);
     
     // Create the room
@@ -33,11 +38,15 @@ export const useRoomOperations = (user: any) => {
 
     console.log('🎉 ROOM CREATION COMPLETED');
     return createdRoom;
-  }, [user]);
+  }, [user?.id]); // Use user?.id instead of user object
 
   const joinRoom = useCallback(async (roomCode: string) => {
+    if (!user?.id) {
+      console.log('❌ No user available for joining room');
+      return false;
+    }
     return await joinRoomUtil(user, roomCode);
-  }, [user]);
+  }, [user?.id]); // Use user?.id instead of user object
 
   return { createRoom, joinRoom };
 };
