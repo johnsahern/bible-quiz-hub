@@ -110,7 +110,7 @@ const Profile = () => {
         </div>
       </div>
     );
-  }
+  };
 
   // Créer un profil étendu avec multiplayer_points
   const extendedProfile: ExtendedProfile = {
@@ -139,6 +139,7 @@ const Profile = () => {
         {/* Profile Header Card */}
         <ProfileHeader 
           profile={extendedProfile}
+          achievementsCount={achievements.length}
           onUpdateProfile={updateProfile}
           onSignOut={handleSignOut}
         />

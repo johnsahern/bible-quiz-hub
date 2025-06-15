@@ -34,11 +34,12 @@ interface Profile {
 
 interface ProfileHeaderProps {
   profile: Profile;
+  achievementsCount: number;
   onUpdateProfile: (updates: Partial<Profile>) => Promise<{ error: any }>;
   onSignOut: () => Promise<void>;
 }
 
-const ProfileHeader = ({ profile, onUpdateProfile, onSignOut }: ProfileHeaderProps) => {
+const ProfileHeader = ({ profile, achievementsCount, onUpdateProfile, onSignOut }: ProfileHeaderProps) => {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -210,13 +211,12 @@ const ProfileHeader = ({ profile, onUpdateProfile, onSignOut }: ProfileHeaderPro
               <div className="text-xs sm:text-sm text-gray-600">Quiz Joués</div>
             </div>
             
-            <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="text-center p-3 bg-amber-50 rounded-lg border border-amber-200">
               <div className="flex items-center justify-center mb-2">
-                <Clock className="w-5 h-5 text-gray-600 mr-1" />
+                <Clock className="w-5 h-5 text-amber-600 mr-1" />
               </div>
-              <div className="text-sm sm:text-lg font-bold text-gray-600">
-                {/* This will be passed as achievements count */}
-                0
+              <div className="text-sm sm:text-lg font-bold text-amber-600">
+                {achievementsCount}
               </div>
               <div className="text-xs sm:text-sm text-gray-600">Achievements</div>
             </div>
