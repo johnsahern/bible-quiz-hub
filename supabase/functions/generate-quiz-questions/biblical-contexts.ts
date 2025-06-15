@@ -11,6 +11,7 @@ import { patriarchsContext } from './contexts/patriarchs.ts';
 import { kingsContext } from './contexts/kings.ts';
 import { womenContext } from './contexts/women.ts';
 import { genealogyJesusContext } from './contexts/genealogy-jesus.ts';
+import { evangelilesContext } from './contexts/evangeliles.ts';
 
 export interface BiblicalContext {
   key: string;
@@ -29,6 +30,7 @@ export const BIBLICAL_CONTEXTS: BiblicalContext[] = [
   prophetsContext,
   newTestamentContext,
   jesusChristContext,
+  evangelilesContext,
   ...apostlesContexts,
   patriarchsContext,
   kingsContext,

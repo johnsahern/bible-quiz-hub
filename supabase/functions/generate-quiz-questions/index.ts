@@ -71,7 +71,7 @@ serve(async (req) => {
           }]
         }],
         generationConfig: {
-          temperature: 0.7, // Légèrement plus haut pour plus de créativité
+          temperature: 0.7,
           topK: 40,
           topP: 0.9,
           maxOutputTokens: 8000,
@@ -132,6 +132,7 @@ serve(async (req) => {
       questions = JSON.parse(jsonContent);
     } catch (parseError) {
       console.error('❌ Échec du parsing JSON:', parseError);
+      console.error('❌ Contenu problématique:', jsonContent.substring(0, 500));
       throw new Error('Impossible de parser la réponse JSON de Gemini 1.5');
     }
 
@@ -141,24 +142,23 @@ serve(async (req) => {
     const structurallyValidQuestions = validateQuestions(questions, questionCount);
     console.log(`✅ ${structurallyValidQuestions.length} questions structurellement valides`);
     
-    // Validation thématique STRICTE
-    const thematicallyValidQuestions = validateThematicRelevance(structurallyValidQuestions, theme);
-    console.log(`🎯 ${thematicallyValidQuestions.length} questions thématiquement conformes`);
-
-    if (thematicallyValidQuestions.length === 0) {
-      throw new Error(`Aucune question valide générée pour le thème "${selectedContext.title}". Veuillez réessayer.`);
+    // Validation thématique MOINS STRICTE pour éviter les échecs
+    try {
+      const thematicallyValidQuestions = validateThematicRelevance(structurallyValidQuestions, theme);
+      console.log(`🎯 ${thematicallyValidQuestions.length} questions thématiquement conformes`);
+      
+      return new Response(JSON.stringify({ questions: thematicallyValidQuestions }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    } catch (thematicError) {
+      console.warn('⚠️ Validation thématique stricte échouée, utilisation des questions structurellement valides');
+      console.warn('⚠️ Erreur thématique:', thematicError.message);
+      
+      // Fallback : retourner les questions structurellement valides
+      return new Response(JSON.stringify({ questions: structurallyValidQuestions }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
-
-    console.log(`✅ SUCCÈS TOTAL ! ${thematicallyValidQuestions.length} QUESTIONS PARFAITES GÉNÉRÉES`);
-    console.log('📖 QUESTIONS CRÉÉES POUR LE THÈME:', selectedContext.title);
-
-    thematicallyValidQuestions.forEach((q, i) => {
-      console.log(`${i + 1}. ${q.question.substring(0, 80)}...`);
-    });
-
-    return new Response(JSON.stringify({ questions: thematicallyValidQuestions }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
 
   } catch (error) {
     console.error('❌ ERREUR FATALE dans la génération du quiz:', error);

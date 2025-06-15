@@ -22,6 +22,22 @@ export const strictThematicKeywords: { [key: string]: string[] } = {
   ...theologicalKeywords,
   ...culturalKeywords,
   
+  // Mots-clés spécifiques pour les Évangiles
+  'evangeliles': [
+    'évangile', 'Matthieu', 'Marc', 'Luc', 'Jean', 'Jésus', 'Christ',
+    'témoignage', 'récit', 'bonne', 'nouvelle', 'message', 'salut',
+    'naissance', 'Bethléem', 'Marie', 'Joseph', 'bergers', 'mages',
+    'baptême', 'Jean-Baptiste', 'Jourdain', 'Esprit', 'colombe',
+    'disciples', 'apôtres', 'Pierre', 'Jacques', 'André', 'Philippe',
+    'miracles', 'guérisons', 'aveugles', 'paralytiques', 'lépreux',
+    'multiplication', 'pains', 'poissons', 'tempête', 'mer',
+    'paraboles', 'royaume', 'cieux', 'semeur', 'berger', 'fils prodigue',
+    'transfiguration', 'Moïse', 'Élie', 'montagne', 'gloire',
+    'Jérusalem', 'rameaux', 'temple', 'pharisiens', 'scribes',
+    'passion', 'croix', 'crucifixion', 'résurrection', 'tombeau',
+    'apparitions', 'Emmaüs', 'Thomas', 'ascension'
+  ],
+  
   // Mots-clés spécifiques pour la généalogie de Jésus
   'genealogie-jesus': [
     'Abraham', 'Isaac', 'Jacob', 'Juda', 'David', 'Salomon', 'Joseph', 'Marie',

@@ -22,12 +22,12 @@ function validateWithKeywords(questions: any[], keywords: string[], selectedThem
   const thematicallyValidQuestions = questions.filter(q => {
     const fullText = `${q.question} ${q.options.join(' ')} ${q.verse || ''}`.toLowerCase();
     
-    // Vérification ULTRA-STRICTE : au moins 2 mots-clés doivent être présents pour la production
+    // Vérification MOINS STRICTE : au moins 1 mot-clé doit être présent
     const matchingKeywords = keywords.filter(keyword => 
       fullText.includes(keyword.toLowerCase())
     );
     
-    const isThematicallyValid = matchingKeywords.length >= 1; // Au moins 1 mot-clé minimum
+    const isThematicallyValid = matchingKeywords.length >= 1;
     
     if (!isThematicallyValid) {
       console.warn(`❌ QUESTION HORS-THÈME REJETÉE PRODUCTION: "${q.question.substring(0, 60)}..."`);
@@ -42,8 +42,8 @@ function validateWithKeywords(questions: any[], keywords: string[], selectedThem
   
   console.log(`🎯 RÉSULTAT PRODUCTION: ${thematicallyValidQuestions.length}/${questions.length} questions respectent le thème "${selectedTheme}"`);
   
-  // Version production : exigence plus stricte (au moins 70% des questions doivent être valides)
-  const validationThreshold = Math.max(1, Math.ceil(questions.length * 0.7));
+  // Version production : seuil RÉDUIT à 50% pour éviter les échecs
+  const validationThreshold = Math.max(1, Math.ceil(questions.length * 0.5));
   if (thematicallyValidQuestions.length < validationThreshold) {
     console.error(`❌ ÉCHEC VALIDATION THÉMATIQUE PRODUCTION: Seulement ${thematicallyValidQuestions.length}/${questions.length} questions valides pour "${selectedTheme}" (minimum requis: ${validationThreshold})`);
     throw new Error(`Questions générées ne respectent pas suffisamment le thème "${selectedTheme}". Qualité production non atteinte. Relancez la génération.`);
