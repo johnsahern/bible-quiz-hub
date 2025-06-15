@@ -1,4 +1,3 @@
-
 // Mots-clés pour le thème "Vue d'ensemble de la Bible"
 const overviewKeywords = [
   'bible', 'ancien testament', 'nouveau testament', 'écriture', 'verset', 'histoire biblique',
@@ -53,6 +52,77 @@ const jugesKeywords = [
 const ruthKeywords = [
   'Ruth', 'Moabite', 'Naomi', 'belle-fille', 'fidélité', 'Boaz', 'glanage', 
   'rédemption', 'David', 'lignée', 'Orpa', 'Élimélec', 'Machlon', 'Kiljon'
+];
+
+// Nouveaux mots-clés pour les livres historiques
+const samuel1Keywords = [
+  '1Samuel', 'Samuel', 'Anne', 'prière', 'Éli', 'Silo', 'vocation', 'enfant',
+  'Saül', 'roi', 'onction', 'David', 'berger', 'Goliath', 'géant', 'fronde'
+];
+
+const samuel2Keywords = [
+  '2Samuel', 'David', 'roi', 'Jérusalem', 'arche', 'Nathan', 'Bath-Schéba',
+  'Absalom', 'rébellion', 'alliance', 'trône', 'éternel'
+];
+
+const rois1Keywords = [
+  '1Rois', 'Salomon', 'sagesse', 'temple', 'construction', 'reine', 'Saba',
+  'division', 'royaume', 'Jéroboam', 'Élie', 'Carmel', 'Baal'
+];
+
+const rois2Keywords = [
+  '2Rois', 'Élisée', 'Élie', 'enlèvement', 'miracles', 'Naaman', 'lèpre',
+  'Josias', 'réforme', 'captivité', 'Babylone'
+];
+
+const chroniques1Keywords = [
+  '1Chroniques', 'généalogies', 'David', 'Lévites', 'temple', 'organisation',
+  'culte', 'musiciens', 'préparatifs'
+];
+
+const chroniques2Keywords = [
+  '2Chroniques', 'Salomon', 'temple', 'dédicace', 'Juda', 'rois', 'réformes',
+  'Ézéchias', 'Josias', 'Babylone', 'Cyrus'
+];
+
+const esdrasKeywords = [
+  'Esdras', 'retour', 'exil', 'Cyrus', 'temple', 'reconstruction', 'Loi',
+  'mariages', 'mixtes', 'réforme'
+];
+
+const nehemieKeywords = [
+  'Néhémie', 'murailles', 'Jérusalem', 'reconstruction', 'opposition',
+  'cinquante-deux', 'jours', 'réformes'
+];
+
+const estherKeywords = [
+  'Esther', 'reine', 'Assuérus', 'Mardochée', 'Haman', 'Pourim',
+  'délivrance', 'providence'
+];
+
+// Mots-clés pour les livres poétiques
+const jobKeywords = [
+  'Job', 'souffrance', 'épreuves', 'Satan', 'amis', 'Élihu', 'Éternel',
+  'tempête', 'restauration', 'patience'
+];
+
+const psaumesKeywords = [
+  'Psaumes', 'David', 'louange', 'prière', 'berger', 'Sion', 'méditation',
+  'Asaph', 'Koré', 'montées'
+];
+
+const proverbesKeywords = [
+  'Proverbes', 'Salomon', 'sagesse', 'crainte', 'Éternel', 'fils', 'instruction',
+  'femme', 'vertueuse', 'folie'
+];
+
+const ecclesiasteKeywords = [
+  'Ecclésiaste', 'vanité', 'temps', 'saisons', 'sous', 'soleil', 'crains', 'Dieu'
+];
+
+const cantiqueKeywords = [
+  'Cantique', 'bien-aimé', 'bien-aimée', 'amour', 'époux', 'épouse',
+  'jardin', 'source', 'lis', 'rose'
 ];
 
 // Mots-clés pour Matthieu
@@ -125,6 +195,20 @@ export const strictThematicKeywords: Record<string, string[]> = {
   'josue': josueKeywords,
   'juges': jugesKeywords,
   'ruth': ruthKeywords,
+  '1-samuel': samuel1Keywords,
+  '2-samuel': samuel2Keywords,
+  '1-rois': rois1Keywords,
+  '2-rois': rois2Keywords,
+  '1-chroniques': chroniques1Keywords,
+  '2-chroniques': chroniques2Keywords,
+  'esdras': esdrasKeywords,
+  'nehemie': nehemieKeywords,
+  'esther': estherKeywords,
+  'job': jobKeywords,
+  'psaumes': psaumesKeywords,
+  'proverbes': proverbesKeywords,
+  'ecclesiaste': ecclesiasteKeywords,
+  'cantique-cantiques': cantiqueKeywords,
   'matthieu': matthieuKeywords,
   'marc': marcKeywords,
   'luc': lucKeywords,
@@ -138,7 +222,8 @@ export const strictThematicKeywords: Record<string, string[]> = {
   
   // Thèmes combinés
   'pentateuque': [...geneseKeywords, ...exodeKeywords, ...levitiqueKeywords, ...nombresKeywords, ...deuteronomeKeywords],
-  'livres-historiques': [...josueKeywords, ...jugesKeywords, ...ruthKeywords],
+  'livres-historiques': [...josueKeywords, ...jugesKeywords, ...ruthKeywords, ...samuel1Keywords, ...samuel2Keywords],
+  'livres-poetiques': [...jobKeywords, ...psaumesKeywords, ...proverbesKeywords, ...ecclesiasteKeywords, ...cantiqueKeywords],
   'evangeliles': [...matthieuKeywords, ...marcKeywords, ...lucKeywords, ...jeanEvangelisteKeywords],
   'nouveau-testament': [...matthieuKeywords, ...marcKeywords, ...lucKeywords, ...jeanEvangelisteKeywords, ...actesApotresKeywords]
 };

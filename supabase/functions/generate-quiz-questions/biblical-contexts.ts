@@ -1,4 +1,3 @@
-
 import { overviewContext } from './contexts/overview.ts';
 import { pentateuchContext } from './contexts/pentateuch.ts';
 import { historicalBooksContext } from './contexts/historical-books.ts';
@@ -13,6 +12,15 @@ import { womenContext } from './contexts/women.ts';
 import { genealogyJesusContext } from './contexts/genealogy-jesus.ts';
 import { evangelilesContext } from './contexts/evangeliles.ts';
 import { ruthContext } from './contexts/ruth.ts';
+import { samuelContext } from './contexts/samuel.ts';
+import { samuel2Context } from './contexts/samuel2.ts';
+import { rois1Context } from './contexts/rois1.ts';
+import { rois2Context } from './contexts/rois2.ts';
+import { chroniques1Context } from './contexts/chroniques1.ts';
+import { chroniques2Context } from './contexts/chroniques2.ts';
+import { esdrasContext } from './contexts/esdras.ts';
+import { nehemieContext } from './contexts/nehemie.ts';
+import { estherContext } from './contexts/esther.ts';
 
 // NOUVEAUX CONTEXTES PENTATEUQUE
 import { geneseContext } from './contexts/genese.ts';
@@ -67,14 +75,28 @@ export const BIBLICAL_CONTEXTS: BiblicalContext[] = [
   nombresContext,
   deuteronomeContext,
   
-  // Livres historiques
+  // Livres historiques complets
   historicalBooksContext,
   josueContext,
   jugesContext,
   ruthContext,
+  samuelContext,
+  samuel2Context,
+  rois1Context,
+  rois2Context,
+  chroniques1Context,
+  chroniques2Context,
+  esdrasContext,
+  nehemieContext,
+  estherContext,
   
-  // Livres poétiques
+  // Livres poétiques complets
   poeticBooksContext,
+  jobContext,
+  psaumesContext,
+  proverbesContext,
+  ecclesiasteContext,
+  cantiqueContext,
   
   // Prophètes
   prophetsContext,
