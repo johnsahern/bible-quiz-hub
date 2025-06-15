@@ -86,15 +86,12 @@ const GameCenter = () => {
     if (gameState === 'selection') {
       return <div className="space-y-8">
           <GameModeSelector onModeSelect={handleModeSelect} />
-          
-          {/* Défi du jour toujours visible */}
-          
         </div>;
     }
     if (gameState === 'playing') {
       switch (selectedMode) {
         case 'true-false':
-          return <TrueFalseGame questions={mockTrueFalseQuestions} onGameComplete={handleGameComplete} />;
+          return <TrueFalseGame onGameComplete={handleGameComplete} />;
         case 'verse-puzzle':
           return <VersePuzzleGame puzzles={mockVersePuzzles} onGameComplete={handleGameComplete} />;
         default:

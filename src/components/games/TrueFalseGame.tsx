@@ -2,23 +2,29 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, XCircle, Clock, Star } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Star, ArrowLeft } from 'lucide-react';
 import { TrueFalseQuestion } from '@/types/gameTypes';
+import { useTrueFalseQuestions } from '@/hooks/useTrueFalseQuestions';
+import TrueFalseGameSetup from './TrueFalseGameSetup';
 
 interface TrueFalseGameProps {
-  questions: TrueFalseQuestion[];
+  questions?: TrueFalseQuestion[];
   onGameComplete: (score: number, timeSpent: number) => void;
 }
 
-const TrueFalseGame = ({ questions, onGameComplete }: TrueFalseGameProps) => {
+const TrueFalseGame = ({ onGameComplete }: TrueFalseGameProps) => {
+  const { questions, isLoading, error, generateQuestions } = useTrueFalseQuestions();
+  const [gameState, setGameState] = useState<'setup' | 'playing' | 'completed'>('setup');
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<boolean | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
-  const [gameStartTime] = useState(Date.now());
+  const [gameStartTime, setGameStartTime] = useState<number>(0);
 
   useEffect(() => {
+    if (gameState !== 'playing') return;
+
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
@@ -30,7 +36,16 @@ const TrueFalseGame = ({ questions, onGameComplete }: TrueFalseGameProps) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [currentQuestion]);
+  }, [currentQuestion, gameState]);
+
+  const handleStartGame = async (theme: string, difficulty: string, questionCount: number) => {
+    await generateQuestions(theme, difficulty, questionCount);
+    setGameState('playing');
+    setGameStartTime(Date.now());
+    setCurrentQuestion(0);
+    setScore(0);
+    setTimeLeft(30);
+  };
 
   const handleTimeUp = () => {
     if (selectedAnswer === null) {
@@ -61,9 +76,59 @@ const TrueFalseGame = ({ questions, onGameComplete }: TrueFalseGameProps) => {
       setTimeLeft(30);
     } else {
       const timeSpent = Math.floor((Date.now() - gameStartTime) / 1000);
+      setGameState('completed');
       onGameComplete(score, timeSpent);
     }
   };
+
+  const handleBackToSetup = () => {
+    setGameState('setup');
+    setCurrentQuestion(0);
+    setScore(0);
+    setSelectedAnswer(null);
+    setShowResult(false);
+  };
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
+        <div className="max-w-2xl mx-auto">
+          <Card className="bg-red-50 border-red-200">
+            <CardContent className="p-6 text-center">
+              <h2 className="text-xl font-semibold text-red-600 mb-4">Erreur</h2>
+              <p className="text-red-600 mb-4">{error}</p>
+              <Button onClick={handleBackToSetup} variant="outline">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Retour à la configuration
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (gameState === 'setup') {
+    return <TrueFalseGameSetup onStartGame={handleStartGame} isLoading={isLoading} />;
+  }
+
+  if (questions.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardContent className="p-6 text-center">
+              <p className="text-gray-600 mb-4">Aucune question disponible.</p>
+              <Button onClick={handleBackToSetup}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Retour à la configuration
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   const question = questions[currentQuestion];
   const isCorrect = selectedAnswer === question.isTrue;
@@ -71,12 +136,16 @@ const TrueFalseGame = ({ questions, onGameComplete }: TrueFalseGameProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
+        {/* Header avec bouton retour */}
         <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center space-x-2">
-            <CheckCircle className="w-6 h-6 text-green-600" />
-            <span className="text-lg font-semibold">Vrai ou Faux</span>
-          </div>
+          <Button 
+            variant="outline" 
+            onClick={handleBackToSetup}
+            className="flex items-center space-x-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Retour</span>
+          </Button>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-1">
               <Star className="w-5 h-5 text-yellow-500" />
