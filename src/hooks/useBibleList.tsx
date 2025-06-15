@@ -52,49 +52,67 @@ export const useBibleList = () => {
   }, []);
 
   const getBibleByLanguage = (languageCode: string) => {
-    // Priorité absolue pour Louis Segond
-    const louisSegondBibles = bibles.filter(bible => 
-      bible.name.toLowerCase().includes('louis segond') ||
-      bible.name.toLowerCase().includes('segond') ||
-      bible.id.includes('LSG')
-    );
+    console.log(`Looking for Bible in language: ${languageCode}`);
+    console.log('Available bibles:', bibles.map(b => ({ id: b.id, name: b.name, lang: b.language.id })));
     
     if (languageCode === 'fr') {
-      // Chercher Louis Segond français en priorité
-      const frenchLouisSegond = louisSegondBibles.find(bible => 
-        bible.language.id.toLowerCase().includes('fr') ||
-        bible.countries.some(country => country.id.toLowerCase().includes('fr'))
+      // Recherche prioritaire: Louis Segond français
+      const louisSegondFr = bibles.find(bible => 
+        (bible.name.toLowerCase().includes('louis segond') || 
+         bible.name.toLowerCase().includes('segond') ||
+         bible.id.toLowerCase().includes('lsg')) &&
+        (bible.language.id.toLowerCase().includes('fr') ||
+         bible.language.id.toLowerCase().includes('french'))
       );
       
-      if (frenchLouisSegond) return frenchLouisSegond;
+      if (louisSegondFr) {
+        console.log('Found Louis Segond French:', louisSegondFr);
+        return louisSegondFr;
+      }
       
-      // Fallback vers autres Bibles françaises
-      const frenchBibles = bibles.filter(bible => 
+      // Fallback: n'importe quelle Bible française
+      const frenchBible = bibles.find(bible => 
         bible.language.id.toLowerCase().includes('fr') ||
-        bible.countries.some(country => country.id.toLowerCase().includes('fr'))
+        bible.language.id.toLowerCase().includes('french')
       );
       
-      return frenchBibles[0];
+      console.log('Using French fallback:', frenchBible);
+      return frenchBible;
     }
     
     if (languageCode === 'en') {
-      // Chercher Louis Segond anglais si disponible, sinon KJV
-      const englishLouisSegond = louisSegondBibles.find(bible => 
-        bible.language.id.toLowerCase().includes('en') ||
-        bible.countries.some(country => country.id.toLowerCase().includes('en') || country.id.toLowerCase().includes('us'))
+      // Recherche prioritaire: Louis Segond anglais ou KJV
+      const louisSegondEn = bibles.find(bible => 
+        (bible.name.toLowerCase().includes('louis segond') || 
+         bible.name.toLowerCase().includes('segond') ||
+         bible.id.toLowerCase().includes('lsg')) &&
+        (bible.language.id.toLowerCase().includes('en') ||
+         bible.language.id.toLowerCase().includes('english'))
       );
       
-      if (englishLouisSegond) return englishLouisSegond;
+      if (louisSegondEn) {
+        console.log('Found Louis Segond English:', louisSegondEn);
+        return louisSegondEn;
+      }
       
-      // Fallback vers KJV ou autres Bibles anglaises
-      const englishBibles = bibles.filter(bible => 
-        bible.language.id.toLowerCase().includes('en') ||
-        bible.countries.some(country => country.id.toLowerCase().includes('en') || country.id.toLowerCase().includes('us'))
+      // Fallback: KJV ou autre Bible anglaise
+      const kjv = bibles.find(bible => 
+        bible.id === 'KJV' || 
+        bible.name.toLowerCase().includes('king james')
       );
       
-      return englishBibles.find(bible => 
-        bible.id === 'KJV' || bible.name.toLowerCase().includes('king james')
-      ) || englishBibles[0];
+      if (kjv) {
+        console.log('Using KJV:', kjv);
+        return kjv;
+      }
+      
+      const englishBible = bibles.find(bible => 
+        bible.language.id.toLowerCase().includes('en') ||
+        bible.language.id.toLowerCase().includes('english')
+      );
+      
+      console.log('Using English fallback:', englishBible);
+      return englishBible;
     }
     
     return bibles[0];
