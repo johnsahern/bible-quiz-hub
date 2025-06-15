@@ -1,3 +1,4 @@
+
 import { overviewContext } from './contexts/overview.ts';
 import { pentateuchContext } from './contexts/pentateuch.ts';
 import { historicalBooksContext } from './contexts/historical-books.ts';
@@ -12,12 +13,12 @@ import { womenContext } from './contexts/women.ts';
 import { genealogyJesusContext } from './contexts/genealogy-jesus.ts';
 import { evangelilesContext } from './contexts/evangeliles.ts';
 import { ruthContext } from './contexts/ruth.ts';
-import { samuelContext } from './contexts/samuel.ts';
-import { samuel2Context } from './contexts/samuel2.ts';
-import { rois1Context } from './contexts/rois1.ts';
-import { rois2Context } from './contexts/rois2.ts';
-import { chroniques1Context } from './contexts/chroniques1.ts';
-import { chroniques2Context } from './contexts/chroniques2.ts';
+import { samuelContext } from './contexts/1-samuel.ts';
+import { samuel2Context } from './contexts/2-samuel.ts';
+import { rois1Context } from './contexts/1-rois.ts';
+import { rois2Context } from './contexts/2-rois.ts';
+import { chroniques1Context } from './contexts/1-chroniques.ts';
+import { chroniques2Context } from './contexts/2-chroniques.ts';
 import { esdrasContext } from './contexts/esdras.ts';
 import { nehemieContext } from './contexts/nehemie.ts';
 import { estherContext } from './contexts/esther.ts';
@@ -53,6 +54,13 @@ import { lucContext } from './contexts/luc.ts';
 import { jeanEvangelisteContext } from './contexts/jean-evangeliste.ts';
 import { actesApotresContext } from './contexts/actes-apotres.ts';
 import { jeanBaptisteContext } from './contexts/jean-baptiste.ts';
+
+// NOUVEAUX CONTEXTES LIVRES POÉTIQUES
+import { jobContext } from './contexts/job.ts';
+import { psaumesContext } from './contexts/psaumes.ts';
+import { proverbesContext } from './contexts/proverbes.ts';
+import { ecclesiasteContext } from './contexts/ecclesiaste.ts';
+import { cantiqueContext } from './contexts/cantique-cantiques.ts';
 
 export interface BiblicalContext {
   key: string;
