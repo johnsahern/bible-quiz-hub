@@ -100,22 +100,40 @@ export const useGameLogic = ({ room, players, currentQuestion, questionIndex }: 
     });
 
     try {
-      // Optimisation: utiliser une transaction pour les deux opérations
-      const { error } = await supabase.rpc('submit_multiplayer_answer', {
-        p_room_id: room.id,
-        p_user_id: user.id,
-        p_question_index: questionIndex,
-        p_answer_index: answerIndex,
-        p_response_time: responseTime,
-        p_is_correct: isCorrect,
-        p_points_earned: points
-      });
+      // Sauvegarder la réponse avec points
+      const { error: answerError } = await supabase
+        .from('quiz_room_answers')
+        .insert({
+          room_id: room.id,
+          user_id: user.id,
+          question_index: questionIndex,
+          answer_index: answerIndex,
+          response_time: responseTime,
+          is_correct: isCorrect,
+          points_earned: points
+        });
 
-      if (error) {
-        console.error('Error submitting answer:', error);
-        // Fallback vers l'ancienne méthode si la fonction RPC n'existe pas
-        await submitAnswerFallback(answerIndex, responseTime, isCorrect, points);
-      }
+      if (answerError) throw answerError;
+
+      // Mettre à jour le score du joueur
+      const currentPlayer = players.find(p => p.user_id === user.id);
+      const newScore = (currentPlayer?.score || 0) + points;
+      const newCorrectAnswers = isCorrect 
+        ? (currentPlayer?.correct_answers || 0) + 1
+        : (currentPlayer?.correct_answers || 0);
+
+      const { error: updateError } = await supabase
+        .from('quiz_room_players')
+        .update({
+          score: newScore,
+          correct_answers: newCorrectAnswers,
+          current_answer: answerIndex,
+          answer_time: new Date().toISOString()
+        })
+        .eq('room_id', room.id)
+        .eq('user_id', user.id);
+
+      if (updateError) throw updateError;
 
       setHasAnswered(true);
       setSelectedAnswer(answerIndex);
@@ -123,7 +141,7 @@ export const useGameLogic = ({ room, players, currentQuestion, questionIndex }: 
       if (isCorrect) {
         toast({
           title: "Bonne réponse ! 🎉",
-          description: `+${points} points (${calculatePoints(room.difficulty, true, 0)} base + ${points - calculatePoints(room.difficulty, true, responseTime)} rapidité)`,
+          description: `+${points} points (${calculatePoints(room.difficulty, true, 30000)} base + ${points - calculatePoints(room.difficulty, true, 30000)} rapidité)`,
         });
       } else {
         toast({
@@ -143,44 +161,6 @@ export const useGameLogic = ({ room, players, currentQuestion, questionIndex }: 
       });
     }
   }, [user, currentQuestion, room.id, room.difficulty, questionIndex, players]);
-
-  // Fallback vers l'ancienne méthode si la fonction RPC n'existe pas
-  const submitAnswerFallback = async (answerIndex: number, responseTime: number, isCorrect: boolean, points: number) => {
-    // Sauvegarder la réponse
-    const { error: answerError } = await supabase
-      .from('quiz_room_answers')
-      .insert({
-        room_id: room.id,
-        user_id: user!.id,
-        question_index: questionIndex,
-        answer_index: answerIndex,
-        response_time: responseTime,
-        is_correct: isCorrect,
-        points_earned: points
-      });
-
-    if (answerError) throw answerError;
-
-    // Mettre à jour le score du joueur
-    const currentPlayer = players.find(p => p.user_id === user!.id);
-    const newScore = (currentPlayer?.score || 0) + points;
-    const newCorrectAnswers = isCorrect 
-      ? (currentPlayer?.correct_answers || 0) + 1
-      : (currentPlayer?.correct_answers || 0);
-
-    const { error: updateError } = await supabase
-      .from('quiz_room_players')
-      .update({
-        score: newScore,
-        correct_answers: newCorrectAnswers,
-        current_answer: answerIndex,
-        answer_time: new Date().toISOString()
-      })
-      .eq('room_id', room.id)
-      .eq('user_id', user!.id);
-
-    if (updateError) throw updateError;
-  };
 
   const handleAnswerClick = (answerIndex: number) => {
     if (hasAnswered || timeLeft === 0 || hasSubmittedAnswer.current) return;
