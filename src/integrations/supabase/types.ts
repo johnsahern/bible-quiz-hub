@@ -266,6 +266,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      user_in_room: {
+        Args: { _room_id: string; _user_id: string }
+        Returns: boolean
+      }
+      user_is_host: {
+        Args: { _room_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
