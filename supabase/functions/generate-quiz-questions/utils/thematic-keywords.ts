@@ -1,4 +1,3 @@
-import { QuizTheme } from '../../../src/types/quiz.ts';
 
 // Mots-clés pour le thème "Vue d'ensemble de la Bible"
 const overviewKeywords = [
@@ -86,6 +85,5 @@ const ruthKeywords = [
 export const strictThematicKeywords: Record<string, string[]> = {
   'overview': overviewKeywords,
   'vie-jesus': vieJesusKeywords,
-  
   'ruth': ruthKeywords,
 };
