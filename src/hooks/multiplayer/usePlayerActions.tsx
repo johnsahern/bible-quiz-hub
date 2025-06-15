@@ -4,21 +4,24 @@ import { updatePlayerReadyStatus } from './playerStatus';
 import { exitRoom } from './roomExit';
 
 export const usePlayerActions = (user: any, room: any) => {
+  const userId = user?.id || null;
+  const roomId = room?.id || null;
+
   const setPlayerReady = useCallback(async (ready: boolean = true) => {
-    if (!user?.id) {
+    if (!userId) {
       console.log('❌ No user available for player ready status');
       return;
     }
     await updatePlayerReadyStatus(user, room, ready);
-  }, [user?.id, room?.id]); // Use primitive values
+  }, [userId, roomId, user, room]);
 
   const leaveRoom = useCallback(async () => {
-    if (!user?.id) {
+    if (!userId) {
       console.log('❌ No user available for leaving room');
       return;
     }
     await exitRoom(user, room);
-  }, [user?.id, room?.id]); // Use primitive values
+  }, [userId, roomId, user, room]);
 
   return { setPlayerReady, leaveRoom };
 };

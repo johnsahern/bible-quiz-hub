@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { QuizQuestion } from '@/types/quiz';
 import { RoomStatus, RoomPlayer } from '@/types/multiplayer';
@@ -27,15 +27,18 @@ export const useRoomData = ({
   const lastLoadedRoomId = useRef<string | null>(null);
 
   useEffect(() => {
+    const safeRoomId = roomId || null;
+    const userId = user?.id || null;
+    
     // Early return if no roomId or user
-    if (!roomId || !user?.id) {
-      console.log('Missing roomId or user for useRoomData:', { roomId, userId: user?.id });
+    if (!safeRoomId || !userId) {
+      console.log('Missing roomId or user for useRoomData:', { roomId: safeRoomId, userId });
       return;
     }
 
     // Skip if already loaded this room
-    if (lastLoadedRoomId.current === roomId) {
-      console.log('Skipping duplicate room data load for:', roomId);
+    if (lastLoadedRoomId.current === safeRoomId) {
+      console.log('Skipping duplicate room data load for:', safeRoomId);
       return;
     }
 
@@ -46,16 +49,16 @@ export const useRoomData = ({
 
     const loadRoomData = async () => {
       isLoadingRef.current = true;
-      lastLoadedRoomId.current = roomId;
+      lastLoadedRoomId.current = safeRoomId;
 
       try {
-        console.log('Loading room data for room:', roomId);
+        console.log('Loading room data for room:', safeRoomId);
         
         // Charger la salle
         const { data: roomData, error: roomError } = await supabase
           .from('quiz_rooms')
           .select('*')
-          .eq('id', roomId)
+          .eq('id', safeRoomId)
           .single();
 
         if (roomError) {
@@ -75,7 +78,7 @@ export const useRoomData = ({
           status: roomData.status as RoomStatus,
           questions: Array.isArray(roomData.questions) ? roomData.questions : []
         });
-        setIsHost(roomData.host_id === user.id);
+        setIsHost(roomData.host_id === userId);
 
         // Charger la question actuelle si le quiz est en cours
         if (roomData.status === 'playing' && roomData.questions && roomData.current_question !== null) {
@@ -86,11 +89,11 @@ export const useRoomData = ({
         }
 
         // Charger les joueurs
-        console.log('Loading players for room:', roomId);
+        console.log('Loading players for room:', safeRoomId);
         const { data: playersData, error: playersError } = await supabase
           .from('quiz_room_players')
           .select('*')
-          .eq('room_id', roomId)
+          .eq('room_id', safeRoomId)
           .order('joined_at');
 
         if (playersError) {
@@ -113,5 +116,5 @@ export const useRoomData = ({
     };
 
     loadRoomData();
-  }, [roomId, user?.id]); // Only depend on primitive values
+  }, [roomId, user?.id]);
 };

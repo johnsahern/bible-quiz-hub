@@ -5,8 +5,10 @@ import { createRoom as createRoomUtil } from './roomCreation';
 import { joinRoom as joinRoomUtil, addPlayerToRoom } from './playerManagement';
 
 export const useRoomOperations = (user: any) => {
+  const userId = user?.id || null;
+
   const createRoom = useCallback(async (theme: string, difficulty: string, questionCount: number = 10) => {
-    if (!user?.id) {
+    if (!userId) {
       console.log('❌ No user available for room creation');
       return null;
     }
@@ -38,15 +40,15 @@ export const useRoomOperations = (user: any) => {
 
     console.log('🎉 ROOM CREATION COMPLETED');
     return createdRoom;
-  }, [user?.id]); // Use user?.id instead of user object
+  }, [userId, user]);
 
   const joinRoom = useCallback(async (roomCode: string) => {
-    if (!user?.id) {
+    if (!userId) {
       console.log('❌ No user available for joining room');
       return false;
     }
     return await joinRoomUtil(user, roomCode);
-  }, [user?.id]); // Use user?.id instead of user object
+  }, [userId, user]);
 
   return { createRoom, joinRoom };
 };

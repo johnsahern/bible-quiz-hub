@@ -4,8 +4,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
 export const useQuizOperations = (user: any, room: any, isHost: boolean) => {
+  const userId = user?.id || null;
+  const roomId = room?.id || null;
+
   const startQuiz = useCallback(async () => {
-    if (!user || !room || !isHost) return;
+    if (!userId || !roomId || !isHost) return;
 
     try {
       // Générer les questions
@@ -35,7 +38,7 @@ export const useQuizOperations = (user: any, room: any, isHost: boolean) => {
           current_question: 0,
           started_at: new Date().toISOString()
         })
-        .eq('id', room.id);
+        .eq('id', roomId);
 
       if (error) throw error;
 
@@ -51,7 +54,7 @@ export const useQuizOperations = (user: any, room: any, isHost: boolean) => {
         variant: "destructive",
       });
     }
-  }, [user, room, isHost]);
+  }, [userId, roomId, isHost, user, room]);
 
   return { startQuiz };
 };
