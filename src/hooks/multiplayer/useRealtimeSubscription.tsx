@@ -48,11 +48,11 @@ export const useRealtimeSubscription = ({
     console.log('Setting up realtime subscription for room:', roomId);
 
     const roomChannel = supabase
-      .channel(`room-${roomId}-${Date.now()}`) // Add timestamp to ensure unique channel
+      .channel(`multiplayer-room-${roomId}`)
       .on('postgres_changes', 
         { event: '*', schema: 'public', table: 'quiz_rooms', filter: `id=eq.${roomId}` },
         (payload) => {
-          console.log('Room update:', payload);
+          console.log('Room update received:', payload);
           if (payload.eventType === 'UPDATE') {
             const newRoom = payload.new as any;
             setRoom({
@@ -65,6 +65,7 @@ export const useRealtimeSubscription = ({
             if (newRoom.status === 'playing' && newRoom.questions && newRoom.current_question !== null) {
               const questions = Array.isArray(newRoom.questions) ? newRoom.questions : [];
               if (questions.length > newRoom.current_question) {
+                console.log('Setting current question:', newRoom.current_question);
                 setCurrentQuestion(questions[newRoom.current_question] as unknown as QuizQuestion);
               }
             }
@@ -74,13 +75,17 @@ export const useRealtimeSubscription = ({
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'quiz_room_players', filter: `room_id=eq.${roomId}` },
         (payload) => {
-          console.log('Players update:', payload);
+          console.log('Players update received:', payload);
           
           if (payload.eventType === 'INSERT') {
-            setPlayers(prev => [...prev, payload.new as RoomPlayer]);
+            setPlayers(prev => {
+              const exists = prev.find(p => p.id === payload.new.id);
+              if (exists) return prev;
+              return [...prev, payload.new as RoomPlayer];
+            });
           } else if (payload.eventType === 'UPDATE') {
             setPlayers(prev => prev.map(p => 
-              p.id === payload.new.id ? payload.new as RoomPlayer : p
+              p.id === payload.new.id ? { ...p, ...payload.new } as RoomPlayer : p
             ));
           } else if (payload.eventType === 'DELETE') {
             setPlayers(prev => prev.filter(p => p.id !== payload.old.id));
@@ -106,5 +111,5 @@ export const useRealtimeSubscription = ({
         currentRoomIdRef.current = null;
       }
     };
-  }, [roomId]); // Only roomId as dependency
+  }, [roomId]);
 };

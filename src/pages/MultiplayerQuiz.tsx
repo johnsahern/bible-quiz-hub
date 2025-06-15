@@ -111,6 +111,7 @@ const MultiplayerQuiz: React.FC = () => {
             players={players} 
             currentQuestion={currentQuestion}
             questionIndex={room.current_question || 0}
+            isHost={isHost}
           />
         )}
         

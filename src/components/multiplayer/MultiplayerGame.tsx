@@ -6,21 +6,28 @@ import { useAuth } from '@/contexts/AuthContext';
 import QuestionCard from './game/QuestionCard';
 import Leaderboard from './game/Leaderboard';
 import { useGameLogic } from './game/useGameLogic';
+import { useQuestionFlow } from '@/hooks/multiplayer/useQuestionFlow';
 
 interface MultiplayerGameProps {
   room: QuizRoom;
   players: RoomPlayer[];
   currentQuestion: QuizQuestion;
   questionIndex: number;
+  isHost: boolean;
 }
 
 const MultiplayerGame: React.FC<MultiplayerGameProps> = ({ 
   room, 
   players, 
   currentQuestion, 
-  questionIndex 
+  questionIndex,
+  isHost
 }) => {
   const { user } = useAuth();
+  
+  // Gérer le flux des questions (host seulement)
+  useQuestionFlow({ room, isHost });
+  
   const {
     selectedAnswer,
     hasAnswered,
