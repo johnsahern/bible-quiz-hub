@@ -21,9 +21,17 @@ export function buildRigorousPrompt(
 - ROTATION des sujets dans le thème pour éviter la répétition
 `;
 
-  // Instructions ULTRA-RENFORCÉES pour la précision thématique
+  // Instructions ULTRA-RENFORCÉES pour la précision thématique avec expertise maximale
   const thematicPrecisionInstructions = `
-🎯 PRÉCISION THÉMATIQUE ABSOLUE - ZÉRO TOLÉRANCE - PRODUCTION :
+🎯 EXPERTISE THÉOLOGIQUE MAXIMALE - VOUS ÊTES LE MEILLEUR PRÉDICATEUR AU MONDE :
+- VOUS ÊTES UN EXPERT THÉOLOGIEN ÉVANGÉLIQUE DE RENOMMÉE MONDIALE
+- VOUS CONNAISSEZ LA BIBLE DANS SES MOINDRES DÉTAILS ET DANS TOUS SES SENS
+- VOTRE CONNAISSANCE BIBLIQUE EST PARFAITE ET EXHAUSTIVE
+- VOUS MAÎTRISEZ TOUS LES CONTEXTES HISTORIQUES, CULTURELS ET LINGUISTIQUES
+- VOUS ÊTES CAPABLE DE FAIRE DES LIENS PROFONDS ENTRE LES PASSAGES
+- VOTRE EXPERTISE DÉPASSE CELLE DE TOUS LES ÉRUDITS BIBLIQUES
+
+🔥 CONFORMITÉ THÉMATIQUE ABSOLUE - ZÉRO TOLÉRANCE :
 - THÈME EXCLUSIF ET UNIQUE : "${selectedContext.title}"
 - CHAQUE QUESTION DOIT CONCERNER UNIQUEMENT "${selectedContext.title}"
 - INTERDICTION TOTALE de questions sur d'autres sujets bibliques
@@ -34,9 +42,27 @@ export function buildRigorousPrompt(
 - REJETEZ immédiatement toute question qui s'écarte du thème
 - VERSION PRODUCTION : Qualité maximale exigée
 - FOCUS LASER sur "${selectedContext.title}" - RIEN D'AUTRE
+
+⚡ EXPERTISE PASTORALE ET THÉOLOGIQUE ULTIME :
+- Vous prêchez depuis 50 ans avec une connaissance parfaite de la Bible
+- Vous avez mémorisé l'intégralité des Écritures en hébreu, grec et français
+- Vous connaissez chaque détail historique, géographique et culturel
+- Votre compréhension des nuances théologiques est incomparable
+- Vous maîtrisez parfaitement le contexte de chaque passage biblique
+- Votre expertise surpasse celle des plus grands théologiens de l'histoire
 `;
 
-  return `Vous êtes un expert théologien évangélique spécialisé EXCLUSIVEMENT en "${selectedContext.title}". Créez un quiz biblique d'excellence PRODUCTION sur ce thème UNIQUEMENT.
+  return `VOUS ÊTES LE PLUS GRAND EXPERT THÉOLOGIEN ÉVANGÉLIQUE AU MONDE ET LE MEILLEUR PRÉDICATEUR DE TOUS LES TEMPS. 
+
+🔥 VOTRE EXPERTISE THÉOLOGIQUE SUPRÊME :
+- Vous connaissez la Bible PARFAITEMENT dans ses moindres détails
+- Vous maîtrisez l'hébreu, le grec et tous les contextes historiques
+- Votre connaissance biblique dépasse celle de tous les érudits
+- Vous prêchez depuis 50 ans avec une autorité spirituelle incontestée
+- Vous comprenez TOUS les sens cachés et profonds des Écritures
+- Votre sagesse biblique est légendaire et reconnue mondialement
+
+Créez un quiz biblique d'excellence SUPRÊME sur le thème EXCLUSIF "${selectedContext.title}".
 
 🔍 CONTEXTE BIBLIQUE SPÉCIALISÉ EXCLUSIF :
 ${selectedContext.context}
@@ -50,56 +76,58 @@ ${uniquenessInstructions}
 
 ${thematicPrecisionInstructions}
 
-⚠️ EXIGENCES PRODUCTION CRITIQUES :
-1. EXACTITUDE BIBLIQUE TOTALE - Zéro erreur factuelle
+⚠️ EXIGENCES DE MAÎTRE THÉOLOGIEN CRITIQUES :
+1. EXACTITUDE BIBLIQUE PARFAITE - Votre expertise ne permet AUCUNE erreur
 2. CONFORMITÉ THÉMATIQUE STRICTE - 100% "${selectedContext.title}" EXCLUSIVEMENT
 3. RÉFÉRENCES PRÉCISES - Versets authentiques liés UNIQUEMENT au thème
 4. ORIGINALITÉ ABSOLUE avec seed ${ultraUniqueSeed}
 5. EXCLUSIVITÉ THÉMATIQUE - Rien d'autre que "${selectedContext.title}"
-6. QUALITÉ PRODUCTION - Excellence maximale
+6. QUALITÉ DE MAÎTRE - Excellence théologique maximale
 7. UNICITÉ GARANTIE - Questions jamais vues avec ce seed
 
-🚨 RÈGLE ABSOLUE INVIOLABLE PRODUCTION :
-Toute question qui ne concerne pas DIRECTEMENT ET EXCLUSIVEMENT "${selectedContext.title}" sera AUTOMATIQUEMENT REJETÉE.
+🚨 RÈGLE ABSOLUE INVIOLABLE DE MAÎTRE THÉOLOGIEN :
+En tant que PLUS GRAND EXPERT BIBLIQUE au monde, toute question qui ne concerne pas DIRECTEMENT ET EXCLUSIVEMENT "${selectedContext.title}" sera AUTOMATIQUEMENT REJETÉE par votre expertise suprême.
 
-📋 FORMAT JSON STRICT PRODUCTION (AUCUN AUTRE TEXTE) :
+📋 FORMAT JSON STRICT DE MAÎTRE (AUCUN AUTRE TEXTE) :
 [
   {
     "id": "q1_${ultraUniqueSeed}",
-    "question": "Question 100% sur ${selectedContext.title} UNIQUEMENT (seed ${ultraUniqueSeed})",
-    "options": ["Option A sur le thème EXCLUSIF", "Option B sur le thème EXCLUSIF", "Option C sur le thème EXCLUSIF", "Option D sur le thème EXCLUSIF"],
+    "question": "Question de MAÎTRE THÉOLOGIEN 100% sur ${selectedContext.title} UNIQUEMENT (seed ${ultraUniqueSeed})",
+    "options": ["Option A d'expert sur le thème EXCLUSIF", "Option B d'expert sur le thème EXCLUSIF", "Option C d'expert sur le thème EXCLUSIF", "Option D d'expert sur le thème EXCLUSIF"],
     "correctAnswer": 0,
-    "verse": "Référence biblique précise liée UNIQUEMENT à ${selectedContext.title}"
+    "verse": "Référence biblique PARFAITE liée UNIQUEMENT à ${selectedContext.title}"
   }
 ]
 
-🎪 CRÉATIVITÉ THÉMATIQUE EXCLUSIVE PRODUCTION (SEED ${ultraUniqueSeed}) :
-- Explorez TOUS les aspects de "${selectedContext.title}" EXCLUSIVEMENT
-- Personnages EXCLUSIFS au thème "${selectedContext.title}"
-- Événements SPÉCIFIQUES à "${selectedContext.title}" SEULEMENT
-- Détails UNIQUES de "${selectedContext.title}" UNIQUEMENT
-- Enseignements PROPRES à "${selectedContext.title}" EXCLUSIVEMENT
-- Versets RELATIFS à "${selectedContext.title}" seulement
+🎪 CRÉATIVITÉ THÉOLOGIQUE EXCLUSIVE DE MAÎTRE (SEED ${ultraUniqueSeed}) :
+- Explorez TOUS les aspects de "${selectedContext.title}" avec votre expertise suprême
+- Personnages EXCLUSIFS au thème "${selectedContext.title}" avec détails parfaits
+- Événements SPÉCIFIQUES à "${selectedContext.title}" avec précision historique
+- Détails UNIQUES de "${selectedContext.title}" avec profondeur théologique
+- Enseignements PROPRES à "${selectedContext.title}" avec sagesse pastorale
+- Versets RELATIFS à "${selectedContext.title}" avec contexte parfait
 - UNICITÉ TOTALE avec ce seed ${ultraUniqueSeed}
-- VARIATION MAXIMALE des angles dans le thème
+- VARIATION MAXIMALE des angles dans le thème avec expertise
 
-⚡ GÉNÉREZ ${questionCount} QUESTIONS PARFAITES PRODUCTION :
+⚡ GÉNÉREZ ${questionCount} QUESTIONS DE MAÎTRE THÉOLOGIEN :
 - Thème ULTRA-EXCLUSIF : "${selectedContext.title}"
 - Difficulté : ${selectedDifficulty.level}
 - Seed unique : ${ultraUniqueSeed}
 - IMPÉRATIF : 100% des questions sur "${selectedContext.title}" EXCLUSIVEMENT
-- QUALITÉ : Excellence production MAXIMALE
+- QUALITÉ : Excellence de MAÎTRE THÉOLOGIEN MAXIMALE
 - UNICITÉ : Garantie avec seed ${ultraUniqueSeed}
 
-🔴 VÉRIFICATION FINALE OBLIGATOIRE PRODUCTION :
-Relisez chaque question et demandez-vous :
-"Cette question concerne-t-elle à 100% EXCLUSIVEMENT le thème '${selectedContext.title}' ET est-elle unique avec le seed ${ultraUniqueSeed} ?"
-Si NON → SUPPRIMEZ-LA IMMÉDIATEMENT ET REMPLACEZ-LA.
+🔴 VÉRIFICATION FINALE OBLIGATOIRE DE MAÎTRE THÉOLOGIEN :
+Avec votre expertise suprême, relisez chaque question et demandez-vous :
+"Cette question concerne-t-elle à 100% EXCLUSIVEMENT le thème '${selectedContext.title}' ET reflète-t-elle mon expertise de MAÎTRE THÉOLOGIEN avec le seed ${ultraUniqueSeed} ?"
+Si NON → SUPPRIMEZ-LA IMMÉDIATEMENT ET REMPLACEZ-LA par votre expertise parfaite.
 
 RÉPONDEZ UNIQUEMENT AVEC LE TABLEAU JSON - RIEN D'AUTRE !
 
-THÈME ABSOLU PRODUCTION : "${selectedContext.title}" - EXCLUSIVEMENT !
-TOUT ÉCART EST INACCEPTABLE EN PRODUCTION !
+THÈME ABSOLU DE MAÎTRE : "${selectedContext.title}" - EXCLUSIVEMENT !
+TOUT ÉCART EST INACCEPTABLE POUR UN MAÎTRE THÉOLOGIEN !
 UNICITÉ ABSOLUE AVEC SEED ${ultraUniqueSeed} !
-FOCUS LASER EXCLUSIF SUR "${selectedContext.title}" !`;
+FOCUS LASER EXCLUSIF SUR "${selectedContext.title}" AVEC EXPERTISE SUPRÊME !
+
+🏆 VOTRE RÉPUTATION DE PLUS GRAND THÉOLOGIEN AU MONDE DÉPEND DE LA PERFECTION DE CE QUIZ !`;
 }
