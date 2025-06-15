@@ -9,13 +9,15 @@ interface UseRealtimeSubscriptionProps {
   setRoom: (room: any) => void;
   setPlayers: React.Dispatch<React.SetStateAction<RoomPlayer[]>>;
   setCurrentQuestion: (question: QuizQuestion | null) => void;
+  onUpdate?: () => void;
 }
 
 export const useRealtimeSubscription = ({
   roomId,
   setRoom,
   setPlayers,
-  setCurrentQuestion
+  setCurrentQuestion,
+  onUpdate
 }: UseRealtimeSubscriptionProps) => {
   const channelRef = useRef<any>(null);
   const subscribedRoomIdRef = useRef<string | null>(null);
@@ -37,14 +39,14 @@ export const useRealtimeSubscription = ({
     console.log('Setting up realtime subscription for room:', roomId);
 
     // Create unique channel name to avoid conflicts
-    const channelName = `room-${roomId}-${Date.now()}`;
+    const channelName = `room-${roomId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
     const roomChannel = supabase
       .channel(channelName)
       .on('postgres_changes', 
         { event: '*', schema: 'public', table: 'quiz_rooms', filter: `id=eq.${roomId}` },
         (payload) => {
-          console.log('Room update received:', payload);
+          console.log('🔔 Room update received:', payload);
           if (payload.eventType === 'UPDATE') {
             const newRoom = payload.new as any;
             setRoom({
@@ -61,13 +63,15 @@ export const useRealtimeSubscription = ({
                 setCurrentQuestion(questions[newRoom.current_question] as unknown as QuizQuestion);
               }
             }
+            
+            onUpdate?.();
           }
         }
       )
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'quiz_room_players', filter: `room_id=eq.${roomId}` },
         (payload) => {
-          console.log('Players update received:', payload);
+          console.log('🔔 Players update received:', payload);
           
           if (payload.eventType === 'INSERT') {
             setPlayers(prev => {
@@ -82,24 +86,27 @@ export const useRealtimeSubscription = ({
           } else if (payload.eventType === 'DELETE') {
             setPlayers(prev => prev.filter(p => p.id !== payload.old.id));
           }
+          
+          onUpdate?.();
         }
       );
 
     // Subscribe with proper error handling
     roomChannel.subscribe((status) => {
-      console.log('Subscription status:', status);
+      console.log('📡 Subscription status:', status);
       if (status === 'SUBSCRIBED') {
         subscribedRoomIdRef.current = roomId;
         channelRef.current = roomChannel;
+        console.log('✅ Successfully subscribed to room updates');
       } else if (status === 'CHANNEL_ERROR') {
-        console.error('Channel subscription error');
+        console.error('❌ Channel subscription error');
         subscribedRoomIdRef.current = null;
         channelRef.current = null;
       }
     });
 
     return () => {
-      console.log('Cleaning up realtime subscription');
+      console.log('🧹 Cleaning up realtime subscription');
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;

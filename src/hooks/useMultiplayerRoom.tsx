@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { QuizRoom, RoomPlayer } from '@/types/multiplayer';
@@ -8,6 +7,8 @@ import { usePlayerActions } from './multiplayer/usePlayerActions';
 import { useQuizOperations } from './multiplayer/useQuizOperations';
 import { useRealtimeSubscription } from './multiplayer/useRealtimeSubscription';
 import { useRoomData } from './multiplayer/useRoomData';
+import { useHeartbeat } from './multiplayer/useHeartbeat';
+import { useRoomSync } from './multiplayer/useRoomSync';
 import { UseMultiplayerRoomReturn } from './multiplayer/types';
 
 export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn => {
@@ -45,6 +46,21 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
   const playerActions = usePlayerActions(user?.id, roomId);
   const quizOperations = useQuizOperations(user?.id, roomId, isHost);
 
+  // Système de synchronisation
+  const { forceResync } = useRoomSync({
+    roomId: isInitialized ? roomId : undefined,
+    setRoom,
+    setPlayers,
+    setCurrentQuestion
+  });
+
+  // Heartbeat pour maintenir la connexion
+  const { markSync } = useHeartbeat({
+    roomId: isInitialized ? roomId : undefined,
+    userId: user?.id,
+    onResync: forceResync
+  });
+
   // Load room data only once when conditions are met
   useRoomData({
     roomId: shouldInitialize ? roomId : undefined,
@@ -57,6 +73,7 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
     onInitialized: () => {
       setIsInitialized(true);
       processingRef.current = false;
+      markSync();
     }
   });
 
@@ -65,7 +82,8 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
     roomId: isInitialized ? roomId : undefined,
     setRoom,
     setPlayers,
-    setCurrentQuestion
+    setCurrentQuestion,
+    onUpdate: markSync
   });
 
   const createRoom = useCallback(async (theme: string, difficulty: string, questionCount: number = 10) => {
@@ -84,6 +102,7 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
         setRoom(result);
         setIsHost(true);
         setIsInitialized(true);
+        markSync();
         console.log('Room set successfully, isHost=true');
       }
       return result;
@@ -95,7 +114,7 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
       setLoading(false);
       processingRef.current = false;
     }
-  }, [roomOperations]);
+  }, [roomOperations, markSync]);
 
   const joinRoom = useCallback(async (roomCode: string) => {
     if (processingRef.current) return false;
@@ -108,6 +127,9 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
     try {
       const success = await roomOperations.joinRoom(roomCode);
       console.log('Join room result:', success);
+      if (success) {
+        markSync();
+      }
       return success;
     } catch (err) {
       console.error('Error in joinRoom wrapper:', err);
@@ -117,7 +139,7 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
       setLoading(false);
       processingRef.current = false;
     }
-  }, [roomOperations]);
+  }, [roomOperations, markSync]);
 
   const leaveRoom = useCallback(async () => {
     console.log('Leaving room');
@@ -140,11 +162,16 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
 
   const setPlayerReady = useCallback(async (ready: boolean = true) => {
     await playerActions.setPlayerReady(ready);
-  }, [playerActions]);
+    markSync();
+  }, [playerActions, markSync]);
 
   const startQuiz = useCallback(async () => {
-    await quizOperations.startQuiz();
-  }, [quizOperations]);
+    const result = await quizOperations.startQuiz();
+    if (result) {
+      markSync();
+    }
+    return result;
+  }, [quizOperations, markSync]);
 
   return {
     room,
@@ -157,6 +184,7 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
     joinRoom,
     setPlayerReady,
     startQuiz,
-    leaveRoom
+    leaveRoom,
+    forceResync
   };
 };
