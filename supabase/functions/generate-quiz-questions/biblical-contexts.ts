@@ -12,6 +12,7 @@ import { kingsContext } from './contexts/kings.ts';
 import { womenContext } from './contexts/women.ts';
 import { genealogyJesusContext } from './contexts/genealogy-jesus.ts';
 import { evangelilesContext } from './contexts/evangeliles.ts';
+import { ruthContext } from './contexts/ruth.ts';
 
 // NOUVEAUX CONTEXTES VIE DE JÉSUS
 import { vieJesusContext } from './contexts/vie-jesus.ts';
@@ -74,6 +75,9 @@ export const BIBLICAL_CONTEXTS: BiblicalContext[] = [
   jeanEvangelisteContext,
   actesApotresContext,
   jeanBaptisteContext,
+  
+  // Contextes spécifiques
+  ruthContext,
   
   // Autres contextes
   ...apostlesContexts,

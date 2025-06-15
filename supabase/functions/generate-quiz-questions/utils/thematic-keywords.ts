@@ -1,183 +1,91 @@
+import { QuizTheme } from '../../../src/types/quiz.ts';
 
-// Fichier principal qui combine tous les mots-clés thématiques
-import { jesusChristKeywords } from './keywords/jesus-christ-keywords.ts';
-import { oldTestamentKeywords } from './keywords/old-testament-keywords.ts';
-import { newTestamentKeywords } from './keywords/new-testament-keywords.ts';
-import { prophetsKeywords } from './keywords/prophets-keywords.ts';
-import { historicalKeywords } from './keywords/historical-keywords.ts';
-import { womenKeywords } from './keywords/women-keywords.ts';
-import { geographicalKeywords } from './keywords/geographical-keywords.ts';
-import { theologicalKeywords } from './keywords/theological-keywords.ts';
-import { culturalKeywords } from './keywords/cultural-keywords.ts';
+// Mots-clés pour le thème "Vue d'ensemble de la Bible"
+const overviewKeywords = [
+  'bible', 'ancien testament', 'nouveau testament', 'écriture', 'verset', 'histoire biblique',
+  'personnage biblique', 'événement biblique', 'enseignement biblique', 'doctrine', 'foi', 'chrétien',
+  'église', 'jésus-christ', 'dieu', 'saint-esprit', 'trinité', 'salut', 'rédemption', 'grâce',
+  'amour', 'prière', 'adoration', 'louange', 'prophétie', 'miracle', 'parabole', 'apôtre', 'disciple',
+  'prophète', 'roi', 'prêtre', 'sacrifice', 'alliance', 'commandement', 'loi', 'péché', 'repentir',
+  'pardon', 'jugement', 'ciel', 'enfer', 'résurrection', 'vie éternelle', 'royaume de dieu', 'paradis',
+  'ange', 'démon', 'satan', 'diable', 'tentation', 'épreuve', 'souffrance', 'persévérance', 'victoire',
+  'paix', 'joie', 'espérance', 'vérité', 'justice', 'sagesse', 'connaissance', 'compréhension',
+  'sainteté', 'pureté', 'humilité', 'obéissance', 'fidélité', 'persévérance', 'amour fraternel',
+  'compassion', 'miséricorde', 'bonté', 'douceur', 'maîtrise de soi', 'patience', 'longanimité',
+  'bienveillance', 'charité', 'aumône', 'offrande', 'dîme', 'culte', 'sacrement', 'ordonnance',
+  'évangile', 'bonne nouvelle', 'témoignage', 'mission', 'évangélisation', 'discipolat', 'croix',
+  'sang de jésus', 'rédempteur', 'sauveur', 'libérateur', 'consolateur', 'avocat', 'médiateur',
+  'berger', 'porte', 'chemin', 'lumière', 'sel', 'levain', 'semence', 'moisson', 'vigne', 'olivier',
+  'arbre de vie', 'eau vive', 'pain de vie', 'rocher', 'forteresse', 'bouclier', 'épée', 'armure',
+  'couronne', 'trône', 'sceptre', 'royaume', 'ville', 'temple', 'maison', 'famille', 'mariage',
+  'enfant', 'parent', 'frère', 'sœur', 'ami', 'voisin', 'étranger', 'pauvre', 'riche', 'esclave',
+  'libre', 'gouvernement', 'nation', 'peuple', 'langue', 'culture', 'art', 'musique', 'danse',
+  'théâtre', 'littérature', 'poésie', 'prose', 'histoire', 'géographie', 'science', 'technologie',
+  'médecine', 'éducation', 'travail', 'économie', 'politique', 'justice sociale', 'environnement',
+  'paix mondiale', 'unité', 'diversité', 'tolérance', 'respect', 'dialogue', 'coopération',
+  'développement', 'progrès', 'avenir', 'destinée', 'éternité', 'amour éternel', 'joie éternelle',
+  'paix éternelle', 'vie éternelle', 'présence de dieu', 'gloire de dieu', 'puissance de dieu',
+  'sagesse de dieu', 'connaissance de dieu', 'amour de dieu', 'grâce de dieu', 'miséricorde de dieu',
+  'bonté de dieu', 'fidélité de dieu', 'justice de dieu', 'sainteté de dieu', 'vérité de dieu',
+  'parole de dieu', 'esprit de dieu', 'royaume de dieu', 'volonté de dieu', 'plan de dieu',
+  'promesse de dieu', 'appel de dieu', 'don de dieu', 'bénédiction de dieu', 'protection de dieu',
+  'direction de dieu', 'consolation de dieu', 'guérison de dieu', 'miracle de dieu', 'intervention de dieu',
+  'présence de dieu', 'gloire de dieu', 'puissance de dieu', 'sagesse de dieu', 'connaissance de dieu',
+  'amour de dieu', 'grâce de dieu', 'miséricorde de dieu', 'bonté de dieu', 'fidélité de dieu',
+  'justice de dieu', 'sainteté de dieu', 'vérité de dieu', 'parole de dieu', 'esprit de dieu',
+  'royaume de dieu', 'volonté de dieu', 'plan de dieu', 'promesse de dieu', 'appel de dieu',
+  'don de dieu', 'bénédiction de dieu', 'protection de dieu', 'direction de dieu', 'consolation de dieu',
+  'guérison de dieu', 'miracle de dieu', 'intervention de dieu'
+];
 
-// Mots-clés thématiques STRICTS pour TOUS les thèmes disponibles
-export const strictThematicKeywords: { [key: string]: string[] } = {
-  ...jesusChristKeywords,
-  ...oldTestamentKeywords,
-  ...newTestamentKeywords,
-  ...prophetsKeywords,
-  ...historicalKeywords,
-  ...womenKeywords,
-  ...geographicalKeywords,
-  ...theologicalKeywords,
-  ...culturalKeywords,
+// Mots-clés pour le thème "Vie de Jésus"
+const vieJesusKeywords = [
+  'jésus', 'christ', 'vie de jésus', 'naissance', 'ministère', 'miracles', 'paraboles', 'enseignements',
+  'passion', 'crucifixion', 'résurrection', 'ascension', 'rédempteur', 'sauveur', 'messie', 'fils de dieu',
+  'fils de l\'homme', 'seigneur', 'roi', 'prêtre', 'prophète', 'disciple', 'apôtre', 'marie', 'joseph',
+  'jean-baptiste', 'pierre', 'jacques', 'jean', 'judas', 'philippe', 'barthélemy', 'thomas', 'matthieu',
+  'simon', 'thaddée', 'jacques le mineur', 'paul', 'étienne', 'pilate', 'hérode', 'caïphe', 'anne',
+  'pharisiens', 'sadducéens', 'scribes', 'docteurs de la loi', 'peuple', 'foule', 'enfants', 'femmes',
+  'pêcheurs', 'collecteurs d\'impôts', 'lépreux', 'aveugles', 'boiteux', 'sourds', 'muets', 'possédés',
+  'malades', 'pauvres', 'riches', 'soldats', 'gouverneurs', 'rois', 'empereurs', 'césar', 'rome',
+  'jérusalem', 'bethléem', 'nazareth', 'galilée', 'judée', 'samarie', 'jordanie', 'mer de galilée',
+  'mont des oliviers', 'géthsémani', 'golgotha', 'tombeau', 'cène', 'eucharistie', 'pâque', 'fête',
+  'sabbat', 'synagogue', 'temple', 'prière', 'jeûne', 'aumône', 'amour', 'foi', 'espérance', 'paix',
+  'joie', 'vérité', 'justice', 'sagesse', 'connaissance', 'compréhension', 'sainteté', 'pureté',
+  'humilité', 'obéissance', 'fidélité', 'persévérance', 'amour fraternel', 'compassion', 'miséricorde',
+  'bonté', 'douceur', 'maîtrise de soi', 'patience', 'longanimité', 'bienveillance', 'charité',
+  'aumône', 'offrande', 'dîme', 'culte', 'sacrement', 'ordonnance', 'évangile', 'bonne nouvelle',
+  'témoignage', 'mission', 'évangélisation', 'discipolat', 'croix', 'sang de jésus', 'rédempteur',
+  'sauveur', 'libérateur', 'consolateur', 'avocat', 'médiateur', 'berger', 'porte', 'chemin',
+  'lumière', 'sel', 'levain', 'semence', 'moisson', 'vigne', 'olivier', 'arbre de vie', 'eau vive',
+  'pain de vie', 'rocher', 'forteresse', 'bouclier', 'épée', 'armure', 'couronne', 'trône', 'sceptre',
+  'royaume', 'ville', 'temple', 'maison', 'famille', 'mariage', 'enfant', 'parent', 'frère', 'sœur',
+  'ami', 'voisin', 'étranger', 'pauvre', 'riche', 'esclave', 'libre', 'gouvernement', 'nation',
+  'peuple', 'langue', 'culture', 'art', 'musique', 'danse', 'théâtre', 'littérature', 'poésie',
+  'prose', 'histoire', 'géographie', 'science', 'technologie', 'médecine', 'éducation', 'travail',
+  'économie', 'politique', 'justice sociale', 'environnement', 'paix mondiale', 'unité', 'diversité',
+  'tolérance', 'respect', 'dialogue', 'coopération', 'développement', 'progrès', 'avenir', 'destinée',
+  'éternité', 'amour éternel', 'joie éternelle', 'paix éternelle', 'vie éternelle', 'présence de dieu',
+  'gloire de dieu', 'puissance de dieu', 'sagesse de dieu', 'connaissance de dieu', 'amour de dieu',
+  'grâce de dieu', 'miséricorde de dieu', 'bonté de dieu', 'fidélité de dieu', 'justice de dieu',
+  'sainteté de dieu', 'vérité de dieu', 'parole de dieu', 'esprit de dieu', 'royaume de dieu',
+  'volonté de dieu', 'plan de dieu', 'promesse de dieu', 'appel de dieu', 'don de dieu',
+  'bénédiction de dieu', 'protection de dieu', 'direction de dieu', 'consolation de dieu',
+  'guérison de dieu', 'miracle de dieu', 'intervention de dieu'
+];
+
+// Mots-clés pour Ruth
+const ruthKeywords = [
+  'Ruth', 'Moabite', 'Naomi', 'belle-fille', 'fidélité', 'Boaz', 'glanage', 
+  'rédemption', 'David', 'lignée', 'Orpa', 'Élimélec', 'Machlon', 'Kiljon',
+  'Bethléhem', 'Moab', 'veuve', 'épis', 'rédempteur', 'rachat', 'Obed',
+  'hessed', 'loyauté', 'providence', 'aire', 'battage', 'pieds', 'couverture',
+  'parent', 'généalogie', 'ancêtre', 'Isaï', 'messianique'
+];
+
+export const strictThematicKeywords: Record<string, string[]> = {
+  'overview': overviewKeywords,
+  'vie-jesus': vieJesusKeywords,
   
-  // === NOUVEAUX CONTEXTES PRODUCTION - VIE DE JÉSUS ===
-  'vie-jesus': [
-    'Jésus', 'Christ', 'Messie', 'Fils', 'Dieu', 'Emmanuel', 'Sauveur',
-    'naissance', 'Bethléem', 'crèche', 'Marie', 'Joseph', 'bergers', 'mages',
-    'enfance', 'Nazareth', 'temple', 'docteurs', 'sagesse', 'croissance',
-    'baptême', 'Jean-Baptiste', 'Jourdain', 'Esprit', 'colombe',
-    'ministère', 'Galilée', 'prédication', 'royaume', 'disciples',
-    'passion', 'croix', 'résurrection', 'ascension'
-  ],
-
-  'miracles-jesus': [
-    'miracles', 'signes', 'prodiges', 'puissance', 'autorité', 'foi',
-    'guérisons', 'aveugles', 'paralytiques', 'lépreux', 'sourds', 'muets',
-    'multiplication', 'pains', 'poissons', 'cinq mille', 'quatre mille',
-    'tempête', 'mer', 'marche', 'eau', 'Pierre', 'barque',
-    'résurrections', 'Lazare', 'Jaïrus', 'fille', 'veuve', 'Naïn',
-    'démons', 'esprits', 'impurs', 'Gérasénien', 'légion',
-    'noces', 'Cana', 'eau', 'vin', 'premier', 'signe'
-  ],
-
-  'paraboles-jesus': [
-    'paraboles', 'royaume', 'cieux', 'Dieu', 'enseignement', 'comparaison',
-    'semeur', 'semence', 'terrain', 'épines', 'oiseaux', 'chemin',
-    'bon berger', 'brebis', 'bergerie', 'porte', 'voleur', 'loup',
-    'fils prodigue', 'père', 'miséricorde', 'repentance', 'fête',
-    'bon Samaritain', 'prochain', 'prêtre', 'lévite', 'compassion',
-    'talents', 'serviteur', 'fidèle', 'paresseux', 'enfouir',
-    'vierges', 'sages', 'folles', 'huile', 'lampes', 'époux'
-  ],
-
-  'passion-christ': [
-    'passion', 'souffrance', 'crucifixion', 'croix', 'mort', 'sacrifice',
-    'Gethsémané', 'jardin', 'prière', 'agonie', 'sueur', 'sang',
-    'arrestation', 'Judas', 'baiser', 'trahison', 'trente', 'deniers',
-    'procès', 'Pilate', 'Hérode', 'Caïphe', 'sanhédrin', 'blasphème',
-    'Barabbas', 'foule', 'crucifie', 'flagellation', 'couronne', 'épines',
-    'Golgotha', 'Calvaire', 'INRI', 'larrons', 'sept', 'paroles'
-  ],
-
-  'resurrection': [
-    'résurrection', 'tombeau', 'vide', 'pierre', 'roulée', 'anges',
-    'Marie-Madeleine', 'femmes', 'aromates', 'matin', 'premier', 'jour',
-    'linges', 'suaire', 'Jean', 'Pierre', 'apparitions', 'disciples',
-    'Emmaüs', 'pain', 'Thomas', 'incrédule', 'doigts', 'plaies',
-    'cénacle', 'portes', 'fermées', 'paix', 'pêche', 'Tibériade',
-    'victoire', 'mort', 'corps', 'glorieux', 'spirituel'
-  ],
-
-  // === NOUVEAUX CONTEXTES ÉVÉNEMENTS JÉSUS ===
-  'bapteme-jesus': [
-    'baptême', 'Jean-Baptiste', 'Jésus', 'Jourdain', 'eau', 'immersion',
-    'Esprit-Saint', 'colombe', 'descendre', 'cieux', 'ouverts',
-    'voix', 'Père', 'Fils', 'bien-aimé', 'complaisance', 'agréable',
-    'début', 'ministère', 'manifestation', 'Trinité', 'théophanie'
-  ],
-
-  'transfiguration': [
-    'transfiguration', 'montagne', 'haute', 'Pierre', 'Jacques', 'Jean',
-    'visage', 'soleil', 'vêtements', 'blancs', 'lumière', 'éclatants',
-    'Moïse', 'Élie', 'apparition', 'conversation', 'nuée', 'lumineuse',
-    'voix', 'Père', 'Fils', 'bien-aimé', 'écoutez', 'tentes', 'trois'
-  ],
-
-  'ascension': [
-    'ascension', 'montagne', 'oliviers', 'Béthanie', 'disciples', 'onze',
-    'nuée', 'élevé', 'ciel', 'anges', 'hommes', 'vêtements', 'blancs',
-    'regarder', 'reviendra', 'même', 'manière', 'promesse', 'Esprit-Saint',
-    'Jérusalem', 'attendre', 'puissance', 'témoins', 'bout', 'terre'
-  ],
-
-  'enfance-jesus': [
-    'enfance', 'Jésus', 'naissance', 'Bethléem', 'crèche', 'mangeoire',
-    'bergers', 'champs', 'anges', 'gloire', 'paix', 'hommes',
-    'mages', 'étoile', 'orient', 'or', 'encens', 'myrrhe', 'adoration',
-    'Hérode', 'massacre', 'innocents', 'fuite', 'Égypte', 'Joseph',
-    'Nazareth', 'croissance', 'grâce', 'sagesse', 'temple', 'douze'
-  ],
-
-  // === NOUVEAUX CONTEXTES ÉVANGILES ===
-  'matthieu': [
-    'Matthieu', 'évangile', 'généalogie', 'Abraham', 'David', 'quatorze',
-    'Emmanuel', 'Dieu', 'nous', 'mages', 'étoile', 'or', 'encens', 'myrrhe',
-    'sermon', 'montagne', 'béatitudes', 'heureux', 'pauvres', 'esprit',
-    'Notre', 'Père', 'cieux', 'prière', 'pardon', 'paraboles', 'royaume'
-  ],
-
-  'marc': [
-    'Marc', 'évangile', 'commencement', 'bonne', 'nouvelle', 'Fils', 'Dieu',
-    'Jean-Baptiste', 'précurseur', 'voix', 'désert', 'préparez', 'chemin',
-    'aussitôt', 'immédiatement', 'action', 'mouvement', 'dynamisme',
-    'autorité', 'enseignement', 'démons', 'esprits', 'impurs', 'secret'
-  ],
-
-  'luc': [
-    'Luc', 'évangile', 'Théophile', 'recherche', 'exacte', 'ordre',
-    'Zacharie', 'Élisabeth', 'Jean-Baptiste', 'annonciation', 'Marie',
-    'Magnificat', 'exalte', 'humble', 'miséricorde', 'compassion',
-    'pauvres', 'opprimés', 'bon', 'Samaritain', 'fils', 'prodigue'
-  ],
-
-  'jean-evangeliste': [
-    'Jean', 'évangile', 'Verbe', 'Logos', 'commencement', 'Dieu', 'chair',
-    'lumière', 'ténèbres', 'monde', 'signes', 'sept', 'miracles',
-    'Je suis', 'pain', 'vie', 'berger', 'résurrection', 'chemin',
-    'vérité', 'cep', 'sarments', 'amour', 'bien-aimé', 'disciple'
-  ],
-
-  'actes-apotres': [
-    'Actes', 'apôtres', 'Luc', 'Théophile', 'Esprit-Saint', 'promesse',
-    'Pentecôte', 'langues', 'feu', 'vent', 'Pierre', 'prédication',
-    'trois mille', 'conversion', 'Étienne', 'martyr', 'Saul', 'Paul',
-    'Damas', 'conversion', 'voyages', 'missionnaire', 'païens'
-  ],
-
-  'jean-baptiste': [
-    'Jean-Baptiste', 'précurseur', 'Zacharie', 'Élisabeth', 'Gabriel',
-    'désert', 'Judée', 'prédication', 'repentance', 'baptême', 'Jourdain',
-    'voix', 'crie', 'préparez', 'chemin', 'Élie', 'Agneau', 'Dieu',
-    'Hérode', 'Hérodias', 'prison', 'décapitation', 'Salomé'
-  ],
-
-  // === GÉNÉALOGIE ET CONTEXTES SPÉCIAUX ===
-  'genealogie-jesus': [
-    'Abraham', 'Isaac', 'Jacob', 'Juda', 'David', 'Salomon', 'Joseph', 'Marie',
-    'Booz', 'Ruth', 'Jesse', 'Obed', 'Rahab', 'Tamar', 'Bethsabée',
-    'généalogie', 'lignée', 'descendance', 'fils de', 'engendra',
-    'générations', 'quatorze', 'ascendance', 'ancêtres',
-    'Matthieu', 'Luc', 'évangile', 'naissance', 'Bethléem',
-    'Messie', 'Christ', 'roi', 'tribu', 'maison de David'
-  ],
-
-  // === ÉVANGILES SPÉCIFIQUES ===
-  'evangeliles': [
-    'évangile', 'Matthieu', 'Marc', 'Luc', 'Jean', 'Jésus', 'Christ',
-    'témoignage', 'récit', 'bonne', 'nouvelle', 'message', 'salut',
-    'naissance', 'Bethléem', 'Marie', 'Joseph', 'bergers', 'mages',
-    'baptême', 'Jean-Baptiste', 'Jourdain', 'Esprit', 'colombe',
-    'disciples', 'apôtres', 'Pierre', 'Jacques', 'André', 'Philippe',
-    'miracles', 'guérisons', 'multiplication', 'pains', 'tempête',
-    'paraboles', 'royaume', 'transfiguration', 'passion', 'résurrection'
-  ],
-
-  // === TOUS LES AUTRES THÈMES PRODUCTION ===
-  'ancien-testament': ['Ancien', 'Testament', 'Loi', 'Prophètes', 'Écrits', 'alliance', 'promesses', 'Messie'],
-  'nouveau-testament': ['Nouveau', 'Testament', 'évangiles', 'Actes', 'épîtres', 'Apocalypse', 'Jésus', 'Christ'],
-  
-  // Ajout de tous les autres contextes avec leurs mots-clés spécifiques
-  'vue-densemble': ['Bible', 'Écriture', 'Ancien', 'Nouveau', 'Testament', 'livres', 'alliance', 'salut'],
-  'pentateuque': ['Genèse', 'Exode', 'Lévitique', 'Nombres', 'Deutéronome', 'Moïse', 'Torah', 'création'],
-  'livres-historiques': ['Josué', 'Juges', 'Samuel', 'Rois', 'Chroniques', 'Esdras', 'Néhémie', 'conquête'],
-  'livres-poetiques': ['Job', 'Psaumes', 'Proverbes', 'Ecclésiaste', 'Cantique', 'sagesse', 'louange'],
-  'prophetes': ['Ésaïe', 'Jérémie', 'Ézéchiel', 'Daniel', 'prophétie', 'oracle', 'Messie', 'jugement'],
-  'jesus-christ': ['Jésus', 'Christ', 'Messie', 'Fils', 'Dieu', 'Sauveur', 'incarnation', 'rédemption'],
-  'paul': ['Paul', 'Saul', 'Tarse', 'conversion', 'Damas', 'voyages', 'épîtres', 'justification'],
-  'pierre': ['Pierre', 'Simon', 'Céphas', 'pêcheur', 'clés', 'royaume', 'reniement', 'restauration'],
-  'patriarches': ['Abraham', 'Isaac', 'Jacob', 'Joseph', 'promesses', 'alliance', 'foi', 'obéissance'],
-  'rois': ['Saül', 'David', 'Salomon', 'royaume', 'temple', 'onction', 'fidélité', 'idolâtrie'],
-  'femmes': ['Marie', 'Esther', 'Ruth', 'Déborah', 'Anne', 'Sara', 'Rebecca', 'foi', 'courage']
+  'ruth': ruthKeywords,
 };
