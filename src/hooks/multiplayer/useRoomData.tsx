@@ -12,6 +12,7 @@ interface UseRoomDataProps {
   setCurrentQuestion: (question: QuizQuestion | null) => void;
   setPlayers: React.Dispatch<React.SetStateAction<RoomPlayer[]>>;
   setError: (error: string | null) => void;
+  onInitialized?: () => void;
 }
 
 export const useRoomData = ({
@@ -21,40 +22,26 @@ export const useRoomData = ({
   setIsHost,
   setCurrentQuestion,
   setPlayers,
-  setError
+  setError,
+  onInitialized
 }: UseRoomDataProps) => {
   const isLoadingRef = useRef(false);
-  const lastLoadedRoomId = useRef<string | null>(null);
-  const lastLoadedUserId = useRef<string | null>(null);
+  const hasLoadedRef = useRef(false);
 
   useEffect(() => {
-    // Early return if no roomId or userId
-    if (!roomId || !userId) {
-      console.log('Missing roomId or userId for useRoomData:', { roomId, userId });
-      return;
-    }
-
-    // Skip if already loaded this combination
-    if (lastLoadedRoomId.current === roomId && lastLoadedUserId.current === userId) {
-      console.log('Skipping duplicate room data load for:', roomId, userId);
-      return;
-    }
-
-    // Skip if already loading
-    if (isLoadingRef.current) {
-      console.log('Already loading room data, skipping...');
+    // Early return if no roomId or userId, or already loaded
+    if (!roomId || !userId || hasLoadedRef.current || isLoadingRef.current) {
       return;
     }
 
     const loadRoomData = async () => {
       isLoadingRef.current = true;
-      lastLoadedRoomId.current = roomId;
-      lastLoadedUserId.current = userId;
+      hasLoadedRef.current = true;
 
       try {
         console.log('Loading room data for room:', roomId);
         
-        // Charger la salle
+        // Load room data
         const { data: roomData, error: roomError } = await supabase
           .from('quiz_rooms')
           .select('*')
@@ -80,15 +67,16 @@ export const useRoomData = ({
         });
         setIsHost(roomData.host_id === userId);
 
-        // Charger la question actuelle si le quiz est en cours
+        // Load current question if quiz is playing
         if (roomData.status === 'playing' && roomData.questions && roomData.current_question !== null) {
           const questions = Array.isArray(roomData.questions) ? roomData.questions : [];
           if (questions.length > roomData.current_question) {
+            console.log('Setting current question:', roomData.current_question);
             setCurrentQuestion(questions[roomData.current_question] as unknown as QuizQuestion);
           }
         }
 
-        // Charger les joueurs
+        // Load players
         console.log('Loading players for room:', roomId);
         const { data: playersData, error: playersError } = await supabase
           .from('quiz_room_players')
@@ -107,14 +95,25 @@ export const useRoomData = ({
         // Clear any previous errors
         setError(null);
         
+        // Notify initialization complete
+        onInitialized?.();
+        
       } catch (err) {
         console.error('Erreur lors du chargement de la salle:', err);
         setError('Impossible de charger la salle');
+        hasLoadedRef.current = false; // Reset on error
       } finally {
         isLoadingRef.current = false;
       }
     };
 
     loadRoomData();
-  }, [roomId, userId]); // Only primitive dependencies
+
+    // Cleanup function to reset state if roomId changes
+    return () => {
+      if (hasLoadedRef.current) {
+        hasLoadedRef.current = false;
+      }
+    };
+  }, [roomId, userId]); // Only depend on roomId and userId
 };

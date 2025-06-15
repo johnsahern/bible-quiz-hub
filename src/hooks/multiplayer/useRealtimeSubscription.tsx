@@ -18,37 +18,29 @@ export const useRealtimeSubscription = ({
   setCurrentQuestion
 }: UseRealtimeSubscriptionProps) => {
   const channelRef = useRef<any>(null);
-  const currentRoomIdRef = useRef<string | null>(null);
+  const subscribedRoomIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!roomId) {
-      // Clean up if no roomId
-      if (channelRef.current) {
-        console.log('Cleaning up subscription - no roomId');
-        supabase.removeChannel(channelRef.current);
-        channelRef.current = null;
-        currentRoomIdRef.current = null;
-      }
-      return;
-    }
-
-    // Skip if already subscribed to the same room
-    if (currentRoomIdRef.current === roomId && channelRef.current) {
-      console.log('Already subscribed to room:', roomId);
+    // Don't setup subscription if no roomId or if already subscribed to this room
+    if (!roomId || subscribedRoomIdRef.current === roomId) {
       return;
     }
 
     // Clean up existing channel first
     if (channelRef.current) {
-      console.log('Cleaning up existing channel');
+      console.log('Cleaning up existing realtime subscription');
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
+      subscribedRoomIdRef.current = null;
     }
 
     console.log('Setting up realtime subscription for room:', roomId);
 
+    // Create unique channel name to avoid conflicts
+    const channelName = `room-${roomId}-${Date.now()}`;
+    
     const roomChannel = supabase
-      .channel(`multiplayer-room-${roomId}`)
+      .channel(channelName)
       .on('postgres_changes', 
         { event: '*', schema: 'public', table: 'quiz_rooms', filter: `id=eq.${roomId}` },
         (payload) => {
@@ -61,11 +53,11 @@ export const useRealtimeSubscription = ({
               questions: Array.isArray(newRoom.questions) ? newRoom.questions : []
             });
             
-            // Mettre à jour la question actuelle
+            // Update current question
             if (newRoom.status === 'playing' && newRoom.questions && newRoom.current_question !== null) {
               const questions = Array.isArray(newRoom.questions) ? newRoom.questions : [];
               if (questions.length > newRoom.current_question) {
-                console.log('Setting current question:', newRoom.current_question);
+                console.log('Setting current question from realtime:', newRoom.current_question);
                 setCurrentQuestion(questions[newRoom.current_question] as unknown as QuizQuestion);
               }
             }
@@ -93,23 +85,26 @@ export const useRealtimeSubscription = ({
         }
       );
 
-    // Subscribe and store reference
+    // Subscribe with proper error handling
     roomChannel.subscribe((status) => {
       console.log('Subscription status:', status);
       if (status === 'SUBSCRIBED') {
-        currentRoomIdRef.current = roomId;
+        subscribedRoomIdRef.current = roomId;
+        channelRef.current = roomChannel;
+      } else if (status === 'CHANNEL_ERROR') {
+        console.error('Channel subscription error');
+        subscribedRoomIdRef.current = null;
+        channelRef.current = null;
       }
     });
-    
-    channelRef.current = roomChannel;
 
     return () => {
-      console.log('Cleaning up subscription');
+      console.log('Cleaning up realtime subscription');
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
-        currentRoomIdRef.current = null;
+        subscribedRoomIdRef.current = null;
       }
     };
-  }, [roomId]);
+  }, [roomId]); // Only depend on roomId
 };

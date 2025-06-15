@@ -18,49 +18,63 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
   const [currentQuestion, setCurrentQuestion] = useState<QuizQuestion | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Use refs to prevent hook recreation on each render
-  const stableRoomId = useRef(roomId);
-  const stableUserId = useRef(user?.id);
-  
-  // Update refs only when values actually change
+  // Track if we're currently processing to prevent duplicate operations
+  const processingRef = useRef(false);
+  const lastRoomIdRef = useRef<string | null>(null);
+  const lastUserIdRef = useRef<string | null>(null);
+
+  // Only initialize when we have both roomId and user, and haven't initialized yet
+  const shouldInitialize = Boolean(
+    roomId && 
+    user?.id && 
+    !isInitialized && 
+    !processingRef.current &&
+    (lastRoomIdRef.current !== roomId || lastUserIdRef.current !== user.id)
+  );
+
+  // Update refs when values change
   useEffect(() => {
-    stableRoomId.current = roomId;
-  }, [roomId]);
-  
-  useEffect(() => {
-    stableUserId.current = user?.id;
-  }, [user?.id]);
+    if (roomId) lastRoomIdRef.current = roomId;
+    if (user?.id) lastUserIdRef.current = user.id;
+  }, [roomId, user?.id]);
 
   // Create operations with stable values
-  const roomOperations = useRoomOperations(stableUserId.current);
-  const playerActions = usePlayerActions(stableUserId.current, stableRoomId.current);
-  const quizOperations = useQuizOperations(stableUserId.current, stableRoomId.current, isHost);
+  const roomOperations = useRoomOperations(user?.id);
+  const playerActions = usePlayerActions(user?.id, roomId);
+  const quizOperations = useQuizOperations(user?.id, roomId, isHost);
 
-  // Load room data on mount - only if roomId is provided
+  // Load room data only once when conditions are met
   useRoomData({
-    roomId: stableRoomId.current,
-    userId: stableUserId.current,
+    roomId: shouldInitialize ? roomId : undefined,
+    userId: shouldInitialize ? user?.id : undefined,
     setRoom,
     setIsHost,
     setCurrentQuestion,
     setPlayers,
-    setError
+    setError,
+    onInitialized: () => {
+      setIsInitialized(true);
+      processingRef.current = false;
+    }
   });
 
-  // Set up realtime subscriptions - only if roomId is provided  
+  // Set up realtime subscriptions only after initialization
   useRealtimeSubscription({
-    roomId: stableRoomId.current,
+    roomId: isInitialized ? roomId : undefined,
     setRoom,
     setPlayers,
     setCurrentQuestion
   });
 
-  // Wrapper functions with useCallback to prevent recreating
   const createRoom = useCallback(async (theme: string, difficulty: string, questionCount: number = 10) => {
+    if (processingRef.current) return null;
+    
     console.log('Creating room with params:', { theme, difficulty, questionCount });
     setLoading(true);
     setError(null);
+    processingRef.current = true;
     
     try {
       const result = await roomOperations.createRoom(theme, difficulty, questionCount);
@@ -69,6 +83,7 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
       if (result) {
         setRoom(result);
         setIsHost(true);
+        setIsInitialized(true);
         console.log('Room set successfully, isHost=true');
       }
       return result;
@@ -78,13 +93,17 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
       return null;
     } finally {
       setLoading(false);
+      processingRef.current = false;
     }
   }, [roomOperations]);
 
   const joinRoom = useCallback(async (roomCode: string) => {
+    if (processingRef.current) return false;
+    
     console.log('Joining room with code:', roomCode);
     setLoading(true);
     setError(null);
+    processingRef.current = true;
     
     try {
       const success = await roomOperations.joinRoom(roomCode);
@@ -96,6 +115,7 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
       return false;
     } finally {
       setLoading(false);
+      processingRef.current = false;
     }
   }, [roomOperations]);
 
@@ -108,6 +128,10 @@ export const useMultiplayerRoom = (roomId?: string): UseMultiplayerRoomReturn =>
       setIsHost(false);
       setCurrentQuestion(null);
       setError(null);
+      setIsInitialized(false);
+      processingRef.current = false;
+      lastRoomIdRef.current = null;
+      lastUserIdRef.current = null;
       console.log('Room left successfully');
     } catch (err) {
       console.error('Error leaving room:', err);
