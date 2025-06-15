@@ -1,23 +1,58 @@
 
-import { BiblicalContext } from '../biblical-contexts.ts';
+export const kingsContext = {
+  key: 'rois',
+  title: 'Rois d\'Israël',
+  description: 'Questions sur les rois d\'Israël et de Juda',
+  keywords: [
+    'Saül', 'David', 'Salomon', 'royaume', 'uni', 'divisé', 'Israël', 'Juda',
+    'onction', 'Samuel', 'Bethléem', 'berger', 'Goliath', 'Philistin',
+    'Jérusalem', 'conquête', 'capitale', 'arche', 'alliance', 'trône',
+    'temple', 'construction', 'Hiram', 'Tyr', 'cèdre', 'Liban',
+    'sagesse', 'jugement', 'deux femmes', 'enfant', 'reine', 'Saba',
+    'division', 'Roboam', 'Jéroboam', 'dix tribus', 'deux tribus',
+    'Achab', 'Jézabel', 'Élie', 'Carmel', 'Baal', 'prophètes',
+    'Josias', 'réforme', 'livre', 'Loi', 'Pâque', 'centralisation',
+    'captivité', 'Babylone', 'Nabucodonosor', 'Sédécias', 'destruction'
+  ],
+  context: `
+Tu es un expert en histoire royale d'Israël, spécialisé dans les règnes des rois d'Israël et de Juda.
 
-export const kingsContexts: BiblicalContext[] = [
-  {
-    id: 'david',
-    title: 'David, le Roi selon le Cœur de Dieu',
-    context: 'L\'étude du roi David, berger devenu roi d\'Israël, ancêtre du Messie et psalmiste inspiré. Sa vie illustre l\'élection divine, la foi victorieuse, la repentance sincère et l\'alliance davidique éternelle.',
-    keyVerses: ['1 Samuel 16:7', '2 Samuel 7:12-16', 'Psaume 23', 'Psaume 51', 'Actes 13:22']
-  },
-  {
-    id: 'salomon',
-    title: 'Salomon, le Roi Sage',
-    context: 'L\'étude du roi Salomon, fils de David, connu pour sa sagesse extraordinaire et la construction du Temple de Jérusalem. Son règne glorieux mais aussi sa chute spirituelle enseignent sur les bénédictions et les responsabilités du leadership.',
-    keyVerses: ['1 Rois 3:5-14', '1 Rois 6:1', '1 Rois 8:23', 'Ecclésiaste 12:13']
-  },
-  {
-    id: 'rois-israel',
-    title: 'Les Rois d\'Israël et de Juda',
-    context: 'L\'étude des rois du royaume divisé, leurs succès et leurs échecs spirituels. Cette période enseigne sur l\'importance du leadership pieux et les conséquences de l\'idolâtrie sur les nations.',
-    keyVerses: ['1 Rois 11:11', '2 Chroniques 7:14']
-  }
-];
+CONTEXTE THÉOLOGIQUE SPÉCIALISÉ :
+- Institution de la royauté en Israël
+- Royaume uni sous Saül, David et Salomon
+- Division du royaume (930 av. J.-C.)
+- Royaumes d'Israël (Nord) et de Juda (Sud)
+- Chute de Samarie (722) et de Jérusalem (586)
+
+ROIS MAJEURS :
+- Saül : premier roi, rejeté par Dieu
+- David : roi selon le cœur de Dieu
+- Salomon : roi sage, constructeur du temple
+- Josias : grand réformateur religieux
+- Ézéchias : roi pieux, délivré d'Assyrie
+
+PÉRIODE DU ROYAUME DIVISÉ :
+- Royaume d'Israël : 19 rois, tous impies
+- Royaume de Juda : 20 rois, certains pieux
+- Conflits fraternels et alliances étrangères
+- Ministère prophétique (Élie, Élisée, Ésaïe)
+- Déportations et exil babylonien
+
+THÈMES THÉOLOGIQUES :
+- Élection divine et responsabilité royale
+- Alliance davidique et promesse messianique
+- Fidélité à l'Éternel vs idolâtrie
+- Conséquences de la désobéissance
+- Espoir de restauration
+`,
+  focus_areas: [
+    'Règnes de Saül, David et Salomon',
+    'Construction du temple',
+    'Division du royaume',
+    'Rois d\'Israël et de Juda',
+    'Réformes religieuses',
+    'Prophètes et rois',
+    'Chute des royaumes',
+    'Alliance davidique'
+  ]
+};
