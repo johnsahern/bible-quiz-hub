@@ -2,28 +2,41 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Puzzle, Clock, Star, RotateCcw, CheckCircle } from 'lucide-react';
-import { VersePuzzle } from '@/types/gameTypes';
+import { Puzzle, Clock, Star, RotateCcw, CheckCircle, ArrowLeft } from 'lucide-react';
+import { useVersePuzzles } from '@/hooks/useVersePuzzles';
+import { useVersePuzzleGameLogic } from '@/hooks/useVersePuzzleGameLogic';
+import VersePuzzleGameSetup from './VersePuzzleGameSetup';
 
 interface VersePuzzleGameProps {
-  puzzles: VersePuzzle[];
   onGameComplete: (score: number, timeSpent: number) => void;
 }
 
-const VersePuzzleGame = ({ puzzles, onGameComplete }: VersePuzzleGameProps) => {
-  const [currentPuzzle, setCurrentPuzzle] = useState(0);
-  const [score, setScore] = useState(0);
-  const [selectedWords, setSelectedWords] = useState<number[]>([]);
-  const [availableWords, setAvailableWords] = useState<string[]>([]);
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(60);
-  const [gameStartTime] = useState(Date.now());
+const VersePuzzleGame = ({ onGameComplete }: VersePuzzleGameProps) => {
+  const { puzzles, isLoading, error, generatePuzzles } = useVersePuzzles();
+  const [gameState, setGameState] = useState<'setup' | 'playing' | 'completed'>('setup');
+  
+  const gameLogic = useVersePuzzleGameLogic(puzzles, onGameComplete);
+  const {
+    currentPuzzle,
+    score,
+    selectedWords,
+    availableWords,
+    isCompleted,
+    timeLeft,
+    gameSettings,
+    setTimeLeft,
+    handleWordSelect,
+    handleWordRemove,
+    handleTimeUp,
+    resetPuzzle,
+    startGame,
+    resetGame,
+    calculatePoints
+  } = gameLogic;
 
   useEffect(() => {
-    resetPuzzle();
-  }, [currentPuzzle]);
+    if (gameState !== 'playing') return;
 
-  useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
@@ -35,67 +48,59 @@ const VersePuzzleGame = ({ puzzles, onGameComplete }: VersePuzzleGameProps) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [currentPuzzle]);
+  }, [currentPuzzle, gameState, handleTimeUp, setTimeLeft]);
 
-  const resetPuzzle = () => {
-    const puzzle = puzzles[currentPuzzle];
-    setAvailableWords([...puzzle.scrambledWords]);
-    setSelectedWords([]);
-    setIsCompleted(false);
-    setTimeLeft(60);
+  const handleStartGame = async (theme: string, difficulty: string, puzzleCount: number) => {
+    await generatePuzzles(theme, difficulty, puzzleCount);
+    startGame(theme, difficulty, puzzleCount);
+    setGameState('playing');
   };
 
-  const handleTimeUp = () => {
-    if (!isCompleted) {
-      nextPuzzle();
-    }
+  const handleBackToSetup = () => {
+    setGameState('setup');
+    resetGame();
   };
 
-  const handleWordSelect = (wordIndex: number) => {
-    const word = availableWords[wordIndex];
-    if (!word) return;
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
+        <div className="max-w-2xl mx-auto">
+          <Card className="bg-red-50 border-red-200">
+            <CardContent className="p-6 text-center">
+              <h2 className="text-xl font-semibold text-red-600 mb-4">Erreur</h2>
+              <p className="text-red-600 mb-4">{error}</p>
+              <Button onClick={handleBackToSetup} variant="outline">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Retour à la configuration
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
-    setSelectedWords(prev => [...prev, wordIndex]);
-    setAvailableWords(prev => prev.map((w, i) => i === wordIndex ? '' : w));
+  if (gameState === 'setup') {
+    return <VersePuzzleGameSetup onStartGame={handleStartGame} isLoading={isLoading} />;
+  }
 
-    // Vérifier si le puzzle est terminé
-    const newSelectedWords = [...selectedWords, wordIndex];
-    if (newSelectedWords.length === puzzles[currentPuzzle].correctOrder.length) {
-      checkSolution(newSelectedWords);
-    }
-  };
-
-  const handleWordRemove = (selectedIndex: number) => {
-    const wordIndex = selectedWords[selectedIndex];
-    const word = puzzles[currentPuzzle].scrambledWords[wordIndex];
-
-    setSelectedWords(prev => prev.filter((_, i) => i !== selectedIndex));
-    setAvailableWords(prev => prev.map((w, i) => i === wordIndex ? word : w));
-  };
-
-  const checkSolution = (wordsOrder: number[]) => {
-    const puzzle = puzzles[currentPuzzle];
-    const isCorrect = JSON.stringify(wordsOrder) === JSON.stringify(puzzle.correctOrder);
-    
-    if (isCorrect) {
-      setIsCompleted(true);
-      const bonus = timeLeft > 30 ? 200 : timeLeft > 10 ? 150 : 100;
-      setScore(prev => prev + bonus);
-      
-      setTimeout(() => {
-        nextPuzzle();
-      }, 3000);
-    }
-  };
-
-  const nextPuzzle = () => {
-    if (currentPuzzle < puzzles.length - 1) {
-      setCurrentPuzzle(prev => prev + 1);
-    } else {
-      const timeSpent = Math.floor((Date.now() - gameStartTime) / 1000);
-      onGameComplete(score, timeSpent);
-    }
-  };
+  if (puzzles.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardContent className="p-6 text-center">
+              <p className="text-gray-600 mb-4">Aucun puzzle disponible.</p>
+              <Button onClick={handleBackToSetup}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Retour à la configuration
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   const puzzle = puzzles[currentPuzzle];
 
@@ -104,6 +109,14 @@ const VersePuzzleGame = ({ puzzles, onGameComplete }: VersePuzzleGameProps) => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
+          <Button 
+            variant="outline" 
+            onClick={handleBackToSetup}
+            className="flex items-center space-x-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Retour</span>
+          </Button>
           <div className="flex items-center space-x-2">
             <Puzzle className="w-6 h-6 text-purple-600" />
             <span className="text-lg font-semibold">Puzzle de Versets</span>
@@ -202,8 +215,13 @@ const VersePuzzleGame = ({ puzzles, onGameComplete }: VersePuzzleGameProps) => {
                 <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
                 <h3 className="text-xl font-bold mb-2">Excellent !</h3>
                 <p className="text-gray-600 mb-4">Vous avez recomposé le verset correctement</p>
-                <p className="text-sm text-gray-500 italic">"{puzzle.verse}"</p>
-                <p className="text-xs text-gray-400 mt-2">{puzzle.reference}</p>
+                <p className="text-sm text-gray-500 italic mb-2">"{puzzle.verse}"</p>
+                <p className="text-xs text-gray-400 mb-4">{puzzle.reference}</p>
+                <div className="p-2 bg-green-100 rounded border border-green-300">
+                  <p className="text-sm text-green-700 font-medium">
+                    +{calculatePoints(puzzle.difficulty, timeLeft)} points !
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>

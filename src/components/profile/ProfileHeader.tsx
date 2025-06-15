@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +14,8 @@ import {
   Share2,
   LogOut,
   Users,
-  CheckCircle
+  CheckCircle,
+  Puzzle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 

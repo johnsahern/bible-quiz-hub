@@ -93,7 +93,7 @@ const GameCenter = () => {
         case 'true-false':
           return <TrueFalseGame onGameComplete={handleGameComplete} />;
         case 'verse-puzzle':
-          return <VersePuzzleGame puzzles={mockVersePuzzles} onGameComplete={handleGameComplete} />;
+          return <VersePuzzleGame onGameComplete={handleGameComplete} />;
         default:
           return <div>Mode de jeu en cours de développement</div>;
       }

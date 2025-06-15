@@ -23,6 +23,7 @@ export type Database = {
           true_false_points: number | null
           updated_at: string | null
           username: string | null
+          verse_puzzle_points: number | null
         }
         Insert: {
           avatar_url?: string | null
@@ -37,6 +38,7 @@ export type Database = {
           true_false_points?: number | null
           updated_at?: string | null
           username?: string | null
+          verse_puzzle_points?: number | null
         }
         Update: {
           avatar_url?: string | null
@@ -51,6 +53,7 @@ export type Database = {
           true_false_points?: number | null
           updated_at?: string | null
           username?: string | null
+          verse_puzzle_points?: number | null
         }
         Relationships: []
       }
@@ -291,6 +294,42 @@ export type Database = {
           description?: string | null
           earned_at?: string | null
           id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      verse_puzzle_history: {
+        Row: {
+          completed_puzzles: number
+          created_at: string
+          difficulty: string
+          id: string
+          theme: string
+          time_spent: number
+          total_points: number
+          total_puzzles: number
+          user_id: string
+        }
+        Insert: {
+          completed_puzzles: number
+          created_at?: string
+          difficulty: string
+          id?: string
+          theme: string
+          time_spent: number
+          total_points: number
+          total_puzzles: number
+          user_id: string
+        }
+        Update: {
+          completed_puzzles?: number
+          created_at?: string
+          difficulty?: string
+          id?: string
+          theme?: string
+          time_spent?: number
+          total_points?: number
+          total_puzzles?: number
           user_id?: string
         }
         Relationships: []

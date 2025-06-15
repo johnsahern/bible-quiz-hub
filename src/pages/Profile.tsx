@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -42,6 +41,7 @@ interface ExtendedProfile {
   favorite_theme: string | null;
   multiplayer_points: number;
   true_false_points: number;
+  verse_puzzle_points: number;
   created_at: string;
   updated_at: string;
 }
@@ -120,7 +120,8 @@ const Profile = () => {
     games_played: profile.games_played || 0,
     best_score: profile.best_score || 0,
     multiplayer_points: profile.multiplayer_points || 0,
-    true_false_points: profile.true_false_points || 0
+    true_false_points: profile.true_false_points || 0,
+    verse_puzzle_points: profile.verse_puzzle_points || 0
   };
 
   return (
