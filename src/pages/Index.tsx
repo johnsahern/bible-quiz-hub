@@ -37,9 +37,6 @@ const Index = () => {
             <VerseDuJour language={language} />
           </div>
 
-          {/* Section Lecture & Audio */}
-          <BibleReadingSection language={language} />
-
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             <QuizCard
               icon={<Brain className="w-8 h-8" />}
@@ -68,6 +65,9 @@ const Index = () => {
               route="/games"
             />
           </div>
+
+          {/* Section Lecture & Audio - Après le Centre de Jeux */}
+          <BibleReadingSection language={language} />
 
           {/* Section de progression en bas */}
           <div className="space-y-12">
