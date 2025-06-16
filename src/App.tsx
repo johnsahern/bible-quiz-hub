@@ -28,6 +28,7 @@ const App = () => (
             <Route path="/quiz-solo" element={<SoloQuiz />} />
             <Route path="/centre-jeux" element={<GameCenter />} />
             <Route path="/games" element={<Navigate to="/centre-jeux" replace />} />
+            <Route path="/quiz-multijoueur" element={<Navigate to="/quiz-multijoueur-setup" replace />} />
             <Route path="/quiz-multijoueur-setup" element={<MultiplayerSetup />} />
             <Route path="/quiz-multijoueur/:roomId" element={<MultiplayerQuiz />} />
             <Route path="/profil" element={<Profile />} />

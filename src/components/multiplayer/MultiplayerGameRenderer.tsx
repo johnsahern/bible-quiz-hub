@@ -46,27 +46,48 @@ const MultiplayerGameRenderer: React.FC<MultiplayerGameRendererProps> = ({
       );
       
     case 'crossword':
-      // TODO: Implémenter MultiplayerCrosswordGame
       return (
         <div className="text-white text-center p-8">
-          <h3>Mots Croisés Multijoueur</h3>
-          <p>En cours de développement...</p>
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+            <h3 className="text-2xl font-bold mb-4">🧩 Mots Croisés Multijoueur</h3>
+            <p className="text-white/80 mb-4">
+              Le mode multijoueur pour les mots croisés arrive bientôt !
+            </p>
+            <div className="text-sm text-white/60">
+              En attendant, vous pouvez profiter des mots croisés en mode solo dans le Centre de Jeux.
+            </div>
+          </div>
         </div>
       );
       
     case 'word-search':
-      // TODO: Implémenter MultiplayerWordSearchGame
       return (
         <div className="text-white text-center p-8">
-          <h3>Mots Cachés Multijoueur</h3>
-          <p>En cours de développement...</p>
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+            <h3 className="text-2xl font-bold mb-4">🔍 Mots Cachés Multijoueur</h3>
+            <p className="text-white/80 mb-4">
+              Le mode multijoueur pour les mots cachés arrive bientôt !
+            </p>
+            <div className="text-sm text-white/60">
+              En attendant, vous pouvez profiter des mots cachés en mode solo dans le Centre de Jeux.
+            </div>
+          </div>
         </div>
       );
       
     default:
       // Quiz par défaut
       const currentQuestion = room.game_state?.gameData?.questions?.[room.current_question || 0];
-      if (!currentQuestion) return null;
+      if (!currentQuestion) {
+        return (
+          <div className="text-white text-center p-8">
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+              <h3 className="text-xl font-bold mb-2">Chargement du jeu...</h3>
+              <p className="text-white/70">Préparation des questions en cours</p>
+            </div>
+          </div>
+        );
+      }
       
       return (
         <MultiplayerGame

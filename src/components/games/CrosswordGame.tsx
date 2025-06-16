@@ -104,7 +104,7 @@ const CrosswordGame = ({ onGameComplete }: CrosswordGameProps) => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
         <Card>
           <CardContent className="p-8 text-center">
-            <p className="text-red-600 mb-4">{error || 'Erreur de chargement'}</p>
+            <p className="text-red-600 mb-4">{error || 'Erreur de chargement des mots croisés'}</p>
             <Button onClick={handleBackToSetup}>Retour à la configuration</Button>
           </CardContent>
         </Card>
