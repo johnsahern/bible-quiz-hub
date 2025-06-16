@@ -132,9 +132,9 @@ const MultiplayerSetup: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4">
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
-          <Button onClick={() => navigate('/')} variant="ghost" className="mb-4">
+          <Button onClick={() => navigate('/centre-jeux')} variant="ghost" className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Retour à l'accueil
+            Retour au centre de jeux
           </Button>
         </div>
 
