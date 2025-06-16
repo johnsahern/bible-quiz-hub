@@ -5,8 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Users, Crown, Check, Clock, Play } from 'lucide-react';
 import { QuizRoom, RoomPlayer } from '@/types/multiplayer';
+import { MultiplayerGameConfig } from '@/types/multiplayerGameTypes';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMultiplayerRoom } from '@/hooks/useMultiplayerRoom';
+import { useMultiplayerGameOperations } from '@/hooks/multiplayer/useMultiplayerGameOperations';
+import MultiplayerGameSelector from './MultiplayerGameSelector';
 
 interface MultiplayerLobbyProps {
   room: QuizRoom;
@@ -16,7 +19,8 @@ interface MultiplayerLobbyProps {
 
 const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({ room, players, isHost }) => {
   const { user } = useAuth();
-  const { setPlayerReady, startQuiz } = useMultiplayerRoom(room.id);
+  const { setPlayerReady } = useMultiplayerRoom(room.id);
+  const { startMultiplayerGame } = useMultiplayerGameOperations(user?.id, room.id, isHost);
 
   const readyPlayers = players.filter(p => p.is_ready);
   const canStart = players.length >= 2 && readyPlayers.length === players.length;
@@ -25,6 +29,10 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({ room, players, isHo
   const handleReadyToggle = () => {
     if (!currentPlayer) return;
     setPlayerReady(!currentPlayer.is_ready);
+  };
+
+  const handleGameStart = async (config: MultiplayerGameConfig) => {
+    await startMultiplayerGame(config);
   };
 
   return (
@@ -96,10 +104,11 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({ room, players, isHo
       </div>
 
       {/* Panneau de contrôle */}
-      <div>
+      <div className="space-y-4">
+        {/* Configuration de base */}
         <Card className="bg-white/10 backdrop-blur-sm border-white/20">
           <CardHeader>
-            <CardTitle className="text-white">Configuration</CardTitle>
+            <CardTitle className="text-white">Configuration de base</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -150,14 +159,6 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({ room, players, isHo
                 </Button>
               ) : (
                 <div className="space-y-2">
-                  <Button
-                    onClick={startQuiz}
-                    disabled={!canStart}
-                    className="w-full bg-green-600 hover:bg-green-700"
-                  >
-                    <Play className="w-4 h-4 mr-2" />
-                    Démarrer le quiz
-                  </Button>
                   {!canStart && (
                     <p className="text-white/60 text-xs text-center">
                       {players.length < 2 
@@ -172,8 +173,16 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({ room, players, isHo
           </CardContent>
         </Card>
 
+        {/* Sélecteur de jeu (pour l'hôte) */}
+        {isHost && canStart && $(
+          <MultiplayerGameSelector
+            onGameStart={handleGameStart}
+            loading={false}
+          />
+        )}
+
         {/* Code de la salle */}
-        <Card className="bg-white/10 backdrop-blur-sm border-white/20 mt-4">
+        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
           <CardContent className="p-4 text-center">
             <div className="text-white/70 text-sm mb-1">Code de la salle</div>
             <div className="text-3xl font-bold text-white font-mono tracking-wider">

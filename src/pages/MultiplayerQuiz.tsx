@@ -8,15 +8,15 @@ import { Users, Clock, ArrowLeft } from 'lucide-react';
 import { useMultiplayerRoom } from '@/hooks/useMultiplayerRoom';
 import { useAuth } from '@/contexts/AuthContext';
 import MultiplayerLobby from '@/components/multiplayer/MultiplayerLobby';
-import MultiplayerGame from '@/components/multiplayer/MultiplayerGame';
+import MultiplayerGameRenderer from '@/components/multiplayer/MultiplayerGameRenderer';
 import MultiplayerResults from '@/components/multiplayer/MultiplayerResults';
+import { GameRoomExtended } from '@/types/multiplayerGameTypes';
 
 const MultiplayerQuiz: React.FC = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   
-  // Only call the hook once with roomId
   const multiplayerRoom = useMultiplayerRoom(roomId);
   const { room, players, isHost, currentQuestion, loading, error, leaveRoom } = multiplayerRoom;
 
@@ -63,6 +63,17 @@ const MultiplayerQuiz: React.FC = () => {
     );
   }
 
+  const getGameTypeLabel = (gameType: string) => {
+    const labels = {
+      'quiz': 'Quiz',
+      'true-false': 'Vrai/Faux',
+      'verse-puzzle': 'Puzzle Versets',
+      'crossword': 'Mots Croisés',
+      'word-search': 'Mots Cachés'
+    };
+    return labels[gameType as keyof typeof labels] || gameType;
+  };
+
   const renderRoomHeader = () => (
     <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 mb-6">
       <div className="flex items-center justify-between mb-4">
@@ -70,7 +81,7 @@ const MultiplayerQuiz: React.FC = () => {
           <div>
             <h1 className="text-2xl font-bold text-white">Salle {room.room_code}</h1>
             <p className="text-white/70">
-              {room.theme.replace('-', ' ').toUpperCase()} • {room.difficulty.toUpperCase()}
+              {getGameTypeLabel(room.game_type || 'quiz')} • {room.theme.replace('-', ' ').toUpperCase()} • {room.difficulty.toUpperCase()}
             </p>
           </div>
           <Badge variant={room.status === 'waiting' ? 'secondary' : room.status === 'playing' ? 'default' : 'outline'}>
@@ -96,6 +107,14 @@ const MultiplayerQuiz: React.FC = () => {
     </div>
   );
 
+  // Convertir room en GameRoomExtended pour les jeux
+  const gameRoom: GameRoomExtended = {
+    ...room,
+    game_type: (room as any).game_type || 'quiz',
+    game_data: (room as any).game_data,
+    game_state: (room as any).game_state
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
       <div className="max-w-6xl mx-auto">
@@ -105,12 +124,10 @@ const MultiplayerQuiz: React.FC = () => {
           <MultiplayerLobby room={room} players={players} isHost={isHost} />
         )}
         
-        {room.status === 'playing' && currentQuestion && (
-          <MultiplayerGame 
-            room={room} 
-            players={players} 
-            currentQuestion={currentQuestion}
-            questionIndex={room.current_question || 0}
+        {room.status === 'playing' && (
+          <MultiplayerGameRenderer 
+            room={gameRoom}
+            players={players}
             isHost={isHost}
           />
         )}

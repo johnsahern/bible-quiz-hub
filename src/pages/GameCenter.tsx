@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GameModeSelector from '@/components/games/GameModeSelector';
@@ -9,7 +10,10 @@ import WordSearchGame from '@/components/games/WordSearchGame';
 import { GameMode, TrueFalseQuestion, VersePuzzle, DailyChallenge } from '@/types/gameTypes';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Users, ArrowRight } from 'lucide-react';
+
 type GameState = 'selection' | 'playing' | 'results';
+
 const GameCenter = () => {
   const navigate = useNavigate();
   const [gameState, setGameState] = useState<GameState>('selection');
@@ -37,6 +41,7 @@ const GameCenter = () => {
     difficulty: 'moyen',
     theme: 'moise'
   }];
+
   const mockVersePuzzles: VersePuzzle[] = [{
     id: '1',
     verse: 'Car Dieu a tant aimé le monde',
@@ -46,6 +51,7 @@ const GameCenter = () => {
     difficulty: 'facile',
     theme: 'amour-dieu'
   }];
+
   const mockDailyChallenge: DailyChallenge = {
     id: '1',
     date: new Date().toISOString().split('T')[0],
@@ -53,6 +59,7 @@ const GameCenter = () => {
     isCompleted: false,
     streakCount: 5
   };
+
   const handleModeSelect = (mode: GameMode) => {
     if (mode === 'quiz') {
       navigate('/quiz-solo');
@@ -65,6 +72,7 @@ const GameCenter = () => {
     }
     setGameState('playing');
   };
+
   const handleGameComplete = (score: number, timeSpent: number) => {
     setGameResult({
       score,
@@ -72,23 +80,53 @@ const GameCenter = () => {
     });
     setGameState('results');
   };
+
   const handleDailyChallengeComplete = (correct: boolean) => {
     console.log('Daily challenge completed:', correct);
     // Ici vous pourriez sauvegarder le résultat et mettre à jour la série
   };
+
   const handlePlayAgain = () => {
     setGameState('selection');
     setSelectedMode(null);
     setGameResult(null);
   };
+
   const handleBackToHome = () => {
     navigate('/');
   };
+
   const renderGameContent = () => {
     if (gameState === 'selection') {
-      return <div className="space-y-8">
+      return (
+        <div className="space-y-8">
+          {/* Bouton Multijoueur en haut */}
+          <Card className="bg-gradient-to-r from-purple-600 to-blue-600 border-white/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                    <Users className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white">Multijoueur</h3>
+                    <p className="text-white/80">Jouez avec vos amis en temps réel !</p>
+                  </div>
+                </div>
+                <Button 
+                  onClick={() => navigate('/quiz-multijoueur-setup')}
+                  className="bg-white text-purple-600 hover:bg-white/90"
+                >
+                  Rejoindre
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           <GameModeSelector onModeSelect={handleModeSelect} />
-        </div>;
+        </div>
+      );
     }
 
     if (gameState === 'playing') {
@@ -107,7 +145,8 @@ const GameCenter = () => {
     }
 
     if (gameState === 'results' && gameResult) {
-      return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4">
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4">
           <div className="max-w-2xl mx-auto">
             <Card>
               <CardHeader>
@@ -133,12 +172,18 @@ const GameCenter = () => {
               </CardContent>
             </Card>
           </div>
-        </div>;
+        </div>
+      );
     }
+
     return null;
   };
-  return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       {renderGameContent()}
-    </div>;
+    </div>
+  );
 };
+
 export default GameCenter;
