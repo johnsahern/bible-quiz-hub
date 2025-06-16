@@ -10,7 +10,7 @@ import WordSearchGame from '@/components/games/WordSearchGame';
 import { GameMode, TrueFalseQuestion, VersePuzzle, DailyChallenge } from '@/types/gameTypes';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, ArrowRight } from 'lucide-react';
+import { Users, ArrowRight, ArrowLeft } from 'lucide-react';
 
 type GameState = 'selection' | 'playing' | 'results';
 
@@ -96,10 +96,25 @@ const GameCenter = () => {
     navigate('/');
   };
 
+  const handleBackToSelection = () => {
+    setGameState('selection');
+    setSelectedMode(null);
+  };
+
   const renderGameContent = () => {
     if (gameState === 'selection') {
       return (
         <div className="space-y-8">
+          {/* Header avec navigation */}
+          <div className="flex items-center justify-between mb-8">
+            <Button onClick={handleBackToHome} variant="ghost">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Retour à l'accueil
+            </Button>
+            <h1 className="text-3xl font-bold text-center">Centre de Jeux</h1>
+            <div></div>
+          </div>
+
           {/* Bouton Multijoueur en haut */}
           <Card className="bg-gradient-to-r from-purple-600 to-blue-600 border-white/20">
             <CardContent className="p-6">
@@ -130,18 +145,31 @@ const GameCenter = () => {
     }
 
     if (gameState === 'playing') {
-      switch (selectedMode) {
-        case 'true-false':
-          return <TrueFalseGame onGameComplete={handleGameComplete} />;
-        case 'verse-puzzle':
-          return <VersePuzzleGame onGameComplete={handleGameComplete} />;
-        case 'crossword':
-          return <CrosswordGame onGameComplete={handleGameComplete} />;
-        case 'word-search':
-          return <WordSearchGame onGameComplete={handleGameComplete} />;
-        default:
-          return <div>Mode de jeu en cours de développement</div>;
-      }
+      return (
+        <div>
+          <div className="mb-6">
+            <Button onClick={handleBackToSelection} variant="ghost">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Retour à la sélection
+            </Button>
+          </div>
+          
+          {(() => {
+            switch (selectedMode) {
+              case 'true-false':
+                return <TrueFalseGame onGameComplete={handleGameComplete} />;
+              case 'verse-puzzle':
+                return <VersePuzzleGame onGameComplete={handleGameComplete} />;
+              case 'crossword':
+                return <CrosswordGame onGameComplete={handleGameComplete} />;
+              case 'word-search':
+                return <WordSearchGame onGameComplete={handleGameComplete} />;
+              default:
+                return <div>Mode de jeu en cours de développement</div>;
+            }
+          })()}
+        </div>
+      );
     }
 
     if (gameState === 'results' && gameResult) {
@@ -180,8 +208,10 @@ const GameCenter = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-      {renderGameContent()}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4">
+      <div className="max-w-6xl mx-auto">
+        {renderGameContent()}
+      </div>
     </div>
   );
 };

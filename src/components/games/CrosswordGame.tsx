@@ -125,7 +125,7 @@ const CrosswordGame = ({ onGameComplete }: CrosswordGameProps) => {
               </Button>
               <CardTitle className="flex items-center gap-2">
                 <Grid3x3 className="w-6 h-6 text-blue-600" />
-                Mots Croisés - {gameSettings?.theme}
+                Mots Croisés - {gameSettings?.theme?.replace('-', ' ')}
               </CardTitle>
               <Badge variant="outline">{gameSettings?.difficulty}</Badge>
             </div>
@@ -225,7 +225,7 @@ const CrosswordGame = ({ onGameComplete }: CrosswordGameProps) => {
                             }}
                             placeholder={`${word.length} lettres`}
                             maxLength={word.length}
-                            className="text-xs"
+                            className="text-sm"
                           />
                           <Button 
                             size="sm" 

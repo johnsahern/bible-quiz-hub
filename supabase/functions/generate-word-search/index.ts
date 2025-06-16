@@ -20,6 +20,17 @@ const difficultyConfig = {
   difficile: { gridSize: 18, wordCount: 15, minWordLength: 6, maxWordLength: 12 }
 };
 
+const themeContexts = {
+  'jesus-christ': 'Jésus-Christ, sa vie, ses enseignements, ses miracles, sa crucifixion, sa résurrection',
+  'ancien-testament': 'Ancien Testament, patriarches, prophètes, rois d\'Israël, livres historiques',
+  'nouveau-testament': 'Nouveau Testament, apôtres, épîtres, évangiles, église primitive',
+  'prophetes': 'Prophètes bibliques, leurs messages, leurs époques, leurs livres',
+  'miracles': 'Miracles bibliques, guérisons, prodiges, interventions divines',
+  'paraboles': 'Paraboles de Jésus, leurs enseignements, leurs significations',
+  'geographie': 'Géographie biblique, villes, pays, montagnes, rivières',
+  'fetes-celebrations': 'Fêtes juives, célébrations bibliques, rituels, traditions'
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -33,10 +44,11 @@ serve(async (req) => {
     }
 
     const config = difficultyConfig[difficulty];
+    const themeContext = themeContexts[theme as keyof typeof themeContexts] || 'Bible, personnages et événements bibliques';
     
     const prompt = `Génère une liste de mots bibliques pour un jeu de mots cachés.
 
-Thème: ${theme}
+Thème: ${themeContext}
 Difficulté: ${difficulty}
 Nombre de mots: ${config.wordCount}
 Longueur des mots: entre ${config.minWordLength} et ${config.maxWordLength} lettres
@@ -58,9 +70,9 @@ FORMAT DE RÉPONSE OBLIGATOIRE - Réponds uniquement avec un objet JSON:
 }
 
 Exemples de mots selon le thème:
-- Si c'est "Jesus Christ": JESUS, CHRIST, CROIX, AMOUR, PAIX, SALUT, GRACE, PARDON
-- Si c'est "Ancien Testament": MOISE, DAVID, ABRAHAM, ISAAC, JACOB, EGYPT, EXODE, ALLIANCE
-- Si c'est "Nouveau Testament": PAUL, PIERRE, JEAN, MATTHIEU, MARC, LUC, ACTES, EGLISE
+- Si c'est "jesus-christ": JESUS, CHRIST, CROIX, AMOUR, PAIX, SALUT, GRACE, PARDON
+- Si c'est "ancien-testament": MOISE, DAVID, ABRAHAM, ISAAC, JACOB, EGYPT, EXODE, ALLIANCE
+- Si c'est "nouveau-testament": PAUL, PIERRE, JEAN, MATTHIEU, MARC, LUC, ACTES, EGLISE
 
 Génère maintenant ${config.wordCount} mots uniques pour le thème "${theme}":`;
 
@@ -71,17 +83,15 @@ Génère maintenant ${config.wordCount} mots uniques pour le thème "${theme}":`
       },
       body: JSON.stringify({
         contents: [{
-          parts: [{
-            text: prompt
-          }]
+          parts: [{ text: prompt }]
         }],
         generationConfig: {
-          temperature: 0.7,
+          temperature: 0.3,
           topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 1024,
+          topP: 0.8,
+          maxOutputTokens: 2048,
         }
-      }),
+      })
     });
 
     if (!response.ok) {
@@ -89,150 +99,136 @@ Génère maintenant ${config.wordCount} mots uniques pour le thème "${theme}":`
     }
 
     const data = await response.json();
-    const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!generatedText) {
-      throw new Error('No response from Gemini API');
+    if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+      throw new Error('Format de réponse Gemini invalide');
     }
 
-    // Nettoyer et parser la réponse
-    const cleanedResponse = generatedText.replace(/```json\n?|\n?```/g, '').trim();
-    let parsedResponse;
+    let responseText = data.candidates[0].content.parts[0].text.trim();
+    responseText = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      responseText = jsonMatch[0];
+    }
+
+    let parsedResponse;
     try {
-      parsedResponse = JSON.parse(cleanedResponse);
+      parsedResponse = JSON.parse(responseText);
     } catch (parseError) {
-      console.error('Parse error:', parseError, 'Response:', cleanedResponse);
-      throw new Error('Invalid JSON response from AI');
+      // Fallback avec des mots prédéfinis
+      const fallbackWords = {
+        'jesus-christ': ['JESUS', 'CHRIST', 'CROIX', 'AMOUR', 'PAIX', 'SALUT', 'GRACE', 'PARDON'],
+        'ancien-testament': ['MOISE', 'DAVID', 'ABRAHAM', 'ISAAC', 'JACOB', 'EGYPT', 'EXODE', 'ALLIANCE'],
+        'nouveau-testament': ['PAUL', 'PIERRE', 'JEAN', 'MATTHIEU', 'MARC', 'LUC', 'ACTES', 'EGLISE']
+      };
+      
+      const words = fallbackWords[theme as keyof typeof fallbackWords] || fallbackWords['jesus-christ'];
+      parsedResponse = {
+        words: words.slice(0, config.wordCount),
+        theme,
+        difficulty
+      };
     }
 
-    // Valider et nettoyer les mots
-    const words = parsedResponse.words || [];
-    const validWords = words
-      .filter((word: string) => 
-        typeof word === 'string' && 
-        word.length >= config.minWordLength && 
-        word.length <= config.maxWordLength &&
-        /^[A-Z]+$/.test(word)
-      )
-      .slice(0, config.wordCount);
-
-    if (validWords.length < Math.floor(config.wordCount * 0.7)) {
-      throw new Error(`Pas assez de mots valides générés: ${validWords.length}/${config.wordCount}`);
+    if (!parsedResponse.words || !Array.isArray(parsedResponse.words)) {
+      throw new Error('Format de mots invalide');
     }
 
-    // Générer la grille
-    const grid = generateWordSearchGrid(validWords, config.gridSize);
+    // Créer la grille de mots cachés
+    const grid = Array(config.gridSize).fill(null).map(() => Array(config.gridSize).fill(''));
+    const placedWords: Array<{word: string, startRow: number, startCol: number, direction: string}> = [];
+
+    // Placer les mots dans la grille
+    parsedResponse.words.forEach((word: string) => {
+      const cleanWord = word.toUpperCase().replace(/[^A-Z]/g, '');
+      if (cleanWord.length >= config.minWordLength && cleanWord.length <= config.maxWordLength) {
+        const placed = placeWordInGrid(grid, cleanWord, config.gridSize);
+        if (placed) {
+          placedWords.push(placed);
+        }
+      }
+    });
+
+    // Remplir les cases vides avec des lettres aléatoires
+    for (let i = 0; i < config.gridSize; i++) {
+      for (let j = 0; j < config.gridSize; j++) {
+        if (grid[i][j] === '') {
+          grid[i][j] = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+        }
+      }
+    }
 
     const result = {
       id: crypto.randomUUID(),
       title: `Mots Cachés - ${theme}`,
       theme,
-      words: validWords,
+      words: placedWords.map(p => p.word),
       grid,
-      difficulty
+      difficulty,
+      placedWords
     };
 
     return new Response(JSON.stringify(result), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
 
   } catch (error) {
-    console.error('Error in generate-word-search function:', error);
-    return new Response(JSON.stringify({ 
-      error: error.message || 'Erreur lors de la génération'
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    console.error('Erreur génération mots cachés:', error);
+    return new Response(
+      JSON.stringify({ 
+        error: error.message || 'Erreur lors de la génération des mots cachés'
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
   }
 });
 
-function generateWordSearchGrid(words: string[], gridSize: number): string[][] {
-  // Créer une grille vide
-  const grid: string[][] = Array(gridSize).fill(null).map(() => Array(gridSize).fill(''));
-  
-  // Directions possibles pour placer les mots
+function placeWordInGrid(grid: string[][], word: string, gridSize: number) {
   const directions = [
-    [0, 1],   // horizontal
-    [1, 0],   // vertical
-    [1, 1],   // diagonal descendante
-    [1, -1],  // diagonal montante
-    [0, -1],  // horizontal inverse
-    [-1, 0],  // vertical inverse
-    [-1, -1], // diagonal descendante inverse
-    [-1, 1]   // diagonal montante inverse
+    { dr: 0, dc: 1, name: 'horizontal' },
+    { dr: 1, dc: 0, name: 'vertical' },
+    { dr: 1, dc: 1, name: 'diagonal' },
+    { dr: 1, dc: -1, name: 'diagonal-reverse' }
   ];
 
-  // Placer chaque mot
-  for (const word of words) {
-    let placed = false;
-    let attempts = 0;
-    const maxAttempts = 100;
+  for (let attempts = 0; attempts < 100; attempts++) {
+    const direction = directions[Math.floor(Math.random() * directions.length)];
+    const startRow = Math.floor(Math.random() * gridSize);
+    const startCol = Math.floor(Math.random() * gridSize);
 
-    while (!placed && attempts < maxAttempts) {
-      const direction = directions[Math.floor(Math.random() * directions.length)];
-      const [dx, dy] = direction;
-      
-      // Position de départ aléatoire
-      const startRow = Math.floor(Math.random() * gridSize);
-      const startCol = Math.floor(Math.random() * gridSize);
-      
-      // Vérifier si le mot peut être placé
-      const canPlace = canPlaceWord(grid, word, startRow, startCol, dx, dy, gridSize);
-      
-      if (canPlace) {
-        // Placer le mot
-        for (let i = 0; i < word.length; i++) {
-          const row = startRow + i * dx;
-          const col = startCol + i * dy;
-          grid[row][col] = word[i];
-        }
-        placed = true;
+    if (canPlaceWord(grid, word, startRow, startCol, direction, gridSize)) {
+      // Placer le mot
+      for (let i = 0; i < word.length; i++) {
+        const row = startRow + i * direction.dr;
+        const col = startCol + i * direction.dc;
+        grid[row][col] = word[i];
       }
-      attempts++;
+      return {
+        word,
+        startRow,
+        startCol,
+        direction: direction.name
+      };
     }
   }
-
-  // Remplir les cases vides avec des lettres aléatoires
-  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  for (let row = 0; row < gridSize; row++) {
-    for (let col = 0; col < gridSize; col++) {
-      if (grid[row][col] === '') {
-        grid[row][col] = letters[Math.floor(Math.random() * letters.length)];
-      }
-    }
-  }
-
-  return grid;
+  return null;
 }
 
-function canPlaceWord(
-  grid: string[][], 
-  word: string, 
-  startRow: number, 
-  startCol: number, 
-  dx: number, 
-  dy: number, 
-  gridSize: number
-): boolean {
-  // Vérifier si le mot sort de la grille
-  const endRow = startRow + (word.length - 1) * dx;
-  const endCol = startCol + (word.length - 1) * dy;
-  
-  if (endRow < 0 || endRow >= gridSize || endCol < 0 || endCol >= gridSize) {
-    return false;
-  }
-
-  // Vérifier si les cases sont libres ou contiennent déjà la bonne lettre
+function canPlaceWord(grid: string[][], word: string, startRow: number, startCol: number, direction: any, gridSize: number): boolean {
   for (let i = 0; i < word.length; i++) {
-    const row = startRow + i * dx;
-    const col = startCol + i * dy;
+    const row = startRow + i * direction.dr;
+    const col = startCol + i * direction.dc;
+    
+    if (row < 0 || row >= gridSize || col < 0 || col >= gridSize) {
+      return false;
+    }
     
     if (grid[row][col] !== '' && grid[row][col] !== word[i]) {
       return false;
     }
   }
-
   return true;
 }
