@@ -1,19 +1,22 @@
 
 -- Ajouter une colonne pour les points Vrai/Faux dans le profil
 ALTER TABLE public.profiles 
-ADD COLUMN true_false_points INTEGER DEFAULT 0;
+ADD COLUMN IF NOT EXISTS true_false_points INTEGER DEFAULT 0;
 
--- Fonction pour mettre à jour les points Vrai/Faux
+-- Supprimer l'ancienne fonction si elle existe
+DROP FUNCTION IF EXISTS public.update_true_false_points();
+
+-- Fonction corrigée pour mettre à jour les points Vrai/Faux
 CREATE OR REPLACE FUNCTION public.update_true_false_points()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER SET search_path = ''
 AS $$
 BEGIN
-  -- Mettre à jour les points Vrai/Faux du profil
+  -- Mettre à jour les points Vrai/Faux du profil avec total_points au lieu de points_earned
   UPDATE public.profiles
   SET 
-    true_false_points = true_false_points + NEW.points_earned,
+    true_false_points = true_false_points + NEW.total_points,
     updated_at = NOW()
   WHERE id = NEW.user_id;
   
@@ -22,7 +25,7 @@ END;
 $$;
 
 -- Créer une table pour stocker l'historique des parties Vrai/Faux
-CREATE TABLE public.true_false_history (
+CREATE TABLE IF NOT EXISTS public.true_false_history (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL,
   theme TEXT NOT NULL,
@@ -37,6 +40,10 @@ CREATE TABLE public.true_false_history (
 -- Activer RLS sur la table d'historique
 ALTER TABLE public.true_false_history ENABLE ROW LEVEL SECURITY;
 
+-- Supprimer les anciennes politiques si elles existent
+DROP POLICY IF EXISTS "Users can view their own true false history" ON public.true_false_history;
+DROP POLICY IF EXISTS "Users can create their own true false history" ON public.true_false_history;
+
 -- Politique pour que les utilisateurs voient seulement leur historique
 CREATE POLICY "Users can view their own true false history" 
   ON public.true_false_history 
@@ -48,6 +55,9 @@ CREATE POLICY "Users can create their own true false history"
   ON public.true_false_history 
   FOR INSERT 
   WITH CHECK (auth.uid() = user_id);
+
+-- Supprimer l'ancien trigger s'il existe
+DROP TRIGGER IF EXISTS on_true_false_game_completed ON public.true_false_history;
 
 -- Trigger pour mettre à jour automatiquement les points Vrai/Faux
 CREATE TRIGGER on_true_false_game_completed

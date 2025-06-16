@@ -56,7 +56,7 @@ CONTRAINTES STRICTES :
 - Les mots doivent être en français et liés au thème biblique
 - Évite les mots trop obscurs ou techniques
 
-FORMAT DE RÉPONSE OBLIGATOIRE (JSON) :
+RÉPONSE OBLIGATOIRE EN JSON VALIDE UNIQUEMENT :
 {
   "crossword": {
     "theme": "${theme}",
@@ -64,18 +64,17 @@ FORMAT DE RÉPONSE OBLIGATOIRE (JSON) :
     "gridSize": ${gridSize},
     "words": [
       {
-        "word": "MOT_MAJUSCULES",
-        "clue": "Indice clair et précis",
+        "word": "JESUS",
+        "clue": "Le Fils de Dieu",
         "startRow": 0,
         "startCol": 0,
         "direction": "horizontal",
-        "length": 3
+        "length": 5
       }
     ],
     "grid": [
-      ["M", "O", "T", null, null, ...],
-      [null, null, null, null, null, ...],
-      ...
+      ["J", "E", "S", "U", "S", null, null, null, null, null],
+      [null, null, null, null, null, null, null, null, null, null]
     ]
   }
 }
@@ -83,9 +82,8 @@ FORMAT DE RÉPONSE OBLIGATOIRE (JSON) :
 IMPORTANT :
 - Les mots doivent s'entrecroire correctement
 - Utilise "horizontal" ou "vertical" pour direction
-- Les coordonnées startRow/startCol doivent être valides
-- Remplis la grille avec les lettres ou null pour les cases vides
-- Assure-toi que la grille est exactement ${gridSize}x${gridSize}`
+- Remplis exactement ${gridSize} lignes et ${gridSize} colonnes dans la grille
+- RÉPONDS UNIQUEMENT AVEC DU JSON VALIDE, AUCUN AUTRE TEXTE`
 
     console.log('📤 Envoi de la requête à Gemini API...')
     
@@ -99,9 +97,9 @@ IMPORTANT :
             parts: [{ text: prompt }]
           }],
           generationConfig: {
-            temperature: 0.7,
+            temperature: 0.3,
             topK: 40,
-            topP: 0.95,
+            topP: 0.8,
             maxOutputTokens: 4096,
           }
         })
@@ -123,26 +121,72 @@ IMPORTANT :
 
     let responseText = data.candidates[0].content.parts[0].text.trim()
     
-    // Nettoyer la réponse
+    // Nettoyage amélioré de la réponse
     responseText = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
     
-    console.log('🧹 Nettoyage de la réponse:', responseText.substring(0, 200) + '...')
+    // Extraire le JSON principal
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      responseText = jsonMatch[0]
+    }
+    
+    console.log('🧹 JSON extrait:', responseText.substring(0, 200) + '...')
 
     let parsedResponse
     try {
       parsedResponse = JSON.parse(responseText)
     } catch (parseError) {
       console.error('❌ Erreur parsing JSON:', parseError)
-      throw new Error('Impossible de parser la réponse de l\'IA')
+      console.error('❌ Contenu problématique:', responseText)
+      
+      // Fallback avec un mots croisés simple
+      const fallbackCrossword = {
+        crossword: {
+          id: crypto.randomUUID(),
+          theme,
+          difficulty,
+          gridSize,
+          words: [
+            {
+              word: "JESUS",
+              clue: "Le Fils de Dieu",
+              startRow: 0,
+              startCol: 0,
+              direction: "horizontal",
+              length: 5
+            },
+            {
+              word: "DIEU",
+              clue: "Le Créateur",
+              startRow: 0,
+              startCol: 0,
+              direction: "vertical",
+              length: 4
+            }
+          ],
+          grid: Array(gridSize).fill(null).map(() => Array(gridSize).fill(null))
+        }
+      }
+      
+      // Placer les mots dans la grille de fallback
+      fallbackCrossword.crossword.grid[0][0] = "D"
+      fallbackCrossword.crossword.grid[0][1] = "I"
+      fallbackCrossword.crossword.grid[0][2] = "E"
+      fallbackCrossword.crossword.grid[0][3] = "U"
+      fallbackCrossword.crossword.grid[1][0] = "J"
+      
+      return new Response(JSON.stringify(fallbackCrossword), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
     }
 
     const crossword = parsedResponse.crossword
-    if (!crossword || !crossword.words || !Array.isArray(crossword.words) || !crossword.grid) {
+    if (!crossword || !crossword.words || !Array.isArray(crossword.words)) {
       console.error('❌ Structure de mots croisés invalide:', parsedResponse)
       throw new Error('Structure de mots croisés invalide')
     }
 
-    // Validation des mots
+    // Validation et nettoyage des mots
     const validWords = crossword.words.filter(word => 
       word.word && 
       word.clue && 
@@ -164,9 +208,9 @@ IMPORTANT :
     validWords.forEach(word => {
       const { word: wordText, startRow, startCol, direction } = word
       for (let i = 0; i < wordText.length; i++) {
-        if (direction === 'horizontal' && startCol + i < gridSize) {
+        if (direction === 'horizontal' && startCol + i < gridSize && startRow < gridSize) {
           grid[startRow][startCol + i] = wordText[i]
-        } else if (direction === 'vertical' && startRow + i < gridSize) {
+        } else if (direction === 'vertical' && startRow + i < gridSize && startCol < gridSize) {
           grid[startRow + i][startCol] = wordText[i]
         }
       }

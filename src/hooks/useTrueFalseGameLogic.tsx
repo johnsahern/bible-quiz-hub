@@ -83,6 +83,16 @@ export const useTrueFalseGameLogic = (
     
     if (user && gameSettings) {
       try {
+        console.log('💾 Sauvegarde historique Vrai/Faux:', {
+          user_id: user.id,
+          theme: gameSettings.theme,
+          difficulty: gameSettings.difficulty,
+          total_questions: questions.length,
+          correct_answers: correctAnswers,
+          total_points: score, // Utilise total_points pour correspondre au trigger
+          time_spent: timeSpent
+        });
+
         const { error } = await supabase
           .from('true_false_history')
           .insert({
@@ -91,17 +101,17 @@ export const useTrueFalseGameLogic = (
             difficulty: gameSettings.difficulty,
             total_questions: questions.length,
             correct_answers: correctAnswers,
-            total_points: score,
+            total_points: score, // Corrigé : utilise total_points
             time_spent: timeSpent
           });
 
         if (error) {
-          console.error('Erreur sauvegarde historique Vrai/Faux:', error);
+          console.error('❌ Erreur sauvegarde historique Vrai/Faux:', error);
         } else {
           console.log('✅ Historique Vrai/Faux sauvegardé avec succès');
         }
       } catch (err) {
-        console.error('Erreur lors de la sauvegarde:', err);
+        console.error('❌ Erreur lors de la sauvegarde:', err);
       }
     }
 
