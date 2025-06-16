@@ -220,8 +220,7 @@ const MultiplayerVersePuzzleGame: React.FC<MultiplayerVersePuzzleGameProps> = ({
                 }
               </p>
               <p className="text-white/70 text-sm mt-1">
-                Verset correct : {currentPuzz
-le.verse}
+                Verset correct : {currentPuzzle.verse}
               </p>
             </div>
           )}
