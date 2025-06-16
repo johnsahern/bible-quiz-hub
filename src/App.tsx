@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
-import QuizSolo from "./pages/QuizSolo";
+import SoloQuiz from "./pages/SoloQuiz";
 import GameCenter from "./pages/GameCenter";
 import MultiplayerSetup from "./pages/MultiplayerSetup";
 import MultiplayerQuiz from "./pages/MultiplayerQuiz";
@@ -25,7 +25,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/quiz-solo" element={<QuizSolo />} />
+            <Route path="/quiz-solo" element={<SoloQuiz />} />
             <Route path="/centre-jeux" element={<GameCenter />} />
             <Route path="/quiz-multijoueur-setup" element={<MultiplayerSetup />} />
             <Route path="/quiz-multijoueur/:roomId" element={<MultiplayerQuiz />} />
