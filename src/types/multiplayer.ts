@@ -15,6 +15,9 @@ export interface QuizRoom {
   created_at: string;
   started_at?: string;
   finished_at?: string;
+  game_type?: string;
+  game_data?: any;
+  game_state?: any;
 }
 
 export interface RoomPlayer {

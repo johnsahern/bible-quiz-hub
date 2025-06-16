@@ -174,7 +174,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({ room, players, isHo
         </Card>
 
         {/* Sélecteur de jeu (pour l'hôte) */}
-        {isHost && canStart && $(
+        {isHost && canStart && (
           <MultiplayerGameSelector
             onGameStart={handleGameStart}
             loading={false}
